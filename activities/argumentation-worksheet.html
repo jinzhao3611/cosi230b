@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Argumentation Mining</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #c62828, #e53935); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #c62828; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #ffebee; border-left: 3px solid #e53935; padding: 12px 15px; margin: 12px 0; }
+        .text-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; line-height: 1.8; }
+        .arg-component { padding: 3px 8px; border-radius: 3px; font-weight: 500; }
+        .claim { background: #ffcdd2; color: #b71c1c; }
+        .premise { background: #c8e6c9; color: #1b5e20; }
+        .evidence { background: #bbdefb; color: #0d47a1; }
+        .rebuttal { background: #fff9c4; color: #f57f17; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .arg-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+        .arg-table th, .arg-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .arg-table th { background: #ffebee; }
+        .relation-box { background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; padding: 10px; margin: 10px 0; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #e53935; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #e53935; color: white; border-color: #e53935; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .arg-diagram { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin: 12px 0; font-size: 0.9rem; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #e53935; color: white; }
+        .btn-clear { background: #757575; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Argumentation Mining</h1>
+            <div class="subtitle">Identifying claims, premises, and argumentative relations</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Structured annotation (components + relations)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Argumentation mining automatically identifies the structure of arguments in text: what claims are made, what evidence supports them, and how different arguments relate.</p>
+
+            <div class="definition-box">
+                <p><strong>Claim:</strong> A statement that the author wants the reader to accept</p>
+                <p><strong>Premise:</strong> A reason or justification offered in support of a claim</p>
+                <p><strong>Evidence:</strong> Factual information (data, citations) supporting a premise</p>
+            </div>
+
+            <h3>Argumentative Relations</h3>
+            <table class="arg-table">
+                <tr><th>Relation</th><th>Description</th><th>Example</th></tr>
+                <tr><td><strong>Support</strong></td><td>Premise supports claim</td><td>P: "Exercise reduces stress" → C: "People should exercise"</td></tr>
+                <tr><td><strong>Attack</strong></td><td>Premise undermines claim</td><td>P: "Exercise takes time" → C: "People should exercise"</td></tr>
+                <tr><td><strong>Rebuttal</strong></td><td>Counter-argument to attack</td><td>"But the time investment pays health dividends"</td></tr>
+            </table>
+
+            <h3>Component Labels</h3>
+            <p><span class="arg-component claim">CLAIM</span> <span class="arg-component premise">PREMISE</span> <span class="arg-component evidence">EVIDENCE</span> <span class="arg-component rebuttal">REBUTTAL</span></p>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Identifying Components</h2>
+            <div class="text-box">
+                <p>(1) <span class="arg-component claim">Universities should require all students to take a public speaking course.</span> (2) <span class="arg-component premise">Communication skills are essential in virtually every career.</span> (3) <span class="arg-component evidence">A 2023 LinkedIn survey found that 89% of employers rank communication as the most valued soft skill.</span></p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Verify the component labels above and identify the relations:</p>
+                <div class="relation-box">
+                    <p>Sentence (2) <select name="r1a"><option value="">relates to</option><option value="supports">SUPPORTS</option><option value="attacks">ATTACKS</option><option value="none">NO RELATION</option></select> Sentence (1)</p>
+                    <p>Sentence (3) <select name="r1b"><option value="">relates to</option><option value="supports">SUPPORTS</option><option value="attacks">ATTACKS</option><option value="none">NO RELATION</option></select> Sentence (2)</p>
+                </div>
+                <div class="input-group">
+                    <label>Is sentence (3) evidence for (2) or for (1)?</label>
+                    <textarea placeholder="Discuss direct vs. indirect support..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Implicit Claims</h2>
+            <div class="text-box">
+                <p>The city spent $50 million on the new stadium while three schools remain without air conditioning. Meanwhile, teacher salaries have been frozen for five years.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>What is the implicit claim being made?</p>
+                <div class="input-group">
+                    <textarea placeholder="Write out the unstated claim..."></textarea>
+                </div>
+                <p style="margin-top: 10px;">Should implicit claims be annotated?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q2" value="yes"> Yes, annotate the implied claim</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="no"> No, only annotate explicit claims</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="separate"> Yes, but mark as "implicit"</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="premises"> Just annotate the premises/evidence</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Support vs. Attack</h2>
+            <div class="text-box">
+                <p><strong>Claim:</strong> "Remote work should become the permanent standard for office jobs."</p>
+                <p style="margin-top: 10px;">Classify each statement as supporting or attacking the claim:</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <table class="arg-table">
+                    <tr><th>Statement</th><th>Relation</th></tr>
+                    <tr>
+                        <td>"Studies show remote workers report higher job satisfaction."</td>
+                        <td><select name="q3a"><option value="">Select...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="neither">NEITHER</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"Remote work can lead to feelings of isolation and loneliness."</td>
+                        <td><select name="q3b"><option value="">Select...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="neither">NEITHER</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"Companies save on office space costs with remote workers."</td>
+                        <td><select name="q3c"><option value="">Select...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="neither">NEITHER</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"Collaboration and spontaneous creativity suffer without in-person interaction."</td>
+                        <td><select name="q3d"><option value="">Select...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="neither">NEITHER</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"The technology for effective remote work now exists."</td>
+                        <td><select name="q3e"><option value="">Select...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="neither">NEITHER</option></select></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Complex Argument Structure</h2>
+            <div class="text-box">
+                <p>(A) We should ban plastic bags. (B) They harm marine life. (C) Over 100,000 marine animals die from plastic annually. (D) However, paper bags require more energy to produce. (E) But the long-term environmental cost of plastic is far greater. (F) Plastic takes 500 years to decompose.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Label each component and map the relations:</p>
+                <table class="arg-table">
+                    <tr><th>Sentence</th><th>Component Type</th><th>Relates To</th><th>Relation Type</th></tr>
+                    <tr>
+                        <td>(A)</td>
+                        <td><select name="q4a_type"><option value="">Type...</option><option value="claim">CLAIM</option><option value="premise">PREMISE</option><option value="evidence">EVIDENCE</option><option value="rebuttal">REBUTTAL</option></select></td>
+                        <td><input type="text" style="width: 50px;" name="q4a_target" placeholder="--"></td>
+                        <td><select name="q4a_rel"><option value="">Relation...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="na">N/A</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(B)</td>
+                        <td><select name="q4b_type"><option value="">Type...</option><option value="claim">CLAIM</option><option value="premise">PREMISE</option><option value="evidence">EVIDENCE</option><option value="rebuttal">REBUTTAL</option></select></td>
+                        <td><input type="text" style="width: 50px;" name="q4b_target" placeholder="e.g., A"></td>
+                        <td><select name="q4b_rel"><option value="">Relation...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="na">N/A</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(C)</td>
+                        <td><select name="q4c_type"><option value="">Type...</option><option value="claim">CLAIM</option><option value="premise">PREMISE</option><option value="evidence">EVIDENCE</option><option value="rebuttal">REBUTTAL</option></select></td>
+                        <td><input type="text" style="width: 50px;" name="q4c_target" placeholder=""></td>
+                        <td><select name="q4c_rel"><option value="">Relation...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="na">N/A</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(D)</td>
+                        <td><select name="q4d_type"><option value="">Type...</option><option value="claim">CLAIM</option><option value="premise">PREMISE</option><option value="evidence">EVIDENCE</option><option value="rebuttal">REBUTTAL</option></select></td>
+                        <td><input type="text" style="width: 50px;" name="q4d_target" placeholder=""></td>
+                        <td><select name="q4d_rel"><option value="">Relation...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="na">N/A</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(E)</td>
+                        <td><select name="q4e_type"><option value="">Type...</option><option value="claim">CLAIM</option><option value="premise">PREMISE</option><option value="evidence">EVIDENCE</option><option value="rebuttal">REBUTTAL</option></select></td>
+                        <td><input type="text" style="width: 50px;" name="q4e_target" placeholder=""></td>
+                        <td><select name="q4e_rel"><option value="">Relation...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="na">N/A</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(F)</td>
+                        <td><select name="q4f_type"><option value="">Type...</option><option value="claim">CLAIM</option><option value="premise">PREMISE</option><option value="evidence">EVIDENCE</option><option value="rebuttal">REBUTTAL</option></select></td>
+                        <td><input type="text" style="width: 50px;" name="q4f_target" placeholder=""></td>
+                        <td><select name="q4f_rel"><option value="">Relation...</option><option value="support">SUPPORT</option><option value="attack">ATTACK</option><option value="na">N/A</option></select></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Argument Quality</h2>
+            <div class="text-box">
+                <p><strong>Argument 1:</strong> "We shouldn't trust scientists about climate change because they just want grant money."</p>
+                <p style="margin-top: 10px;"><strong>Argument 2:</strong> "Climate change is real because 97% of climate scientists agree, based on peer-reviewed research analyzing temperature data from the past 150 years."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Evaluate the quality of each argument:</p>
+                <table class="arg-table">
+                    <tr><th>Dimension</th><th>Argument 1</th><th>Argument 2</th></tr>
+                    <tr>
+                        <td>Evidence quality</td>
+                        <td><select name="q5a1"><option value="">Rate...</option><option value="1">1-Poor</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5-Strong</option></select></td>
+                        <td><select name="q5a2"><option value="">Rate...</option><option value="1">1-Poor</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5-Strong</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Logical validity</td>
+                        <td><select name="q5b1"><option value="">Rate...</option><option value="1">1-Fallacious</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5-Valid</option></select></td>
+                        <td><select name="q5b2"><option value="">Rate...</option><option value="1">1-Fallacious</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5-Valid</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Persuasiveness</td>
+                        <td><select name="q5c1"><option value="">Rate...</option><option value="1">1-Weak</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5-Strong</option></select></td>
+                        <td><select name="q5c2"><option value="">Rate...</option><option value="1">1-Weak</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5-Strong</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>What fallacy does Argument 1 commit?</label>
+                    <textarea placeholder="Identify the logical fallacy..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Annotate This Passage</h2>
+            <div class="text-box">
+                <p>Social media should be banned for children under 16. Young minds are particularly susceptible to the addictive design of these platforms. Research from Stanford shows that teen anxiety has increased 70% since smartphones became ubiquitous. Some argue that social media helps kids stay connected, but studies show that online interactions don't provide the same mental health benefits as face-to-face friendships. The potential for cyberbullying is another serious concern, with 37% of teens reporting online harassment.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Identify all argumentative components and their relations:</p>
+                <div class="input-group">
+                    <label>Claims:</label>
+                    <textarea placeholder="List the claims made..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Premises/Evidence:</label>
+                    <textarea placeholder="List the supporting reasons and evidence..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Counter-arguments and rebuttals:</label>
+                    <textarea placeholder="Identify any opposing points and responses..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="boundaries"> Component boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="type"> Component types</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="relations"> Support vs attack</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="implicit"> Implicit claims</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="quality"> Argument quality</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is argumentation mining difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Claims are often implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="structure"> Argument structures vary widely</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Context needed for interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Support/attack can be subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="quality"> Quality assessment requires domain knowledge</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Argumentation is structured reasoning, but structure is often implicit and subjective.</strong></p>
+                <ul>
+                    <li>The same text can be interpreted as having different argument structures</li>
+                    <li>Whether something supports or attacks depends on perspective</li>
+                    <li>Implicit claims and premises are common in natural text</li>
+                    <li>Quality evaluation requires both logical and domain expertise</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('argumentation-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
+            localStorage.setItem('argumentation-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('argumentation-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+                Object.entries(data.inputs || {}).forEach(([name, value]) => {
+                    const i = document.querySelector(`input[type="text"][name="${name}"]`);
+                    if (i) i.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

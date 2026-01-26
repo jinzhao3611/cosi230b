@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Question Answering Annotation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #00796b, #009688); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #00796b; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .definition-box { background: #e0f2f1; border-left: 3px solid #009688; padding: 12px 15px; margin: 12px 0; }
+        .passage-box { background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin: 12px 0; line-height: 1.8; }
+        .passage-box .label { font-weight: 600; color: #00796b; margin-bottom: 8px; font-size: 0.9rem; }
+        .question-card { background: #e3f2fd; border: 1px solid #90caf9; border-radius: 6px; padding: 12px; margin: 12px 0; }
+        .question-card .q-text { font-weight: 500; color: #1976d2; }
+        .answer-input { margin: 10px 0; }
+        .answer-input label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .answer-input input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; }
+        .answer-input input:focus { outline: none; border-color: #009688; }
+        .highlight { background: #ffeb3b; padding: 2px 4px; border-radius: 2px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #009688; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .toggle-btn.active { background: #009688; color: white; border-color: #009688; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .answer-options { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 10px; margin: 10px 0; }
+        .answer-option { padding: 8px; margin: 5px 0; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .answer-option:hover { background: #e0f2f1; }
+        .answer-option input { width: 18px; height: 18px; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #009688; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Question Answering Annotation</h1>
+            <div class="subtitle">Span extraction and answer validation</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Extractive QA / Span selection</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Extractive Question Answering (QA) involves selecting a <strong>span of text</strong> from a passage that answers a given question. This is the task behind systems like SQuAD.</p>
+
+            <div class="definition-box">
+                <p><strong>Extractive QA:</strong> Given a passage and a question, identify the minimal span of text that correctly and completely answers the question.</p>
+            </div>
+
+            <h3>Annotation Challenges</h3>
+            <ul style="margin: 8px 0 8px 20px; font-size: 0.9rem;">
+                <li>Answer span boundaries: where does the answer start/end?</li>
+                <li>Multiple valid answers in the same passage</li>
+                <li>Questions that cannot be answered from the passage</li>
+                <li>Questions requiring inference beyond the text</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Span Selection</h2>
+            <div class="passage-box">
+                <div class="label">Passage 1:</div>
+                <p>The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France. It was constructed from 1887 to 1889 as the entrance to the 1889 World's Fair. The tower is 330 meters tall and was the tallest man-made structure in the world for 41 years until the Chrysler Building was completed in 1930.</p>
+            </div>
+
+            <div class="question-card">
+                <div class="q-text">Q1: When was the Eiffel Tower built?</div>
+            </div>
+            <div class="answer-input">
+                <label>Your answer span (copy exact text from passage):</label>
+                <input type="text" name="a1" placeholder="Select the answer span...">
+            </div>
+
+            <div class="question-card">
+                <div class="q-text">Q2: How tall is the Eiffel Tower?</div>
+            </div>
+            <div class="answer-input">
+                <label>Your answer span:</label>
+                <input type="text" name="a2" placeholder="Select the answer span...">
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>For Q1, which answer span is most appropriate?</p>
+                <div class="answer-options">
+                    <label class="answer-option"><input type="radio" name="q1" value="a"> "1887 to 1889"</label>
+                    <label class="answer-option"><input type="radio" name="q1" value="b"> "from 1887 to 1889"</label>
+                    <label class="answer-option"><input type="radio" name="q1" value="c"> "constructed from 1887 to 1889"</label>
+                    <label class="answer-option"><input type="radio" name="q1" value="d"> "It was constructed from 1887 to 1889"</label>
+                </div>
+                <div class="input-group">
+                    <label>What principle guides span boundary decisions?</label>
+                    <textarea placeholder="Explain how to determine minimal vs. complete answers..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Multiple Valid Answers</h2>
+            <div class="passage-box">
+                <div class="label">Passage 2:</div>
+                <p>Albert Einstein was born in Ulm, Germany on March 14, 1879. The theoretical physicist developed the theory of relativity, one of the two pillars of modern physics. Einstein received the Nobel Prize in Physics in 1921 for his discovery of the law of the photoelectric effect.</p>
+            </div>
+
+            <div class="question-card">
+                <div class="q-text">Q3: Where was Einstein born?</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Multiple spans could answer this question. Which are valid? (Check all)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="ulm"> "Ulm"</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="ulm-germany"> "Ulm, Germany"</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="germany"> "Germany"</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="full"> "in Ulm, Germany"</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How should annotation handle multiple valid answers?</label>
+                    <textarea placeholder="Should all valid spans be annotated, or just one?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Unanswerable Questions</h2>
+            <div class="passage-box">
+                <div class="label">Passage 3:</div>
+                <p>The Amazon rainforest produces approximately 20% of the world's oxygen. It spans across nine countries in South America, with Brazil containing 60% of the forest. The Amazon River, which flows through the forest, is the largest river by discharge volume of water in the world.</p>
+            </div>
+
+            <div class="question-card">
+                <div class="q-text">Q4: How many species live in the Amazon rainforest?</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>This question cannot be answered from the passage. How should it be annotated?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q3" value="closest"> Select closest related span</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="skip"> Skip the question</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="unanswerable"> Mark as "Unanswerable"</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="no-answer"> Leave answer empty</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why is identifying unanswerable questions important for QA systems?</label>
+                    <textarea placeholder="Discuss the implications of unanswerable questions..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Inference-Required Questions</h2>
+            <div class="passage-box">
+                <div class="label">Passage 4:</div>
+                <p>The company reported revenue of $50 million in Q1 and $75 million in Q2. Operating costs remained stable at $30 million per quarter throughout the first half of the year.</p>
+            </div>
+
+            <div class="question-card">
+                <div class="q-text">Q5: What was the company's profit in Q2?</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>The answer ($45 million) requires arithmetic (75 - 30). Can this be answered?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q4" value="no"> No - answer not directly in text</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="spans"> Yes - select both relevant spans</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="inference"> Mark as "Requires inference"</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="calculated"> Provide calculated answer</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Should extractive QA datasets include inference questions?</label>
+                    <textarea placeholder="Discuss the scope of extractive QA..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Question Writing</h2>
+            <div class="passage-box">
+                <div class="label">Passage 5:</div>
+                <p>Marie Curie was awarded two Nobel Prizes: one in Physics (1903, shared with Pierre Curie and Henri Becquerel) and one in Chemistry (1911). She remains the only person to have won Nobel Prizes in two different sciences.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Write 3 questions that can be answered from this passage:</p>
+                <div class="answer-input">
+                    <label>Question 1:</label>
+                    <input type="text" name="written_q1" placeholder="Write a question...">
+                </div>
+                <div class="answer-input">
+                    <label>Question 2:</label>
+                    <input type="text" name="written_q2" placeholder="Write a question...">
+                </div>
+                <div class="answer-input">
+                    <label>Question 3:</label>
+                    <input type="text" name="written_q3" placeholder="Write a question...">
+                </div>
+                <div class="input-group">
+                    <label>What makes a good QA annotation question?</label>
+                    <textarea placeholder="What qualities should questions have?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Group Comparison</h2>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Compare your span selections with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="start"> Span start position</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="end"> Span end position</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="minimal"> Minimal vs. complete spans</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="answerable"> Whether question is answerable</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="multiple"> Which of multiple valid spans</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Why is QA annotation challenging?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="boundaries"> Span boundaries are subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="multiple"> Multiple valid answers exist</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="inference"> Some questions require inference</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="unanswerable"> Identifying unanswerables is hard</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>QA annotation requires balancing precision (exact span) with completeness (sufficient answer), while handling the reality that some questions simply cannot be answered from the given text.</strong></p>
+                <ul>
+                    <li>Span boundaries are conventions, not absolute truths</li>
+                    <li>Multiple valid answers should be acknowledged in annotation</li>
+                    <li>Unanswerable questions are as important as answerable ones</li>
+                    <li>Question quality affects data quality</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea, input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('qa-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], textInputs: [] };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
+            localStorage.setItem('qa-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('qa-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                document.querySelectorAll('input[type="text"]').forEach((t, i) => { if (data.textInputs?.[i]) t.value = data.textInputs[i]; });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

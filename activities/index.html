@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COSI 230B - Natural Language Annotation for Machine Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #003478 0%, #0070ae 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header .course-code {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 15px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: #0070ae;
+            border-bottom-color: #0070ae;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .intro {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .intro h2 {
+            color: #003478;
+            margin-bottom: 15px;
+        }
+
+        .intro p {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #003478;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .worksheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .worksheet-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border-left: 4px solid #0070ae;
+        }
+
+        .worksheet-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .worksheet-card h3 {
+            color: #003478;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .worksheet-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .worksheet-card .tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .worksheet-card .tag.llm {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .worksheet-card .tag.classification {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .worksheet-card .tag.sequence {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .worksheet-card .tag.evaluation {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .category-section {
+            margin-bottom: 50px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-header h2 {
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        .category-header .count {
+            background: #0070ae;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .instructor-tools {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+            color: white;
+        }
+
+        .instructor-tools h2 {
+            margin-bottom: 15px;
+        }
+
+        .instructor-tools p {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .instructor-tools a {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .instructor-tools a:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+
+        footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            nav ul {
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .worksheet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="course-code">COSI 230B</div>
+        <h1>Natural Language Annotation for Machine Learning</h1>
+        <p class="subtitle">Learn the art and science of creating high-quality training data for NLP systems</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#worksheets" class="active">Worksheets</a></li>
+            <li><a href="#traditional">Traditional NLP</a></li>
+            <li><a href="#llm">LLM Tasks</a></li>
+            <li><a href="#instructor">Instructor Tools</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="intro">
+            <h2>About the Worksheets</h2>
+            <p>These interactive worksheets are designed to help you understand the challenges of annotation for various NLP tasks. Each worksheet contains hands-on exercises where you'll annotate real examples, compare your decisions with classmates, and reflect on sources of disagreement.</p>
+            <p><strong>How to use:</strong> Complete the worksheet during class, enter the session code provided by your instructor, and submit your answers to see how the class responded.</p>
+        </div>
+
+        <!-- Traditional NLP Tasks -->
+        <section class="category-section" id="traditional">
+            <div class="category-header">
+                <h2>Traditional NLP Tasks</h2>
+                <span class="count">13 worksheets</span>
+            </div>
+            <div class="worksheet-grid">
+                <a href="toxicity-worksheet.html" class="worksheet-card">
+                    <h3>Toxicity Detection</h3>
+                    <p>Label comments as toxic or not toxic. Explore how sarcasm and context affect interpretation.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="sentiment-worksheet.html" class="worksheet-card">
+                    <h3>Sentiment Analysis</h3>
+                    <p>Determine positive, negative, or neutral sentiment. Handle mixed emotions and implicit opinions.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="sarcasm-worksheet.html" class="worksheet-card">
+                    <h3>Sarcasm Detection</h3>
+                    <p>Identify sarcastic statements. Learn why context and tone are crucial for detection.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="emotion-detection-worksheet.html" class="worksheet-card">
+                    <h3>Emotion Detection</h3>
+                    <p>Classify text into emotions like joy, anger, fear. Handle multi-label and intensity challenges.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="stance-detection-worksheet.html" class="worksheet-card">
+                    <h3>Stance Detection</h3>
+                    <p>Determine if text supports, opposes, or is neutral toward a target. Explore implicit stances.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="ner-worksheet.html" class="worksheet-card">
+                    <h3>Named Entity Recognition</h3>
+                    <p>Identify and classify entities like people, organizations, locations. Handle boundary decisions.</p>
+                    <span class="tag sequence">Sequence Labeling</span>
+                </a>
+
+                <a href="event-extraction-worksheet.html" class="worksheet-card">
+                    <h3>Event Extraction</h3>
+                    <p>Identify events and their participants. Understand triggers and argument structure.</p>
+                    <span class="tag sequence">Sequence Labeling</span>
+                </a>
+
+                <a href="semantic-role-worksheet.html" class="worksheet-card">
+                    <h3>Semantic Role Labeling</h3>
+                    <p>Label who did what to whom. Identify agents, patients, and other semantic roles.</p>
+                    <span class="tag sequence">Sequence Labeling</span>
+                </a>
+
+                <a href="coreference-worksheet.html" class="worksheet-card">
+                    <h3>Coreference Resolution</h3>
+                    <p>Link pronouns and mentions to entities. Handle ambiguous references and bridging.</p>
+                    <span class="tag sequence">Sequence Labeling</span>
+                </a>
+
+                <a href="temporal-annotation-worksheet.html" class="worksheet-card">
+                    <h3>Temporal Annotation</h3>
+                    <p>Mark time expressions and temporal relations. Normalize dates and durations.</p>
+                    <span class="tag sequence">Sequence Labeling</span>
+                </a>
+
+                <a href="relation-extraction-worksheet.html" class="worksheet-card">
+                    <h3>Relation Extraction</h3>
+                    <p>Identify relationships between entities. Handle implicit and multiple relations.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="causal-relation-worksheet.html" class="worksheet-card">
+                    <h3>Causal Relations</h3>
+                    <p>Identify cause-effect relationships. Distinguish correlation from causation.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="word-sense-worksheet.html" class="worksheet-card">
+                    <h3>Word Sense Disambiguation</h3>
+                    <p>Choose the correct meaning of ambiguous words. Explore sense granularity challenges.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- LLM-Related Tasks -->
+        <section class="category-section" id="llm">
+            <div class="category-header">
+                <h2>LLM-Related Tasks</h2>
+                <span class="count">12 worksheets</span>
+            </div>
+            <div class="worksheet-grid">
+                <a href="llm-preference-worksheet.html" class="worksheet-card">
+                    <h3>LLM Preference (RLHF)</h3>
+                    <p>Compare model outputs and choose the better response. The foundation of RLHF training.</p>
+                    <span class="tag llm">LLM</span>
+                </a>
+
+                <a href="hallucination-worksheet.html" class="worksheet-card">
+                    <h3>Hallucination Detection</h3>
+                    <p>Identify when LLMs generate false or unsupported information. Critical for AI safety.</p>
+                    <span class="tag llm">LLM</span>
+                </a>
+
+                <a href="prompt-quality-worksheet.html" class="worksheet-card">
+                    <h3>Prompt Quality Assessment</h3>
+                    <p>Evaluate prompt clarity, specificity, and safety. Learn what makes prompts effective.</p>
+                    <span class="tag llm">LLM</span>
+                </a>
+
+                <a href="summarization-eval-worksheet.html" class="worksheet-card">
+                    <h3>Summarization Evaluation</h3>
+                    <p>Assess summary quality on faithfulness, relevance, and coherence dimensions.</p>
+                    <span class="tag evaluation">Evaluation</span>
+                </a>
+
+                <a href="translation-quality-worksheet.html" class="worksheet-card">
+                    <h3>Translation Quality</h3>
+                    <p>Evaluate machine translation accuracy, fluency, and meaning preservation.</p>
+                    <span class="tag evaluation">Evaluation</span>
+                </a>
+
+                <a href="text-simplification-worksheet.html" class="worksheet-card">
+                    <h3>Text Simplification</h3>
+                    <p>Evaluate if simplified text preserves meaning while improving readability.</p>
+                    <span class="tag evaluation">Evaluation</span>
+                </a>
+
+                <a href="code-review-worksheet.html" class="worksheet-card">
+                    <h3>Code Generation Review</h3>
+                    <p>Evaluate LLM-generated code for correctness, efficiency, and best practices.</p>
+                    <span class="tag llm">LLM</span>
+                </a>
+
+                <a href="qa-annotation-worksheet.html" class="worksheet-card">
+                    <h3>Question Answering</h3>
+                    <p>Select answer spans and handle unanswerable questions. Build QA datasets.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="dialogue-act-worksheet.html" class="worksheet-card">
+                    <h3>Dialogue Act Classification</h3>
+                    <p>Label conversational intents: questions, statements, requests. Build chatbot training data.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="argumentation-worksheet.html" class="worksheet-card">
+                    <h3>Argumentation Mining</h3>
+                    <p>Identify claims, premises, and argument structure. Evaluate reasoning quality.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+
+                <a href="bias-detection-worksheet.html" class="worksheet-card">
+                    <h3>Bias Detection</h3>
+                    <p>Identify various forms of bias in text: gender, racial, political, and more.</p>
+                    <span class="tag llm">LLM</span>
+                </a>
+
+                <a href="implicit-hate-worksheet.html" class="worksheet-card">
+                    <h3>Implicit Hate Speech</h3>
+                    <p>Detect subtle, coded, and implicit forms of hateful content.</p>
+                    <span class="tag classification">Classification</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Instructor Tools -->
+        <section id="instructor">
+            <div class="instructor-tools">
+                <h2>Instructor Dashboard</h2>
+                <p>View real-time student responses, agreement statistics, and Fleiss' Kappa scores during class. Generate session codes and display results on the big screen.</p>
+                <a href="dashboard.html">Open Dashboard</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>COSI 230B - Natural Language Annotation for Machine Learning</p>
+        <p style="margin-top: 10px;">Brandeis University | Instructor: Jin Zhao</p>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Highlight active nav on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

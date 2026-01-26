@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activities - COSI 230B</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .activity-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border-left: 4px solid #0070ae;
+        }
+        .activity-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .activity-card h4 {
+            color: #003478;
+            margin-bottom: 8px;
+        }
+        .activity-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        .activity-card .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        .activity-card .tag.classification { background: #e8f5e9; color: #2e7d32; }
+        .activity-card .tag.sequence { background: #fff3e0; color: #e65100; }
+        .activity-card .tag.llm { background: #f3e5f5; color: #7b1fa2; }
+        .activity-card .tag.evaluation { background: #fce4ec; color: #c2185b; }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 40px 0 20px 0;
+        }
+        .category-header h3 {
+            color: #003478;
+            font-size: 1.3rem;
+        }
+        .category-header .count {
+            background: #0070ae;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+        .instructor-panel {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .instructor-panel h3 {
+            margin-bottom: 10px;
+        }
+        .instructor-panel p {
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        .instructor-panel a {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .instructor-panel a:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="course-code">COSI 230B | Spring 2025</div>
+            <h1>Natural Language Annotation for Machine Learning</h1>
+            <p class="subtitle">In-Class Activities</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="syllabus.html">Syllabus</a></li>
+                <li><a href="schedule.html">Schedule</a></li>
+                <li><a href="lectures.html">Lectures</a></li>
+                <li><a href="activities.html" class="active">Activities</a></li>
+                <li><a href="assignments.html">Assignments</a></li>
+                <li><a href="project.html">Project</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-title">
+            <h2>Annotation Worksheets</h2>
+            <p>Interactive exercises to understand annotation challenges</p>
+        </div>
+
+        <div class="card">
+            <h3>About These Worksheets</h3>
+            <p>These interactive worksheets help you understand the challenges of annotation for various NLP tasks. Each worksheet contains hands-on exercises where you'll annotate real examples, compare your decisions with classmates, and reflect on sources of disagreement.</p>
+            <div class="info-box">
+                <strong>How to use:</strong> Complete the worksheet during class, enter the session code provided by your instructor, and submit your answers to see how the class responded.
+            </div>
+        </div>
+
+        <div class="instructor-panel">
+            <h3>Instructor Dashboard</h3>
+            <p>View real-time student responses, agreement statistics, and text answers during class.</p>
+            <a href="activities/dashboard.html">Open Dashboard</a>
+        </div>
+
+        <!-- Traditional NLP Tasks -->
+        <div class="category-header">
+            <h3>Traditional NLP Tasks</h3>
+            <span class="count">13 worksheets</span>
+        </div>
+        <div class="activity-grid">
+            <a href="activities/toxicity-worksheet.html" class="activity-card">
+                <h4>Toxicity Detection</h4>
+                <p>Label comments as toxic or not toxic. Explore how sarcasm and context affect interpretation.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/sentiment-worksheet.html" class="activity-card">
+                <h4>Sentiment Analysis</h4>
+                <p>Determine positive, negative, or neutral sentiment. Handle mixed emotions and implicit opinions.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/sarcasm-worksheet.html" class="activity-card">
+                <h4>Sarcasm Detection</h4>
+                <p>Identify sarcastic statements. Learn why context and tone are crucial for detection.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/emotion-detection-worksheet.html" class="activity-card">
+                <h4>Emotion Detection</h4>
+                <p>Classify text into emotions like joy, anger, fear. Handle multi-label and intensity challenges.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/stance-detection-worksheet.html" class="activity-card">
+                <h4>Stance Detection</h4>
+                <p>Determine if text supports, opposes, or is neutral toward a target. Explore implicit stances.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/ner-worksheet.html" class="activity-card">
+                <h4>Named Entity Recognition</h4>
+                <p>Identify and classify entities like people, organizations, locations. Handle boundary decisions.</p>
+                <span class="tag sequence">Sequence Labeling</span>
+            </a>
+            <a href="activities/event-extraction-worksheet.html" class="activity-card">
+                <h4>Event Extraction</h4>
+                <p>Identify events and their participants. Understand triggers and argument structure.</p>
+                <span class="tag sequence">Sequence Labeling</span>
+            </a>
+            <a href="activities/semantic-role-worksheet.html" class="activity-card">
+                <h4>Semantic Role Labeling</h4>
+                <p>Label who did what to whom. Identify agents, patients, and other semantic roles.</p>
+                <span class="tag sequence">Sequence Labeling</span>
+            </a>
+            <a href="activities/coreference-worksheet.html" class="activity-card">
+                <h4>Coreference Resolution</h4>
+                <p>Link pronouns and mentions to entities. Handle ambiguous references and bridging.</p>
+                <span class="tag sequence">Sequence Labeling</span>
+            </a>
+            <a href="activities/temporal-annotation-worksheet.html" class="activity-card">
+                <h4>Temporal Annotation</h4>
+                <p>Mark time expressions and temporal relations. Normalize dates and durations.</p>
+                <span class="tag sequence">Sequence Labeling</span>
+            </a>
+            <a href="activities/relation-extraction-worksheet.html" class="activity-card">
+                <h4>Relation Extraction</h4>
+                <p>Identify relationships between entities. Handle implicit and multiple relations.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/causal-relation-worksheet.html" class="activity-card">
+                <h4>Causal Relations</h4>
+                <p>Identify cause-effect relationships. Distinguish correlation from causation.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/word-sense-worksheet.html" class="activity-card">
+                <h4>Word Sense Disambiguation</h4>
+                <p>Choose the correct meaning of ambiguous words. Explore sense granularity challenges.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+        </div>
+
+        <!-- LLM-Related Tasks -->
+        <div class="category-header">
+            <h3>LLM-Related Tasks</h3>
+            <span class="count">12 worksheets</span>
+        </div>
+        <div class="activity-grid">
+            <a href="activities/llm-preference-worksheet.html" class="activity-card">
+                <h4>LLM Preference (RLHF)</h4>
+                <p>Compare model outputs and choose the better response. The foundation of RLHF training.</p>
+                <span class="tag llm">LLM</span>
+            </a>
+            <a href="activities/hallucination-worksheet.html" class="activity-card">
+                <h4>Hallucination Detection</h4>
+                <p>Identify when LLMs generate false or unsupported information. Critical for AI safety.</p>
+                <span class="tag llm">LLM</span>
+            </a>
+            <a href="activities/prompt-quality-worksheet.html" class="activity-card">
+                <h4>Prompt Quality Assessment</h4>
+                <p>Evaluate prompt clarity, specificity, and safety. Learn what makes prompts effective.</p>
+                <span class="tag llm">LLM</span>
+            </a>
+            <a href="activities/summarization-eval-worksheet.html" class="activity-card">
+                <h4>Summarization Evaluation</h4>
+                <p>Assess summary quality on faithfulness, relevance, and coherence dimensions.</p>
+                <span class="tag evaluation">Evaluation</span>
+            </a>
+            <a href="activities/translation-quality-worksheet.html" class="activity-card">
+                <h4>Translation Quality</h4>
+                <p>Evaluate machine translation accuracy, fluency, and meaning preservation.</p>
+                <span class="tag evaluation">Evaluation</span>
+            </a>
+            <a href="activities/text-simplification-worksheet.html" class="activity-card">
+                <h4>Text Simplification</h4>
+                <p>Evaluate if simplified text preserves meaning while improving readability.</p>
+                <span class="tag evaluation">Evaluation</span>
+            </a>
+            <a href="activities/code-review-worksheet.html" class="activity-card">
+                <h4>Code Generation Review</h4>
+                <p>Evaluate LLM-generated code for correctness, efficiency, and best practices.</p>
+                <span class="tag llm">LLM</span>
+            </a>
+            <a href="activities/qa-annotation-worksheet.html" class="activity-card">
+                <h4>Question Answering</h4>
+                <p>Select answer spans and handle unanswerable questions. Build QA datasets.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/dialogue-act-worksheet.html" class="activity-card">
+                <h4>Dialogue Act Classification</h4>
+                <p>Label conversational intents: questions, statements, requests. Build chatbot training data.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/argumentation-worksheet.html" class="activity-card">
+                <h4>Argumentation Mining</h4>
+                <p>Identify claims, premises, and argument structure. Evaluate reasoning quality.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+            <a href="activities/bias-detection-worksheet.html" class="activity-card">
+                <h4>Bias Detection</h4>
+                <p>Identify various forms of bias in text: gender, racial, political, and more.</p>
+                <span class="tag llm">LLM</span>
+            </a>
+            <a href="activities/implicit-hate-worksheet.html" class="activity-card">
+                <h4>Implicit Hate Speech</h4>
+                <p>Detect subtle, coded, and implicit forms of hateful content.</p>
+                <span class="tag classification">Classification</span>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <p>COSI 230B - Natural Language Annotation for Machine Learning</p>
+        <p>Brandeis University | Spring 2025</p>
+    </footer>
+</body>
+</html>

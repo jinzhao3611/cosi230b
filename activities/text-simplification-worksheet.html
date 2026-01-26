@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Text Simplification Evaluation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #00838f, #00acc1); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #00838f; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #e0f7fa; border-left: 3px solid #00acc1; padding: 12px 15px; margin: 12px 0; }
+        .text-pair { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .original-text { background: #fff3e0; padding: 12px; border-radius: 4px; margin-bottom: 10px; }
+        .original-text .label { font-weight: 600; color: #e65100; font-size: 0.85rem; margin-bottom: 6px; }
+        .simplified-text { background: #e0f7fa; padding: 12px; border-radius: 4px; }
+        .simplified-text .label { font-weight: 600; color: #00838f; font-size: 0.85rem; margin-bottom: 6px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .scale-container { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; padding: 10px; background: #f8f9fa; border-radius: 6px; }
+        .scale-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .scale-option input { width: 20px; height: 20px; }
+        .scale-option label { font-size: 0.75rem; text-align: center; max-width: 60px; }
+        .eval-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+        .eval-table th, .eval-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .eval-table th { background: #e0f7fa; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #00acc1; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #00acc1; color: white; border-color: #00acc1; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .operation-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; margin: 2px; }
+        .op-lexical { background: #c8e6c9; color: #2e7d32; }
+        .op-syntactic { background: #bbdefb; color: #1565c0; }
+        .op-delete { background: #ffcdd2; color: #c62828; }
+        .op-split { background: #fff9c4; color: #f9a825; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #00acc1; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Text Simplification Evaluation</h1>
+            <div class="subtitle">Assessing simplified text for readability and meaning preservation</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Multi-dimensional evaluation</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Text simplification makes text easier to read while preserving its meaning. This is important for readers with cognitive disabilities, non-native speakers, and children.</p>
+
+            <div class="definition-box">
+                <p><strong>Text Simplification:</strong> Transforming text to make it more accessible while retaining essential information.</p>
+                <p><strong>Key Challenge:</strong> Balancing simplicity with meaning preservation and naturalness.</p>
+            </div>
+
+            <h3>Simplification Operations</h3>
+            <p><span class="operation-tag op-lexical">Lexical</span> Replace complex words with simpler ones</p>
+            <p><span class="operation-tag op-syntactic">Syntactic</span> Simplify sentence structure</p>
+            <p><span class="operation-tag op-split">Splitting</span> Break long sentences into shorter ones</p>
+            <p><span class="operation-tag op-delete">Deletion</span> Remove non-essential information</p>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Evaluating Simplification Quality</h2>
+            <div class="text-pair">
+                <div class="original-text">
+                    <div class="label">Original:</div>
+                    <p>The pharmaceutical company's quarterly earnings exceeded analysts' expectations, resulting in a significant surge in stock prices during after-hours trading.</p>
+                </div>
+                <div class="simplified-text">
+                    <div class="label">Simplified:</div>
+                    <p>The drug company made more money than expected. Its stock price went up a lot.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Rate this simplification:</p>
+                <table class="eval-table">
+                    <tr><th>Dimension</th><th>Rating (1-5)</th></tr>
+                    <tr>
+                        <td><strong>Simplicity:</strong> Is it easier to read?</td>
+                        <td>
+                            <div class="scale-container" style="padding: 5px;">
+                                <span>1</span>
+                                <input type="radio" name="q1_simp" value="1">
+                                <input type="radio" name="q1_simp" value="2">
+                                <input type="radio" name="q1_simp" value="3">
+                                <input type="radio" name="q1_simp" value="4">
+                                <input type="radio" name="q1_simp" value="5">
+                                <span>5</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Meaning:</strong> Is the meaning preserved?</td>
+                        <td>
+                            <div class="scale-container" style="padding: 5px;">
+                                <span>1</span>
+                                <input type="radio" name="q1_mean" value="1">
+                                <input type="radio" name="q1_mean" value="2">
+                                <input type="radio" name="q1_mean" value="3">
+                                <input type="radio" name="q1_mean" value="4">
+                                <input type="radio" name="q1_mean" value="5">
+                                <span>5</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fluency:</strong> Is it grammatical and natural?</td>
+                        <td>
+                            <div class="scale-container" style="padding: 5px;">
+                                <span>1</span>
+                                <input type="radio" name="q1_flu" value="1">
+                                <input type="radio" name="q1_flu" value="2">
+                                <input type="radio" name="q1_flu" value="3">
+                                <input type="radio" name="q1_flu" value="4">
+                                <input type="radio" name="q1_flu" value="5">
+                                <span>5</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>What information was lost in the simplification?</label>
+                    <textarea placeholder="Identify any missing details..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Identifying Operations</h2>
+            <div class="text-pair">
+                <div class="original-text">
+                    <div class="label">Original:</div>
+                    <p>The government has implemented comprehensive legislation to mitigate the environmental impact of industrial activities, which has been criticized by business leaders as being excessively restrictive.</p>
+                </div>
+                <div class="simplified-text">
+                    <div class="label">Simplified:</div>
+                    <p>The government made new laws to reduce pollution from factories. Business leaders think these laws are too strict.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>What simplification operations were used?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="lexical"> Lexical substitution</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="syntactic"> Syntactic simplification</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="split"> Sentence splitting</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="delete"> Information deletion</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q2" value="reorder"> Reordering</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Give specific examples of each operation used:</label>
+                    <textarea placeholder="e.g., 'implemented' → 'made', 'comprehensive legislation' → 'new laws'..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Over-Simplification</h2>
+            <div class="text-pair">
+                <div class="original-text">
+                    <div class="label">Original:</div>
+                    <p>The patient should take 500mg of the medication twice daily with food, and should avoid consuming alcohol or grapefruit juice, as these may interact with the drug and cause adverse effects.</p>
+                </div>
+                <div class="simplified-text">
+                    <div class="label">Simplified:</div>
+                    <p>Take the medicine with food.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Is this an acceptable simplification?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q3" value="yes"> Yes - simpler is better</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="no"> No - critical information is missing</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="depends"> Depends on the target audience</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="partial"> Partially acceptable - needs dosage info</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What critical information was lost?</label>
+                    <textarea placeholder="List the missing essential details..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Write a better simplification that preserves essential information:</label>
+                    <textarea placeholder="Your improved simplification..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Comparing Simplifications</h2>
+            <div class="text-pair">
+                <div class="original-text">
+                    <div class="label">Original:</div>
+                    <p>Photosynthesis is the process by which plants convert light energy, usually from the sun, into chemical energy that can be later released to fuel the plant's activities.</p>
+                </div>
+            </div>
+
+            <p><strong>Simplification A:</strong></p>
+            <div class="simplified-text">
+                <p>Plants use sunlight to make food. This process is called photosynthesis.</p>
+            </div>
+
+            <p><strong>Simplification B:</strong></p>
+            <div class="simplified-text">
+                <p>Photosynthesis is how plants turn light into energy they can use.</p>
+            </div>
+
+            <p><strong>Simplification C:</strong></p>
+            <div class="simplified-text">
+                <p>Plants need sun to live.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Rank these simplifications from best (1) to worst (3):</p>
+                <table class="eval-table">
+                    <tr><th>Version</th><th>Rank</th><th>Reason</th></tr>
+                    <tr>
+                        <td>A</td>
+                        <td><select name="q4_rank_a"><option value="">Rank...</option><option value="1">1 (Best)</option><option value="2">2</option><option value="3">3 (Worst)</option></select></td>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="q4_reason_a" placeholder="Why?"></td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td><select name="q4_rank_b"><option value="">Rank...</option><option value="1">1 (Best)</option><option value="2">2</option><option value="3">3 (Worst)</option></select></td>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="q4_reason_b" placeholder="Why?"></td>
+                    </tr>
+                    <tr>
+                        <td>C</td>
+                        <td><select name="q4_rank_c"><option value="">Rank...</option><option value="1">1 (Best)</option><option value="2">2</option><option value="3">3 (Worst)</option></select></td>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="q4_reason_c" placeholder="Why?"></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Target Audience Considerations</h2>
+            <div class="text-pair">
+                <div class="original-text">
+                    <div class="label">Original (Legal Document):</div>
+                    <p>The lessee shall be liable for any damages to the premises resulting from negligence or intentional misconduct, exclusive of normal wear and tear.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Write appropriate simplifications for different audiences:</p>
+                <div class="input-group">
+                    <label>For a general adult audience:</label>
+                    <textarea placeholder="Your simplification..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>For someone with limited English proficiency:</label>
+                    <textarea placeholder="Your simplification..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>For a 10-year-old:</label>
+                    <textarea placeholder="Your simplification..."></textarea>
+                </div>
+                <p style="margin-top: 10px;">How did your simplifications differ?</p>
+                <div class="input-group">
+                    <textarea placeholder="Discuss the different approaches..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Evaluating Automatic Simplification</h2>
+            <div class="text-pair">
+                <div class="original-text">
+                    <div class="label">Original:</div>
+                    <p>The committee unanimously approved the proposal after extensive deliberation, despite initial reservations expressed by several members regarding the financial implications.</p>
+                </div>
+                <div class="simplified-text">
+                    <div class="label">System Output:</div>
+                    <p>The committee said yes to the proposal. They talked about it a lot. Some people were worried about money at first.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Evaluate this automatic simplification:</p>
+                <table class="eval-table">
+                    <tr><th>Criterion</th><th>Rating</th></tr>
+                    <tr>
+                        <td>Grammaticality</td>
+                        <td><select name="q6_gram"><option value="">Rate...</option><option value="5">5-Perfect</option><option value="4">4-Minor issues</option><option value="3">3-Some errors</option><option value="2">2-Many errors</option><option value="1">1-Ungrammatical</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Meaning preservation</td>
+                        <td><select name="q6_mean"><option value="">Rate...</option><option value="5">5-Complete</option><option value="4">4-Mostly preserved</option><option value="3">3-Partial</option><option value="2">2-Significant loss</option><option value="1">1-Distorted</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Simplicity</td>
+                        <td><select name="q6_simp"><option value="">Rate...</option><option value="5">5-Much simpler</option><option value="4">4-Simpler</option><option value="3">3-Somewhat simpler</option><option value="2">2-Similar</option><option value="1">1-Not simpler</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Coherence</td>
+                        <td><select name="q6_coh"><option value="">Rate...</option><option value="5">5-Excellent</option><option value="4">4-Good</option><option value="3">3-Adequate</option><option value="2">2-Disjointed</option><option value="1">1-Incoherent</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>What nuance was lost by saying "said yes" instead of "unanimously approved"?</label>
+                    <textarea placeholder="Discuss the semantic difference..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your evaluations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="simplicity"> What counts as "simpler"</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="essential"> What information is essential</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="fluency"> Fluency vs. simplicity tradeoff</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="audience"> Target audience assumptions</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="ranking"> Comparing simplifications</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is text simplification evaluation difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> "Simple" is subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="tradeoff"> Simplicity vs. meaning tradeoff</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="audience"> Audience-dependent</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="valid"> Multiple valid simplifications</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="domain"> Domain affects what's essential</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Good simplification requires balancing multiple competing goals.</strong></p>
+                <ul>
+                    <li>Simplicity and meaning preservation often conflict</li>
+                    <li>What counts as "essential" depends on context and audience</li>
+                    <li>Over-simplification can be dangerous in critical domains (medical, legal)</li>
+                    <li>Multiple valid simplifications exist for most texts</li>
+                    <li>Target audience must guide simplification decisions</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('text-simplification-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
+            localStorage.setItem('text-simplification-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('text-simplification-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+                Object.entries(data.inputs || {}).forEach(([name, value]) => {
+                    const i = document.querySelector(`input[type="text"][name="${name}"]`);
+                    if (i) i.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

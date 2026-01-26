@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignments - COSI 230B</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="course-code">COSI 230B | Spring 2025</div>
+            <h1>Natural Language Annotation for Machine Learning</h1>
+            <p class="subtitle">Homework Assignments</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="syllabus.html">Syllabus</a></li>
+                <li><a href="schedule.html">Schedule</a></li>
+                <li><a href="lectures.html">Lectures</a></li>
+                <li><a href="activities.html">Activities</a></li>
+                <li><a href="assignments.html" class="active">Assignments</a></li>
+                <li><a href="project.html">Project</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-title">
+            <h2>Homework Assignments</h2>
+            <p>5 assignments worth 40% of your final grade</p>
+        </div>
+
+        <div class="card">
+            <h3>Assignment Policy</h3>
+            <p>Each homework assignment has equal weight. Assignments are announced and submitted via MOODLE.</p>
+            <div class="info-box">
+                <strong>Late Policy:</strong> You have <strong>three grace days</strong> total for the semester. No more than <strong>one grace day per assignment</strong>. Additional late submissions receive a 20% penalty per day.
+            </div>
+        </div>
+
+        <!-- HW 0 -->
+        <div class="assignment-box">
+            <h4>Homework 0: Dataset Exploration</h4>
+            <div class="dates">
+                <span><strong>Assigned:</strong> Jan 14 (Week 1)</span>
+                <span><strong>Due:</strong> Jan 21 (Week 2)</span>
+            </div>
+            <p><strong>Description:</strong> Explore existing annotated NLP datasets using a provided worksheet. Analyze datasets to understand annotation schemas, data formats, and task characteristics.</p>
+            <p><strong>Deliverables:</strong> Completed Excel worksheet with dataset analysis</p>
+            <p><strong>Skills:</strong> Dataset analysis, understanding annotation schemas, data format familiarity</p>
+        </div>
+
+        <!-- HW 1 -->
+        <div class="assignment-box">
+            <h4>Homework 1: Annotation Tools Exploration</h4>
+            <div class="dates">
+                <span><strong>Assigned:</strong> Jan 21 (Week 2)</span>
+                <span><strong>Due:</strong> Jan 28 (Week 3)</span>
+            </div>
+            <p><strong>Description:</strong> Hands-on experience with annotation tools and data formats.</p>
+            <p><strong>Tasks:</strong></p>
+            <ul>
+                <li>Set up and use brat annotation tool</li>
+                <li>Set up and use Label Studio</li>
+                <li>Annotate sample data from provided corpora (wikinews, reddit)</li>
+                <li>Compare annotation interfaces and workflows</li>
+            </ul>
+            <p><strong>Deliverables:</strong></p>
+            <ul>
+                <li>Annotated files from brat</li>
+                <li>Annotated files from Label Studio</li>
+                <li>Reflection on tool comparison</li>
+            </ul>
+        </div>
+
+        <!-- HW 2 -->
+        <div class="assignment-box">
+            <h4>Homework 2: Data Wrangling with Pandas</h4>
+            <div class="dates">
+                <span><strong>Assigned:</strong> Mar 9 (Week 9)</span>
+                <span><strong>Due:</strong> Mar 18 (Week 10)</span>
+            </div>
+            <p><strong>Description:</strong> Implement an <code>NLPDataFrame</code> class that extends pandas for NLP annotation tasks.</p>
+            <p><strong>Tasks:</strong></p>
+            <ul>
+                <li>Load data from multiple formats (JSON, CSV, XML)</li>
+                <li>Implement preprocessing methods (lowercase, normalize numbers, strip whitespace/punctuation)</li>
+                <li>Implement summary statistics methods</li>
+                <li>Serialize processed data</li>
+            </ul>
+            <p><strong>Deliverables:</strong></p>
+            <ul>
+                <li>Completed <code>hw2.py</code> file</li>
+                <li>Serialized <code>nlp_data.bz2</code> file</li>
+            </ul>
+        </div>
+
+        <!-- HW 3 -->
+        <div class="assignment-box">
+            <h4>Homework 3: Inter-Annotator Agreement</h4>
+            <div class="dates">
+                <span><strong>Assigned:</strong> Mar 23 (Week 11)</span>
+                <span><strong>Due:</strong> Mar 30 (Week 12)</span>
+            </div>
+            <p><strong>Description:</strong> Calculate agreement metrics for annotation data.</p>
+            <p><strong>Tasks:</strong></p>
+            <ul>
+                <li>Calculate observed agreement for span annotations (token-level and entity-level)</li>
+                <li>Compute Cohen's Kappa for two annotators</li>
+                <li>Compute Fleiss' Kappa for multiple annotators</li>
+                <li>Interpret agreement scores and discuss implications</li>
+            </ul>
+            <p><strong>Deliverables:</strong> Written solutions showing all calculations and work</p>
+        </div>
+
+        <!-- HW 4 -->
+        <div class="assignment-box">
+            <h4>Homework 4: Sentiment Analysis Fine-tuning</h4>
+            <div class="dates">
+                <span><strong>Assigned:</strong> Apr 13 (Week 13)</span>
+                <span><strong>Due:</strong> Apr 22 (Week 14)</span>
+            </div>
+            <p><strong>Description:</strong> Fine-tune a sentiment classifier on annotated movie review data.</p>
+            <p><strong>Tasks:</strong></p>
+            <ul>
+                <li>Load and preprocess the movie review dataset</li>
+                <li>Fine-tune a pre-trained model for sentiment classification</li>
+                <li>Evaluate model performance</li>
+                <li>Analyze results and errors</li>
+            </ul>
+            <p><strong>Deliverables:</strong> Completed Jupyter notebook with code, results, and analysis</p>
+        </div>
+
+        <div class="card">
+            <h3>Submission Guidelines</h3>
+            <ul>
+                <li>All assignments are submitted through MOODLE</li>
+                <li>Follow the naming conventions specified in each assignment</li>
+                <li>Include your name and student ID in all submissions</li>
+                <li>If using generative AI tools, disclose their use as required by course policy</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>COSI 230B - Natural Language Annotation for Machine Learning</p>
+        <p>Brandeis University | Spring 2025</p>
+    </footer>
+</body>
+</html>

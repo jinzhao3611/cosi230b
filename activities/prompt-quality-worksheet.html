@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Prompt Quality Assessment</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #1565c0, #42a5f5); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #1565c0; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .definition-box { background: #e3f2fd; border-left: 3px solid #42a5f5; padding: 12px 15px; margin: 12px 0; }
+        .prompt-card { background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin: 12px 0; }
+        .prompt-card .label { font-weight: 600; color: #1565c0; margin-bottom: 8px; font-size: 0.9rem; }
+        .prompt-card .prompt-text { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 12px; font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; }
+        .rating-scale { display: flex; justify-content: space-between; background: #fafafa; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .rating-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .rating-option input { width: 18px; height: 18px; }
+        .rating-option label { font-size: 0.75rem; text-align: center; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #42a5f5; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .toggle-btn.active { background: #42a5f5; color: white; border-color: #42a5f5; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #42a5f5; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media (max-width: 600px) { .comparison-grid { grid-template-columns: 1fr; } }
+        @media print { body { background: white; } .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; } .toolbar { display: none; } .choices-container { display: block !important; } .toggle-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Prompt Quality Assessment</h1>
+            <div class="subtitle">Evaluating instructions for LLMs and chatbots</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Multi-dimensional quality rating</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>As LLMs become more prevalent, evaluating prompt quality becomes essential. Good prompts lead to better model outputs, while poor prompts lead to confusion, hallucination, or unhelpful responses.</p>
+
+            <div class="definition-box">
+                <p><strong>Prompt Quality Dimensions:</strong></p>
+                <ul style="margin: 5px 0 0 20px;">
+                    <li><strong>Clarity:</strong> Is the instruction unambiguous?</li>
+                    <li><strong>Specificity:</strong> Does it provide enough detail?</li>
+                    <li><strong>Feasibility:</strong> Can the task be reasonably completed?</li>
+                    <li><strong>Safety:</strong> Does it avoid harmful requests?</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Clarity Assessment</h2>
+            <div class="prompt-card">
+                <div class="label">Prompt A:</div>
+                <div class="prompt-text">Write something about dogs.</div>
+            </div>
+            <div class="prompt-card">
+                <div class="label">Prompt B:</div>
+                <div class="prompt-text">Write a 200-word informative paragraph about the health benefits of owning a dog, citing at least two scientific studies.</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Rate the clarity of each prompt (1=very unclear, 5=very clear):</p>
+                <p style="margin: 10px 0;"><strong>Prompt A clarity:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r1a" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r1a" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r1a" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r1a" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r1a" value="5"><label>5</label></div>
+                </div>
+                <p style="margin: 10px 0;"><strong>Prompt B clarity:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r1b" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r1b" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r1b" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r1b" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r1b" value="5"><label>5</label></div>
+                </div>
+                <div class="input-group">
+                    <label>What makes Prompt B clearer?</label>
+                    <textarea placeholder="Identify specific clarity features..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Over-Specification vs. Under-Specification</h2>
+            <div class="prompt-card">
+                <div class="label">Prompt C:</div>
+                <div class="prompt-text">Write a poem about nature using exactly 14 lines with ABAB CDCD EFEF GG rhyme scheme, iambic pentameter, including references to at least 3 specific flowers, 2 birds, and 1 body of water, with a volta in line 9, no words over 3 syllables except proper nouns, in the style of Shakespeare but with modern themes.</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Is Prompt C too specific? Rate its usability:</p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r2" value="1"><label>1<br>Too constrained</label></div>
+                    <div class="rating-option"><input type="radio" name="r2" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r2" value="3"><label>3<br>Just right</label></div>
+                    <div class="rating-option"><input type="radio" name="r2" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r2" value="5"><label>5<br>Not detailed enough</label></div>
+                </div>
+                <div class="input-group">
+                    <label>Which constraints are helpful vs. unnecessary?</label>
+                    <textarea placeholder="Discuss the balance of specification..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Ambiguity Detection</h2>
+            <div class="prompt-card">
+                <div class="label">Prompt D:</div>
+                <div class="prompt-text">Explain the bank.</div>
+            </div>
+            <div class="prompt-card">
+                <div class="label">Prompt E:</div>
+                <div class="prompt-text">Make it shorter.</div>
+            </div>
+            <div class="prompt-card">
+                <div class="label">Prompt F:</div>
+                <div class="prompt-text">Write better code.</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Identify the ambiguity in each prompt:</p>
+                <div class="input-group">
+                    <label>Prompt D ambiguity:</label>
+                    <textarea placeholder="What is ambiguous about 'bank'?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Prompt E ambiguity:</label>
+                    <textarea placeholder="What needs to be shorter? How short?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Prompt F ambiguity:</label>
+                    <textarea placeholder="What code? What does 'better' mean?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Feasibility Assessment</h2>
+            <div class="prompt-card">
+                <div class="label">Prompt G:</div>
+                <div class="prompt-text">Predict exactly what the stock market will do tomorrow with 100% accuracy.</div>
+            </div>
+            <div class="prompt-card">
+                <div class="label">Prompt H:</div>
+                <div class="prompt-text">Summarize the key themes from my private diary that I haven't shared with you.</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Why are these prompts infeasible?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <p style="margin: 10px 0;"><strong>Prompt G is infeasible because:</strong></p>
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4g" value="impossible"> Task is inherently impossible</label>
+                        <label class="radio-option"><input type="radio" name="q4g" value="knowledge"> Requires future knowledge</label>
+                        <label class="radio-option"><input type="radio" name="q4g" value="precision"> Unrealistic precision demanded</label>
+                    </div>
+                    <p style="margin: 10px 0;"><strong>Prompt H is infeasible because:</strong></p>
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4h" value="access"> No access to required information</label>
+                        <label class="radio-option"><input type="radio" name="q4h" value="context"> Missing context</label>
+                        <label class="radio-option"><input type="radio" name="q4h" value="privacy"> Privacy violation</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Safety Evaluation</h2>
+            <div class="prompt-card">
+                <div class="label">Prompt I:</div>
+                <div class="prompt-text">Explain how encryption algorithms work for educational purposes.</div>
+            </div>
+            <div class="prompt-card">
+                <div class="label">Prompt J:</div>
+                <div class="prompt-text">List all the personal information you can find about [real person's name].</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Rate the safety of each prompt (1=unsafe, 5=safe):</p>
+                <p style="margin: 10px 0;"><strong>Prompt I:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r5i" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r5i" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r5i" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r5i" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r5i" value="5"><label>5</label></div>
+                </div>
+                <p style="margin: 10px 0;"><strong>Prompt J:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r5j" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r5j" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r5j" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r5j" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r5j" value="5"><label>5</label></div>
+                </div>
+                <div class="input-group">
+                    <label>What distinguishes educational requests from harmful ones?</label>
+                    <textarea placeholder="Discuss the boundary between legitimate and harmful prompts..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Rewrite Exercise</h2>
+            <div class="prompt-card">
+                <div class="label">Original Prompt:</div>
+                <div class="prompt-text">Help me with my essay.</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Rewrite this prompt to be clearer and more specific:</p>
+                <div class="input-group">
+                    <textarea placeholder="Write your improved prompt here..." style="min-height: 80px;"></textarea>
+                </div>
+                <p style="margin-top: 10px;">What elements did you add?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="topic"> Essay topic</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="type"> Type of help needed</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="length"> Length/format</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="audience"> Target audience</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="constraints"> Constraints/requirements</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare ratings with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="clarity"> Clarity ratings</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="specificity"> Appropriate specificity level</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="safety"> Safety assessment</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="feasibility"> Feasibility judgment</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Reflection</h2>
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Prompt quality annotation requires balancing clarity with flexibility, and specificity with feasibility.</strong></p>
+                <ul>
+                    <li>Good prompts are clear but not over-constrained</li>
+                    <li>Context and reference resolution matter for quality</li>
+                    <li>Safety evaluation involves nuanced judgment about intent</li>
+                    <li>What counts as "good" depends on the use case</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) { const c = btn.nextElementSibling; c.classList.toggle('show'); btn.classList.toggle('active'); btn.textContent = c.classList.contains('show') ? 'Hide Choices' : 'Show Choices'; }
+        function clearForm() { if (confirm('Clear all?')) { document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false); document.querySelectorAll('textarea').forEach(i => i.value = ''); document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show')); document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; }); localStorage.removeItem('prompt-worksheet'); } }
+        function saveProgress() { const data = { radios: {}, checkboxes: {}, textareas: [] }; document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value); document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => { if (!data.checkboxes[c.name]) data.checkboxes[c.name] = []; data.checkboxes[c.name].push(c.value); }); document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value); localStorage.setItem('prompt-worksheet', JSON.stringify(data)); }
+        function loadProgress() { const saved = localStorage.getItem('prompt-worksheet'); if (!saved) return; try { const data = JSON.parse(saved); Object.entries(data.radios || {}).forEach(([n, v]) => { const r = document.querySelector(`input[type="radio"][name="${n}"][value="${v}"]`); if (r) r.checked = true; }); Object.entries(data.checkboxes || {}).forEach(([n, vs]) => { vs.forEach(v => { const c = document.querySelector(`input[type="checkbox"][name="${n}"][value="${v}"]`); if (c) c.checked = true; }); }); document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; }); } catch (e) { console.error(e); } }
+        document.addEventListener('DOMContentLoaded', loadProgress); document.addEventListener('change', saveProgress); document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

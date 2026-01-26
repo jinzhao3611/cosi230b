@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Named Entity Recognition</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #2c3e50, #3498db); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #2c3e50; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #ecf0f1; border-left: 3px solid #3498db; padding: 12px 15px; margin: 12px 0; }
+        .label-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin: 10px 0; }
+        .label-item { background: #f8f9fa; padding: 8px 12px; border-radius: 4px; font-size: 0.9rem; }
+        .label-item code { background: #2c3e50; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 0.85rem; margin-right: 5px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .sentence-box { background: #e8f4fd; border: 1px solid #90caf9; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .sentence-box .sentence-label { font-weight: 600; color: #1976d2; margin-bottom: 8px; }
+        .sentence-box .sentence-text { font-style: italic; font-size: 1.05rem; margin-bottom: 12px; }
+        .token-grid { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+        .token-cell { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+        .token-cell .token { font-family: monospace; background: #f0f0f0; padding: 6px 8px; border: 1px solid #ddd; border-bottom: none; border-radius: 4px 4px 0 0; font-size: 0.85rem; text-align: center; width: 100%; }
+        .token-cell input[type="text"] { width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 0 0 4px 4px; font-size: 0.75rem; text-align: center; }
+        .token-cell input[type="text"]:focus { outline: none; border-color: #3498db; background: #e8f4fd; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #3498db; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; transition: all 0.2s; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #3498db; color: white; border-color: #3498db; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #3498db; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Named Entity Recognition (NER)</h1>
+            <div class="subtitle">Understanding boundary decisions and entity type ambiguity</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Sequence labeling (BIO tagging)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>You are annotating data for a Named Entity Recognition (NER) system that identifies <strong>people, organizations, locations, and miscellaneous entities</strong> in text.</p>
+            <p>NER seems straightforward but involves many difficult decisions about:</p>
+            <ul style="margin: 8px 0 8px 20px;">
+                <li>Entity boundaries (where does an entity start and end?)</li>
+                <li>Entity types (is "Apple" a company or a fruit?)</li>
+                <li>Nested entities (can entities contain other entities?)</li>
+            </ul>
+
+            <h3>Entity Types</h3>
+            <div class="label-list">
+                <div class="label-item"><code>PER</code> Person names</div>
+                <div class="label-item"><code>ORG</code> Organizations</div>
+                <div class="label-item"><code>LOC</code> Locations</div>
+                <div class="label-item"><code>MISC</code> Miscellaneous (events, products, etc.)</div>
+            </div>
+
+            <h3>BIO Tagging Scheme</h3>
+            <div class="label-list">
+                <div class="label-item"><code>B-TYPE</code> Beginning of entity</div>
+                <div class="label-item"><code>I-TYPE</code> Inside/continuation of entity</div>
+                <div class="label-item"><code>O</code> Outside any entity</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Entity Recognition</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 1</div>
+                <div class="sentence-text">"Barack Obama visited the White House in Washington."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">Barack</div><input type="text" name="s1_t1" placeholder="B-PER"></div>
+                    <div class="token-cell"><div class="token">Obama</div><input type="text" name="s1_t2"></div>
+                    <div class="token-cell"><div class="token">visited</div><input type="text" name="s1_t3"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s1_t4"></div>
+                    <div class="token-cell"><div class="token">White</div><input type="text" name="s1_t5"></div>
+                    <div class="token-cell"><div class="token">House</div><input type="text" name="s1_t6"></div>
+                    <div class="token-cell"><div class="token">in</div><input type="text" name="s1_t7"></div>
+                    <div class="token-cell"><div class="token">Washington</div><input type="text" name="s1_t8"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Is "White House" a location (LOC) or an organization (ORG)?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q1" value="loc"> LOC (it's a building)</label>
+                        <label class="radio-option"><input type="radio" name="q1" value="org"> ORG (it represents the administration)</label>
+                        <label class="radio-option"><input type="radio" name="q1" value="depends"> Depends on context</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your reasoning:</label>
+                    <textarea placeholder="Why did you choose this type?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Ambiguous Entity Types</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 2</div>
+                <div class="sentence-text">"Apple announced new products at their Cupertino headquarters."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">Apple</div><input type="text" name="s2_t1"></div>
+                    <div class="token-cell"><div class="token">announced</div><input type="text" name="s2_t2"></div>
+                    <div class="token-cell"><div class="token">new</div><input type="text" name="s2_t3"></div>
+                    <div class="token-cell"><div class="token">products</div><input type="text" name="s2_t4"></div>
+                    <div class="token-cell"><div class="token">at</div><input type="text" name="s2_t5"></div>
+                    <div class="token-cell"><div class="token">their</div><input type="text" name="s2_t6"></div>
+                    <div class="token-cell"><div class="token">Cupertino</div><input type="text" name="s2_t7"></div>
+                    <div class="token-cell"><div class="token">headquarters</div><input type="text" name="s2_t8"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Should "Cupertino headquarters" be tagged as one entity or two?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q2" value="one"> One entity: "Cupertino headquarters" (LOC)</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="city-only"> Just "Cupertino" (LOC)</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="neither"> Neither is an entity</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What's the boundary decision principle here?</label>
+                    <textarea placeholder="How do you decide where an entity ends?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Metonymy and Reference</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 3</div>
+                <div class="sentence-text">"Washington condemned the attacks on civilians."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">Washington</div><input type="text" name="s3_t1"></div>
+                    <div class="token-cell"><div class="token">condemned</div><input type="text" name="s3_t2"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s3_t3"></div>
+                    <div class="token-cell"><div class="token">attacks</div><input type="text" name="s3_t4"></div>
+                    <div class="token-cell"><div class="token">on</div><input type="text" name="s3_t5"></div>
+                    <div class="token-cell"><div class="token">civilians</div><input type="text" name="s3_t6"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>"Washington" here refers to the U.S. government, not the city. How should it be tagged?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q3" value="loc"> LOC (surface form is a place)</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="org"> ORG (semantic reference is government)</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="gpe"> GPE (geopolitical entity - special type)</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Should annotation follow surface form or semantic meaning?</label>
+                    <textarea placeholder="Explain your approach to metonymy..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Complex Named Entities</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 4</div>
+                <div class="sentence-text">"The New York Times reported on University of California, Berkeley research."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">The</div><input type="text" name="s4_t1"></div>
+                    <div class="token-cell"><div class="token">New</div><input type="text" name="s4_t2"></div>
+                    <div class="token-cell"><div class="token">York</div><input type="text" name="s4_t3"></div>
+                    <div class="token-cell"><div class="token">Times</div><input type="text" name="s4_t4"></div>
+                    <div class="token-cell"><div class="token">reported</div><input type="text" name="s4_t5"></div>
+                    <div class="token-cell"><div class="token">on</div><input type="text" name="s4_t6"></div>
+                    <div class="token-cell"><div class="token">University</div><input type="text" name="s4_t7"></div>
+                    <div class="token-cell"><div class="token">of</div><input type="text" name="s4_t8"></div>
+                    <div class="token-cell"><div class="token">California</div><input type="text" name="s4_t9"></div>
+                    <div class="token-cell"><div class="token">,</div><input type="text" name="s4_t10"></div>
+                    <div class="token-cell"><div class="token">Berkeley</div><input type="text" name="s4_t11"></div>
+                    <div class="token-cell"><div class="token">research</div><input type="text" name="s4_t12"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Should "The" be included in "The New York Times"?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q4" value="include"> Yes, it's part of the official name</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="exclude"> No, articles are never part of entities</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="depends"> Depends on specific guidelines</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How do you handle punctuation in "University of California, Berkeley"?</label>
+                    <textarea placeholder="Should the comma be tagged? How do you handle it?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Nested Entities</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 5</div>
+                <div class="sentence-text">"The Bank of America Tower is the tallest building in Charlotte."</div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>"Bank of America Tower" contains "Bank of America" (ORG) and refers to a building (LOC). How should this be handled?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="outer"> Tag only the outer entity (LOC)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="inner"> Tag only the inner entity (ORG)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="both"> Tag both (nested annotation)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="longest"> Use longest match rule</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What are the tradeoffs of each approach?</label>
+                    <textarea placeholder="Discuss the implications for annotation and modeling..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Group Comparison</h2>
+            <p>Compare your annotations with your group members.</p>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Where did you disagree most?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="type"> Entity type assignment</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="boundary"> Entity boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="existence"> Whether something is an entity at all</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="nested"> Handling nested entities</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Give one specific example of disagreement:</label>
+                    <textarea placeholder="Describe a case where your group disagreed..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Guideline Design</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Which guideline change would most improve annotator agreement?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q7" value="examples"> More examples for each entity type</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="metonymy"> Clear rules for metonymy</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="boundary"> Explicit boundary conventions</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="nested"> Decision on nested entity handling</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="types"> Finer-grained entity types</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why would this change be most effective?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is NER harder than it appears?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="ambiguous"> Names are ambiguous (Apple, Washington)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="boundaries"> Boundaries are context-dependent</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="types"> Type systems don't capture reality</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="world"> Requires world knowledge</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Named Entity Recognition requires making decisions that combine linguistic form with world knowledge.</strong></p>
+                <ul>
+                    <li>Entity types are categories we impose on a continuous reality</li>
+                    <li>Boundaries are conventions, not facts</li>
+                    <li>Context determines meaning, but annotations are often context-free</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea, input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('ner-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], textInputs: [] };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
+            localStorage.setItem('ner-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('ner-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                document.querySelectorAll('input[type="text"]').forEach((t, i) => { if (data.textInputs?.[i]) t.value = data.textInputs[i]; });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

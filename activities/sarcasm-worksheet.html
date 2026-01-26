@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Sarcasm and Irony Detection</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #ff5722, #ff9800); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #ff5722; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #fff3e0; border-left: 3px solid #ff9800; padding: 12px 15px; margin: 12px 0; }
+        .example-card { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .example-card .example-header { font-weight: 600; color: #ff5722; margin-bottom: 8px; }
+        .example-card .text { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 12px; font-style: italic; font-size: 1.05rem; margin: 10px 0; }
+        .example-card .context { background: #e3f2fd; padding: 8px 12px; border-radius: 4px; font-size: 0.9rem; margin-top: 10px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #ff9800; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #ff9800; color: white; border-color: #ff9800; }
+        .confidence-scale { display: flex; justify-content: space-between; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .confidence-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .confidence-option input { width: 18px; height: 18px; }
+        .confidence-option label { font-size: 0.75rem; text-align: center; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #ff9800; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Sarcasm and Irony Detection</h1>
+            <div class="subtitle">When words don't mean what they say</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Classification with pragmatic interpretation</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Sarcasm and irony are forms of figurative language where the <strong>intended meaning differs from the literal meaning</strong>. Detecting these is crucial for sentiment analysis, content moderation, and conversational AI.</p>
+
+            <div class="definition-box">
+                <p><strong>Sarcasm:</strong> Using irony to mock or convey contempt. Often involves saying the opposite of what one means.</p>
+                <p><strong>Irony:</strong> A broader concept where reality differs from expectation, or words convey opposite meaning.</p>
+            </div>
+
+            <h3>Why This is Hard</h3>
+            <ul style="margin: 8px 0 8px 20px; font-size: 0.9rem;">
+                <li>Sarcasm often looks identical to sincere text without context</li>
+                <li>Cultural and individual differences in sarcasm usage</li>
+                <li>Same words can be sincere or sarcastic depending on tone</li>
+                <li>Written text lacks vocal cues present in speech</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Sarcasm Recognition</h2>
+
+            <div class="example-card">
+                <div class="example-header">Example 1</div>
+                <div class="text">"Oh great, another meeting that could have been an email."</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex1" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex1" value="sincere"> Sincere</label>
+                    <label class="radio-option"><input type="radio" name="ex1" value="unclear"> Unclear</label>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Example 2</div>
+                <div class="text">"I love working weekends!"</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex2" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex2" value="sincere"> Sincere</label>
+                    <label class="radio-option"><input type="radio" name="ex2" value="unclear"> Unclear</label>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Example 3</div>
+                <div class="text">"What a beautiful day for a hike!"</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex3" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex3" value="sincere"> Sincere</label>
+                    <label class="radio-option"><input type="radio" name="ex3" value="unclear"> Unclear</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>For Example 2 and 3, what additional information would you need to be certain?</p>
+                <div class="input-group">
+                    <textarea placeholder="What context would help disambiguate these?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Context Dependence</h2>
+
+            <div class="example-card">
+                <div class="example-header">Example 4a</div>
+                <div class="text">"Nice job on the presentation."</div>
+                <div class="context"><strong>Context:</strong> Said after colleague delivered an award-winning pitch</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex4a" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex4a" value="sincere"> Sincere</label>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Example 4b</div>
+                <div class="text">"Nice job on the presentation."</div>
+                <div class="context"><strong>Context:</strong> Said after colleague forgot their slides and rambled for 30 minutes</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex4b" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex4b" value="sincere"> Sincere</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>The same sentence has opposite meanings in different contexts. How should annotation handle this?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q2" value="always-context"> Always provide context for annotation</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="text-only"> Annotate text in isolation (without context)</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="unclear"> Mark context-dependent cases as "unclear"</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="both"> Annotate both literal and contextual interpretation</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="What are the tradeoffs of each approach?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Sarcasm Markers and Cues</h2>
+
+            <div class="example-card">
+                <div class="example-header">Example 5</div>
+                <div class="text">"Wow, what a BRILLIANT idea. I can't POSSIBLY imagine what could go wrong."</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex5" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex5" value="sincere"> Sincere</label>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Example 6</div>
+                <div class="text">"Sure, that plan will definitely work 🙄"</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex6" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex6" value="sincere"> Sincere</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>What textual cues suggest sarcasm? (Check all that apply)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="caps"> ALL CAPS emphasis</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="emoji"> Eye-roll emoji 🙄</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="exaggeration"> Exaggeration (BRILLIANT)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="rhetorical"> Rhetorical questions</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="quotation"> Quotation marks</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="ellipsis"> Ellipsis (...)</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Are these markers reliable? Can they be used sincerely?</label>
+                    <textarea placeholder="Discuss the reliability of sarcasm markers..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Cultural and Platform Differences</h2>
+
+            <div class="example-card">
+                <div class="example-header">Example 7 (Twitter/X)</div>
+                <div class="text">"Day 47 of my diet. Still fat. This is fine."</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex7" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex7" value="sincere"> Sincere/Self-deprecating humor</label>
+                    <label class="radio-option"><input type="radio" name="ex7" value="both"> Both (humorous but sincere frustration)</label>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Example 8 (Product Review)</div>
+                <div class="text">"This vacuum cleaner is so good at collecting dust that it broke after one use. Highly recommend!"</div>
+                <div class="radio-options">
+                    <label class="radio-option"><input type="radio" name="ex8" value="sarcastic"> Sarcastic (negative review)</label>
+                    <label class="radio-option"><input type="radio" name="ex8" value="unclear"> Unclear</label>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Does the platform/genre affect how you interpret sarcasm?</p>
+                <div class="input-group">
+                    <textarea placeholder="How does context from Twitter vs. product reviews affect interpretation?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Confidence Annotation</h2>
+
+            <div class="example-card">
+                <div class="example-header">Example 9</div>
+                <div class="text">"Thanks for the feedback. Really helpful."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Label this example and rate your confidence:</p>
+                <div class="radio-options" style="margin-bottom: 15px;">
+                    <label class="radio-option"><input type="radio" name="ex9" value="sarcastic"> Sarcastic</label>
+                    <label class="radio-option"><input type="radio" name="ex9" value="sincere"> Sincere</label>
+                    <label class="radio-option"><input type="radio" name="ex9" value="unclear"> Unclear</label>
+                </div>
+                <p><strong>Confidence level:</strong></p>
+                <div class="confidence-scale">
+                    <div class="confidence-option">
+                        <input type="radio" name="conf9" value="1">
+                        <label>1<br>Very uncertain</label>
+                    </div>
+                    <div class="confidence-option">
+                        <input type="radio" name="conf9" value="2">
+                        <label>2</label>
+                    </div>
+                    <div class="confidence-option">
+                        <input type="radio" name="conf9" value="3">
+                        <label>3<br>Moderate</label>
+                    </div>
+                    <div class="confidence-option">
+                        <input type="radio" name="conf9" value="4">
+                        <label>4</label>
+                    </div>
+                    <div class="confidence-option">
+                        <input type="radio" name="conf9" value="5">
+                        <label>5<br>Very certain</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Should confidence be part of sarcasm annotation?</label>
+                    <textarea placeholder="Discuss the value of confidence scores..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Sentiment and Sarcasm Interaction</h2>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Consider the review: "This product exceeded all my expectations. It fell apart after two days. Just what I was hoping for."</p>
+                <p style="margin-top: 10px;"><strong>What is the sentiment?</strong></p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q6sent" value="positive"> Positive (literal text)</label>
+                        <label class="radio-option"><input type="radio" name="q6sent" value="negative"> Negative (intended meaning)</label>
+                        <label class="radio-option"><input type="radio" name="q6sent" value="both"> Label both literal and intended</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Should sarcasm detection be done before or after sentiment analysis?</label>
+                    <textarea placeholder="Discuss the annotation pipeline order..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="detection"> Sarcasm detection itself</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="context"> Context interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="confidence"> Confidence levels</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="cultural"> Cultural differences</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="subtle"> Subtle vs. obvious sarcasm</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is sarcasm detection one of the hardest NLP tasks?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Requires extensive context</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="cultural"> Cultural variation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="individual"> Individual style differences</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="surface"> Surface form identical to sincere</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="intent"> Requires inferring speaker intent</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Sarcasm annotation requires modeling speaker intent, not just text—and intent depends on context, culture, and relationship.</strong></p>
+                <ul>
+                    <li>The same text can be sincere or sarcastic depending on context</li>
+                    <li>Annotation guidelines must decide: literal meaning or intended meaning?</li>
+                    <li>Confidence annotation may be as important as the label itself</li>
+                    <li>Some texts are genuinely ambiguous—and that's useful information</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('sarcasm-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [] };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            localStorage.setItem('sarcasm-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('sarcasm-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

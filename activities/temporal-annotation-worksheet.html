@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Temporal Expression Annotation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #00897b, #26a69a); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #00897b; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #e0f2f1; border-left: 3px solid #00897b; padding: 12px 15px; margin: 12px 0; }
+        .text-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; line-height: 1.8; }
+        .timex { background: #b2dfdb; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+        .event { background: #ffcc80; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .type-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+        .type-table th, .type-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .type-table th { background: #e0f2f1; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #00897b; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .inline-input { width: 150px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; margin: 0 4px; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #00897b; color: white; border-color: #00897b; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .timeline-box { background: #f5f5f5; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin: 12px 0; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #00897b; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Temporal Expression Annotation</h1>
+            <div class="subtitle">Understanding time in text: dates, durations, and temporal relations</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Span labeling + Normalization + Relation extraction</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Temporal annotation involves identifying <strong>time expressions</strong> (TIMEX) in text, normalizing them to standard formats, and annotating <strong>temporal relations</strong> between events.</p>
+
+            <div class="definition-box">
+                <p><strong>TIMEX (Temporal Expression):</strong> A word or phrase that refers to a point in time, duration, or frequency.</p>
+                <p><strong>Temporal Relation:</strong> How two events or times relate (before, after, during, etc.).</p>
+            </div>
+
+            <h3>Types of Temporal Expressions</h3>
+            <table class="type-table">
+                <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+                <tr><td>DATE</td><td>Calendar date or period</td><td>"January 15, 2024", "last week"</td></tr>
+                <tr><td>TIME</td><td>Time of day</td><td>"3:30 PM", "noon"</td></tr>
+                <tr><td>DURATION</td><td>Length of time</td><td>"two hours", "for months"</td></tr>
+                <tr><td>SET</td><td>Recurring time</td><td>"every Tuesday", "annually"</td></tr>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Identifying Temporal Expressions</h2>
+            <div class="text-box">
+                <p>The meeting scheduled for <span class="timex">[next Monday]</span> has been postponed. We will reconvene <span class="timex">[in two weeks]</span>, specifically on <span class="timex">[February 12th]</span>. The original <span class="timex">[three-hour]</span> session will be shortened to <span class="timex">[90 minutes]</span>.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Classify each highlighted expression:</p>
+                <table class="type-table">
+                    <tr><th>Expression</th><th>Type</th></tr>
+                    <tr>
+                        <td>"next Monday"</td>
+                        <td><select name="t1"><option value="">Select...</option><option value="date">DATE</option><option value="time">TIME</option><option value="duration">DURATION</option><option value="set">SET</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"in two weeks"</td>
+                        <td><select name="t2"><option value="">Select...</option><option value="date">DATE</option><option value="time">TIME</option><option value="duration">DURATION</option><option value="set">SET</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"February 12th"</td>
+                        <td><select name="t3"><option value="">Select...</option><option value="date">DATE</option><option value="time">TIME</option><option value="duration">DURATION</option><option value="set">SET</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"three-hour"</td>
+                        <td><select name="t4"><option value="">Select...</option><option value="date">DATE</option><option value="time">TIME</option><option value="duration">DURATION</option><option value="set">SET</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>"90 minutes"</td>
+                        <td><select name="t5"><option value="">Select...</option><option value="date">DATE</option><option value="time">TIME</option><option value="duration">DURATION</option><option value="set">SET</option></select></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Normalization</h2>
+            <p>Temporal expressions must be normalized to a standard format (ISO 8601) for processing.</p>
+
+            <div class="definition-box">
+                <p><strong>Document Creation Time (DCT):</strong> The reference point for relative expressions. Assume DCT = 2024-01-29 for this worksheet.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Normalize these expressions (DCT = January 29, 2024, Monday):</p>
+                <table class="type-table">
+                    <tr><th>Expression</th><th>Normalized Value</th></tr>
+                    <tr>
+                        <td>"yesterday"</td>
+                        <td><input type="text" class="inline-input" name="n1" placeholder="YYYY-MM-DD"></td>
+                    </tr>
+                    <tr>
+                        <td>"next Friday"</td>
+                        <td><input type="text" class="inline-input" name="n2" placeholder="YYYY-MM-DD"></td>
+                    </tr>
+                    <tr>
+                        <td>"last summer"</td>
+                        <td><input type="text" class="inline-input" name="n3" placeholder="YYYY-SU"></td>
+                    </tr>
+                    <tr>
+                        <td>"three days ago"</td>
+                        <td><input type="text" class="inline-input" name="n4" placeholder="YYYY-MM-DD"></td>
+                    </tr>
+                    <tr>
+                        <td>"the 90s"</td>
+                        <td><input type="text" class="inline-input" name="n5" placeholder="YYYY"></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>What challenges arise when normalizing vague expressions like "last summer"?</label>
+                    <textarea placeholder="Discuss the ambiguity..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Ambiguous Expressions</h2>
+            <div class="text-box">
+                <p>"The project started <span class="timex">[in March]</span> and was completed <span class="timex">[six months later]</span>."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>What year does "in March" refer to? (DCT = January 29, 2024)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q3" value="2023"> March 2023 (most recent past March)</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="2024"> March 2024 (upcoming March)</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="unknown"> Cannot be determined without context</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="underspecified"> Leave underspecified (XXXX-03)</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How should annotation guidelines handle year ambiguity?</label>
+                    <textarea placeholder="Propose a rule..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Temporal Relations</h2>
+            <p>Events and times can be related temporally. Common relations include:</p>
+            <table class="type-table">
+                <tr><th>Relation</th><th>Meaning</th><th>Example</th></tr>
+                <tr><td>BEFORE</td><td>A ends before B starts</td><td>"He left before she arrived"</td></tr>
+                <tr><td>AFTER</td><td>A starts after B ends</td><td>"She arrived after he left"</td></tr>
+                <tr><td>DURING</td><td>A occurs within B's span</td><td>"It rained during the game"</td></tr>
+                <tr><td>OVERLAP</td><td>A and B share some time</td><td>"While cooking, I listened to music"</td></tr>
+                <tr><td>SIMULTANEOUS</td><td>A and B at same time</td><td>"The explosion and flash were simultaneous"</td></tr>
+            </table>
+
+            <div class="text-box">
+                <p>"<span class="event">[John arrived]</span> at the office at <span class="timex">[9 AM]</span>. <span class="event">[The meeting started]</span> at <span class="timex">[10 AM]</span>. <span class="event">[He was still preparing]</span> when <span class="event">[the CEO walked in]</span>."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Identify the temporal relations:</p>
+                <table class="type-table">
+                    <tr><th>Event A</th><th>Event B</th><th>Relation</th></tr>
+                    <tr>
+                        <td>John arrived</td>
+                        <td>Meeting started</td>
+                        <td><select name="r1"><option value="">Select...</option><option value="before">BEFORE</option><option value="after">AFTER</option><option value="during">DURING</option><option value="overlap">OVERLAP</option><option value="simultaneous">SIMULTANEOUS</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>He was preparing</td>
+                        <td>CEO walked in</td>
+                        <td><select name="r2"><option value="">Select...</option><option value="before">BEFORE</option><option value="after">AFTER</option><option value="during">DURING</option><option value="overlap">OVERLAP</option><option value="simultaneous">SIMULTANEOUS</option></select></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Complex Temporal Reasoning</h2>
+            <div class="text-box">
+                <p>"The company was founded <span class="timex">[two decades before]</span> the CEO was born. She joined the firm <span class="timex">[in her twenties]</span> and became CEO <span class="timex">[after 15 years]</span>. <span class="timex">[Last year]</span>, the company celebrated its <span class="timex">[50th anniversary]</span>."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Can you determine when the company was founded? (DCT = 2024)</p>
+                <div class="input-group">
+                    <textarea placeholder="Show your temporal reasoning..."></textarea>
+                </div>
+                <p style="margin-top: 10px;">How old is the CEO approximately?</p>
+                <div class="input-group">
+                    <textarea placeholder="Explain your calculation..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Annotate This Passage</h2>
+            <div class="text-box">
+                <p>The earthquake struck at 3:42 AM on Tuesday. Within hours, rescue teams were deployed. By the end of the week, over 500 survivors had been found. The recovery effort is expected to continue for several months. Officials said that in the past decade, this was the strongest earthquake to hit the region since the devastating 1995 event.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>List all temporal expressions in the passage and classify them:</p>
+                <div class="input-group">
+                    <textarea placeholder="Expression | Type | Normalized Value (if possible)" style="min-height: 100px;"></textarea>
+                </div>
+                <p style="margin-top: 10px;">What makes "the past decade" difficult to normalize?</p>
+                <div class="input-group">
+                    <textarea placeholder="Discuss the challenge..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="span"> Expression boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="type"> Expression types</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="norm"> Normalization values</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="rel"> Temporal relations</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="vague"> Handling vague expressions</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is temporal annotation difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="relative"> Many expressions are relative to context</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="vague"> Natural time expressions are vague</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="inference"> Temporal reasoning requires inference</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="culture"> Cultural variation in time concepts</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Many temporal relations are implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Time in language is often relative, vague, and context-dependent.</strong></p>
+                <ul>
+                    <li>Normalization requires a reference point (document creation time)</li>
+                    <li>Vague expressions require annotation decisions about precision</li>
+                    <li>Temporal relations often require world knowledge and inference</li>
+                    <li>The same expression can have different meanings in different contexts</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('temporal-annotation-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
+            localStorage.setItem('temporal-annotation-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('temporal-annotation-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+                Object.entries(data.inputs || {}).forEach(([name, value]) => {
+                    const i = document.querySelector(`input[type="text"][name="${name}"]`);
+                    if (i) i.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

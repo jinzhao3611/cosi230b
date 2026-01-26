@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Summarization Quality Evaluation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #5d4037, #795548); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #5d4037; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .definition-box { background: #efebe9; border-left: 3px solid #795548; padding: 12px 15px; margin: 12px 0; }
+        .source-box { background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin: 12px 0; }
+        .source-box .label { font-weight: 600; color: #5d4037; margin-bottom: 8px; font-size: 0.9rem; }
+        .summary-box { background: #e3f2fd; border: 1px solid #90caf9; border-radius: 6px; padding: 15px; margin: 12px 0; }
+        .summary-box .label { font-weight: 600; color: #1976d2; margin-bottom: 8px; font-size: 0.9rem; }
+        .rating-scale { display: flex; justify-content: space-between; background: #fafafa; padding: 12px; border-radius: 6px; margin: 10px 0; }
+        .rating-option { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 50px; }
+        .rating-option input { width: 20px; height: 20px; }
+        .rating-option label { font-size: 0.75rem; text-align: center; }
+        .dimension-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 15px 0; }
+        .dimension-box .dim-header { font-weight: 600; color: #f57c00; margin-bottom: 8px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #795548; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .toggle-btn.active { background: #795548; color: white; border-color: #795548; }
+        .error-highlight { background: #ffcdd2; padding: 2px 4px; border-radius: 2px; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #795548; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Summarization Quality Evaluation</h1>
+            <div class="subtitle">Multi-dimensional assessment of generated summaries</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Quality evaluation / Multi-dimensional rating</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Evaluating summarization quality requires assessing multiple dimensions simultaneously. Unlike simple classification, summary evaluation involves subjective judgments about what information is important and how well it's conveyed.</p>
+
+            <div class="definition-box">
+                <p><strong>Key Evaluation Dimensions:</strong></p>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li><strong>Faithfulness:</strong> Is the summary factually consistent with the source?</li>
+                    <li><strong>Relevance:</strong> Does it include important information?</li>
+                    <li><strong>Coherence:</strong> Is it well-organized and readable?</li>
+                    <li><strong>Conciseness:</strong> Is it appropriately brief without losing meaning?</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Faithfulness Evaluation</h2>
+            <div class="source-box">
+                <div class="label">Source Article:</div>
+                <p>Scientists at MIT have developed a new battery technology that could charge electric vehicles in just 10 minutes. The research, published in Nature Energy, shows that the lithium-ion batteries use a modified electrode structure. Lead researcher Dr. Sarah Chen noted that while promising, the technology is still 3-5 years from commercial production. Current EV batteries typically require 30-60 minutes for a full charge.</p>
+            </div>
+
+            <div class="summary-box">
+                <div class="label">Summary A:</div>
+                <p>MIT researchers have created a revolutionary battery that charges EVs in 10 minutes, making range anxiety a thing of the past. The breakthrough, led by Dr. Sarah Chen, will be available to consumers within 2 years.</p>
+            </div>
+
+            <div class="dimension-box">
+                <div class="dim-header">Rate Faithfulness (1-5):</div>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r1_faith" value="1"><label>1<br>Completely unfaithful</label></div>
+                    <div class="rating-option"><input type="radio" name="r1_faith" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r1_faith" value="3"><label>3<br>Partially faithful</label></div>
+                    <div class="rating-option"><input type="radio" name="r1_faith" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r1_faith" value="5"><label>5<br>Completely faithful</label></div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Identify specific faithfulness errors in Summary A:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="timeline"> Wrong timeline (2 years vs 3-5 years)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="range"> "Range anxiety" not mentioned in source</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="revolutionary"> "Revolutionary" is editorializing</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="consumers"> "Available to consumers" not stated</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How serious are these errors?</label>
+                    <textarea placeholder="Discuss the impact of each error type..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Relevance vs. Faithfulness Trade-off</h2>
+            <div class="summary-box">
+                <div class="label">Summary B (Same source):</div>
+                <p>A study in Nature Energy describes lithium-ion batteries with modified electrode structures.</p>
+            </div>
+
+            <div class="dimension-box">
+                <div class="dim-header">Rate Summary B:</div>
+                <p style="margin: 10px 0;"><strong>Faithfulness:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r2_faith" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_faith" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_faith" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_faith" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_faith" value="5"><label>5</label></div>
+                </div>
+                <p style="margin: 10px 0;"><strong>Relevance:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r2_rel" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_rel" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_rel" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_rel" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r2_rel" value="5"><label>5</label></div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Summary B is faithful but misses key information. Which is worse: unfaithful or incomplete?</p>
+                <div class="input-group">
+                    <textarea placeholder="Discuss the trade-off between faithfulness and relevance..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Coherence Evaluation</h2>
+            <div class="source-box">
+                <div class="label">Source Article:</div>
+                <p>The city council approved a $50 million budget for road repairs. Mayor Johnson praised the decision, calling it "long overdue." Critics argue the money should go to schools instead. The repairs will focus on the downtown area first, then expand to suburbs over three years.</p>
+            </div>
+
+            <div class="summary-box">
+                <div class="label">Summary C:</div>
+                <p>Road repairs will start downtown. $50 million was approved by the council. Mayor Johnson praised it. Critics want school funding. Suburbs will be repaired later.</p>
+            </div>
+
+            <div class="summary-box">
+                <div class="label">Summary D:</div>
+                <p>The city council approved $50 million for road repairs that will begin downtown and expand to suburbs over three years. While Mayor Johnson praised the decision, critics argue the funding should go to schools instead.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Both summaries contain the same information. Rate their coherence:</p>
+                <p style="margin: 10px 0;"><strong>Summary C coherence:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r3c" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r3c" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r3c" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r3c" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r3c" value="5"><label>5</label></div>
+                </div>
+                <p style="margin: 10px 0;"><strong>Summary D coherence:</strong></p>
+                <div class="rating-scale">
+                    <div class="rating-option"><input type="radio" name="r3d" value="1"><label>1</label></div>
+                    <div class="rating-option"><input type="radio" name="r3d" value="2"><label>2</label></div>
+                    <div class="rating-option"><input type="radio" name="r3d" value="3"><label>3</label></div>
+                    <div class="rating-option"><input type="radio" name="r3d" value="4"><label>4</label></div>
+                    <div class="rating-option"><input type="radio" name="r3d" value="5"><label>5</label></div>
+                </div>
+                <div class="input-group">
+                    <label>What makes Summary D more coherent?</label>
+                    <textarea placeholder="Identify specific coherence features..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Overall Quality Ranking</h2>
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Rank the summaries from best to worst overall:</p>
+                <div class="input-group">
+                    <label>Best:</label>
+                    <select name="rank1" style="padding: 8px; width: 100%; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="">Select...</option>
+                        <option value="A">Summary A</option>
+                        <option value="B">Summary B</option>
+                        <option value="C">Summary C</option>
+                        <option value="D">Summary D</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>How did you weight the different dimensions?</label>
+                    <textarea placeholder="Explain your overall ranking criteria..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Error Severity</h2>
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Rank these summary errors from most to least severe:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="checkbox" name="q5_1" value="1"> 1. Incorrect date/number</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5_2" value="1"> 2. Missing key information</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5_3" value="1"> 3. Grammatical errors</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5_4" value="1"> 4. Inventing information not in source</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5_5" value="1"> 5. Wrong attribution (who said what)</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Your severity ranking (most severe to least):</label>
+                    <textarea placeholder="Rank: e.g., 4, 5, 1, 2, 3 and explain why..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Compare ratings with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="faith"> Faithfulness ratings</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="relevance"> Relevance judgments</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="coherence"> Coherence assessment</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="overall"> Overall ranking</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="severity"> Error severity</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Why is summarization evaluation difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="dimensions"> Multiple competing dimensions</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="subjective"> "Important" is subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="tradeoffs"> Dimensions have trade-offs</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="scale"> Scale interpretation varies</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Summary evaluation is inherently multi-dimensional, and annotators must balance competing criteria while maintaining consistent standards.</strong></p>
+                <ul>
+                    <li>Faithfulness errors are not all equally severe</li>
+                    <li>A summary can excel on one dimension while failing on another</li>
+                    <li>Relevance depends on who the summary is for</li>
+                    <li>Annotation guidelines must specify dimension priorities</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('summarization-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            localStorage.setItem('summarization-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('summarization-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

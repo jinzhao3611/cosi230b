@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Implicit Hate Speech Detection</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #6d4c41, #8d6e63); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #6d4c41; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #efebe9; border-left: 3px solid #8d6e63; padding: 12px 15px; margin: 12px 0; }
+        .warning-box { background: #fff3e0; border-left: 3px solid #ff9800; padding: 12px 15px; margin: 12px 0; }
+        .text-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .example-text { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 12px; font-style: italic; margin: 10px 0; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .type-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+        .type-table th, .type-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .type-table th { background: #efebe9; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #8d6e63; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #8d6e63; color: white; border-color: #8d6e63; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .strategy-box { background: #e3f2fd; border-left: 3px solid #2196f3; padding: 10px 15px; margin: 8px 0; font-size: 0.9rem; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #8d6e63; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Implicit Hate Speech Detection</h1>
+            <div class="subtitle">Recognizing hate without explicit slurs or threats</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Multi-label classification</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p><strong>Implicit hate speech</strong> expresses hatred or promotes discrimination without using explicit slurs, threats, or overtly offensive language. It is particularly challenging to detect because it relies on implication, coded language, and context.</p>
+
+            <div class="warning-box">
+                <p><strong>Content Warning:</strong> This worksheet contains examples of hateful content for educational purposes. These examples illustrate real annotation challenges but do not reflect the views of the course or author.</p>
+            </div>
+
+            <div class="definition-box">
+                <p><strong>Implicit Hate:</strong> Content that promotes negative stereotypes, dehumanizes groups, or incites discrimination through indirect means—without explicit slurs or direct calls to violence.</p>
+            </div>
+
+            <h3>Common Strategies for Implicit Hate</h3>
+            <div class="strategy-box"><strong>Stereotyping:</strong> Generalizing negative traits to an entire group</div>
+            <div class="strategy-box"><strong>Dehumanization:</strong> Comparing groups to animals, diseases, or objects</div>
+            <div class="strategy-box"><strong>Delegitimization:</strong> Questioning a group's right to exist or belong</div>
+            <div class="strategy-box"><strong>Dog whistles:</strong> Coded language understood by in-groups</div>
+            <div class="strategy-box"><strong>False concern:</strong> "Just asking questions" or expressing "worry"</div>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Distinguishing Explicit vs. Implicit</h2>
+            <p>Classify each example as explicit hate, implicit hate, or not hate.</p>
+
+            <div class="text-box">
+                <div class="example-text">"Studies show that certain neighborhoods have higher crime rates. Interesting correlation with demographics, isn't it?"</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="e1" value="explicit"> Explicit hate speech</label>
+                        <label class="radio-option"><input type="radio" name="e1" value="implicit"> Implicit hate speech</label>
+                        <label class="radio-option"><input type="radio" name="e1" value="not-hate"> Not hate speech</label>
+                        <label class="radio-option"><input type="radio" name="e1" value="unclear"> Unclear/borderline</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"I'm not racist, but I've noticed that people from that country just don't share our values."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="e2" value="explicit"> Explicit hate speech</label>
+                        <label class="radio-option"><input type="radio" name="e2" value="implicit"> Implicit hate speech</label>
+                        <label class="radio-option"><input type="radio" name="e2" value="not-hate"> Not hate speech</label>
+                        <label class="radio-option"><input type="radio" name="e2" value="unclear"> Unclear/borderline</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>What makes implicit hate harder to detect than explicit hate?</p>
+                <div class="input-group">
+                    <textarea placeholder="Explain the key differences..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Identifying Implicit Strategies</h2>
+            <p>For each example, identify which implicit hate strategy is being used.</p>
+
+            <div class="text-box">
+                <div class="example-text">"They breed like rabbits. No wonder the welfare system is strained."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="s1" value="stereotype"> Stereotyping</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s1" value="dehumanize"> Dehumanization</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s1" value="delegitimize"> Delegitimization</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s1" value="dogwhistle"> Dog whistle</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s1" value="concern"> False concern</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"I'm just concerned about preserving our cultural heritage. Is that so wrong?"</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="s2" value="stereotype"> Stereotyping</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s2" value="dehumanize"> Dehumanization</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s2" value="delegitimize"> Delegitimization</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s2" value="dogwhistle"> Dog whistle</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s2" value="concern"> False concern</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"Why is it that one group commits 50% of violent crimes? Just stating facts."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="s3" value="stereotype"> Stereotyping</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s3" value="dehumanize"> Dehumanization</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s3" value="delegitimize"> Delegitimization</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s3" value="dogwhistle"> Dog whistle</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s3" value="concern"> False concern</label>
+                        <label class="checkbox-option"><input type="checkbox" name="s3" value="jaq"> "Just asking questions"</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>How can presenting "statistics" be used as implicit hate speech?</p>
+                <div class="input-group">
+                    <textarea placeholder="Discuss the relationship between facts and framing..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Context Dependence</h2>
+            <p>The same statement can be hateful or not depending on context.</p>
+
+            <div class="text-box">
+                <div class="example-text">"They're not like us."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Provide two contexts where this statement would be:</p>
+                <div class="input-group">
+                    <label>Context A (Not hate speech):</label>
+                    <textarea placeholder="Describe a benign context..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Context B (Implicit hate speech):</label>
+                    <textarea placeholder="Describe a hateful context..."></textarea>
+                </div>
+                <p style="margin-top: 10px;">What additional information would annotators need?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="speaker"> Speaker identity/history</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="thread"> Surrounding conversation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="platform"> Platform/community norms</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="topic"> Discussion topic</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="audience"> Target audience</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Coded Language and Dog Whistles</h2>
+            <div class="definition-box">
+                <p><strong>Dog Whistle:</strong> Coded language that appears innocent to outsiders but carries hateful meaning to those "in the know."</p>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"We need to secure a future for our children and their heritage."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="dw1" value="benign"> Benign statement about family values</label>
+                        <label class="radio-option"><input type="radio" name="dw1" value="dogwhistle"> Known white supremacist slogan</label>
+                        <label class="radio-option"><input type="radio" name="dw1" value="depends"> Depends on context/speaker</label>
+                        <label class="radio-option"><input type="radio" name="dw1" value="unsure"> Cannot determine</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Should annotators be trained on known dog whistles and coded language?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes, essential for accurate detection</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="no"> No, may cause over-flagging innocent content</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="careful"> Yes, but with careful guidelines about context</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="expert"> Only expert annotators should handle these</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What are the risks of either approach?</label>
+                    <textarea placeholder="Discuss the tradeoffs..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Annotation Guidelines</h2>
+            <div class="text-box">
+                <div class="example-text">"Look, I have friends from that background. But you have to admit, their culture just doesn't prioritize education the way ours does."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Annotate this example with the following dimensions:</p>
+                <table class="type-table">
+                    <tr><th>Dimension</th><th>Label</th></tr>
+                    <tr>
+                        <td>Is it hate speech?</td>
+                        <td><select name="dim1"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option><option value="borderline">Borderline</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Type (if hate)</td>
+                        <td><select name="dim2"><option value="">Select...</option><option value="explicit">Explicit</option><option value="implicit">Implicit</option><option value="na">N/A</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Target group</td>
+                        <td><input type="text" style="width: 150px; padding: 4px;" name="dim3" placeholder="Specify..."></td>
+                    </tr>
+                    <tr>
+                        <td>Strategy used</td>
+                        <td><select name="dim4"><option value="">Select...</option><option value="stereotype">Stereotyping</option><option value="dehumanize">Dehumanization</option><option value="delegitimize">Delegitimization</option><option value="dogwhistle">Dog whistle</option><option value="concern">False concern</option><option value="other">Other</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Confidence</td>
+                        <td><select name="dim5"><option value="">Select...</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Edge Cases</h2>
+            <div class="text-box">
+                <div class="example-text">"I think immigration should be controlled. Every country has the right to decide who enters."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Is expressing political opinions about immigration inherently hateful?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q6" value="no"> No, political opinions are not hate speech</label>
+                        <label class="radio-option"><input type="radio" name="q6" value="depends"> Depends on how it's expressed and context</label>
+                        <label class="radio-option"><input type="radio" name="q6" value="coded"> This specific phrasing is often coded hate</label>
+                        <label class="radio-option"><input type="radio" name="q6" value="borderline"> Borderline - needs more context</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Where should we draw the line between legitimate political discourse and implicit hate?</label>
+                    <textarea placeholder="Discuss the boundary..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="threshold"> Threshold for "hateful"</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="implicit"> Recognizing implicit strategies</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="dogwhistle"> Dog whistle recognition</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="context"> Context interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="political"> Political vs. hateful speech</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is implicit hate speech annotation particularly challenging?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="knowledge"> Requires cultural/contextual knowledge</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="evolving"> Coded language evolves rapidly</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Interpretation is subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="plausible"> Plausible deniability is intentional</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="bias"> Annotator background affects perception</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Implicit hate is designed to be deniable—which makes annotation inherently difficult.</strong></p>
+                <ul>
+                    <li>The same words can be hateful or innocent depending on context</li>
+                    <li>Annotators need training on evolving coded language</li>
+                    <li>Cultural background significantly affects perception</li>
+                    <li>Guidelines must balance sensitivity with avoiding over-censorship</li>
+                    <li>Multiple annotators with diverse backgrounds improve coverage</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('implicit-hate-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
+            localStorage.setItem('implicit-hate-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('implicit-hate-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+                Object.entries(data.inputs || {}).forEach(([name, value]) => {
+                    const i = document.querySelector(`input[type="text"][name="${name}"]`);
+                    if (i) i.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

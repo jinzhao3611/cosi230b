@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lectures - COSI 230B</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="course-code">COSI 230B | Spring 2025</div>
+            <h1>Natural Language Annotation for Machine Learning</h1>
+            <p class="subtitle">Lecture Materials</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="syllabus.html">Syllabus</a></li>
+                <li><a href="schedule.html">Schedule</a></li>
+                <li><a href="lectures.html" class="active">Lectures</a></li>
+                <li><a href="activities.html">Activities</a></li>
+                <li><a href="assignments.html">Assignments</a></li>
+                <li><a href="project.html">Project</a></li>
+                <li><a href="resources.html">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-title">
+            <h2>Lecture Materials</h2>
+            <p>Slides and resources for each lecture</p>
+        </div>
+
+        <div class="info-box">
+            <strong>Note:</strong> Lecture slides are released after each class. Check MOODLE for any supplementary materials.
+        </div>
+
+        <!-- Week 1 -->
+        <div class="card">
+            <h3>Week 1: Introduction (Jan 12, 14)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-1-Intro.pdf" class="resource-card">
+                    <h4>Lecture 1: Course Introduction & The Annotation Landscape</h4>
+                    <p>Course overview, what is annotation, evolution from manual labeling to LLM-assisted workflows</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-2-Fundamentals.pdf" class="resource-card">
+                    <h4>Lecture 2: Annotation Fundamentals</h4>
+                    <p>Formal definition, types of NLP tasks, the MATTER cycle, quality vs. quantity</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 2 -->
+        <div class="card">
+            <h3>Week 2: When to Annotate (Jan 21)</h3>
+            <a href="lectures/COSI-230B-2025-Lecture-3-When-to-Annotate.pdf" class="resource-card">
+                <h4>Lecture 3: When to Annotate | Tools & Formats</h4>
+                <p>Rule-based vs. ML approaches, decision framework, annotation tool landscape, data formats</p>
+                <span class="tag pdf">PDF</span>
+            </a>
+        </div>
+
+        <!-- Week 3 -->
+        <div class="card">
+            <h3>Week 3: Corpus & Tools (Jan 26, 28)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-4-Corpus-Selection.pdf" class="resource-card">
+                    <h4>Lecture 4: Corpus Selection & Data Sourcing</h4>
+                    <p>MAMA criteria, sampling strategies, licensing, synthetic data generation</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-5-Annotation-Tools-brat.pdf" class="resource-card">
+                    <h4>Lecture 5: Annotation Tools: brat | Events & Emotion</h4>
+                    <p>brat setup, event annotation, emotion classification</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 4 -->
+        <div class="card">
+            <h3>Week 4: Task Overview I & II (Feb 2, 4)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-6-Tasks-Classification.pdf" class="resource-card">
+                    <h4>Lecture 6: Overview of Annotation Tasks I</h4>
+                    <p>Text classification, sentiment analysis, topic classification, intent detection</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-7-Tasks-Sequence.pdf" class="resource-card">
+                    <h4>Lecture 7: Overview of Annotation Tasks II</h4>
+                    <p>Sequence labeling, NER, POS tagging, BIO schemes</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 5 -->
+        <div class="card">
+            <h3>Week 5: MATTER & Relations (Feb 9, 11)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-8-Task-Formalization.pdf" class="resource-card">
+                    <h4>Lecture 8: MATTER Cycle Deep Dive | Task Formalization</h4>
+                    <p>DTDs, JSON Schema, tag types, prompts as specifications</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-9-Tasks-Relations.pdf" class="resource-card">
+                    <h4>Lecture 9: Overview of Annotation Tasks III</h4>
+                    <p>Relation extraction, coreference, semantic role labeling, event extraction</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 7 -->
+        <div class="card">
+            <h3>Week 7: LLM Tasks & Guidelines (Feb 23, 25)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-10-Tasks-LLM.pdf" class="resource-card">
+                    <h4>Lecture 10: Overview of Annotation Tasks IV</h4>
+                    <p>LLM-specific tasks, preference annotation for RLHF, safety annotation</p>
+                    <span class="tag pdf">PDF</span> <span class="tag llm">LLM</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-11-Guidelines.pdf" class="resource-card">
+                    <h4>Lecture 11: Writing Annotation Guidelines</h4>
+                    <p>Anatomy of good guidelines, examples, edge cases, prompts for LLMs</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 8 -->
+        <div class="card">
+            <h3>Week 8: Presentations & LLM Annotation (Mar 2, 4)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-12-Group-Presentations.pdf" class="resource-card">
+                    <h4>Lecture 12: Group Presentations</h4>
+                    <p>Peer feedback on annotation designs, common challenges</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-13-LLM-Annotation.pdf" class="resource-card">
+                    <h4>Lecture 13: LLM-Based Annotation</h4>
+                    <p>Zero-shot, few-shot, prompt design, model selection, cost optimization</p>
+                    <span class="tag pdf">PDF</span> <span class="tag llm">LLM</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 9-10 -->
+        <div class="card">
+            <h3>Weeks 9-10: Tools & Human-AI Collaboration (Mar 9-18)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-15-Tools-II.pdf" class="resource-card">
+                    <h4>Lectures 14-15: Annotation Tools & Formats</h4>
+                    <p>Label Studio, workflows, data conversion, batch processing</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <div>
+                    <a href="lectures/COSI-230B-2025-Lecture-16-Tools-Advanced.pdf" class="resource-card" style="margin-bottom: 15px;">
+                        <h4>Lecture 16: Tools Advanced</h4>
+                        <p>Argilla for RLHF, custom interfaces, feature engineering</p>
+                        <span class="tag pdf">PDF</span>
+                    </a>
+                    <a href="lectures/COSI-230B-2025-Lecture-17-Human-AI-Collaboration.pdf" class="resource-card">
+                        <h4>Lecture 17: Human-AI Collaborative Annotation</h4>
+                        <p>Human-in-the-loop, LLM pre-annotation, active learning</p>
+                        <span class="tag pdf">PDF</span> <span class="tag llm">LLM</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 11-12 -->
+        <div class="card">
+            <h3>Weeks 11-12: Inter-Annotator Agreement (Mar 23-30)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-18-IAA-I.pdf" class="resource-card">
+                    <h4>Lecture 18: Inter-Annotator Agreement I</h4>
+                    <p>Why measure agreement, Cohen's Kappa, interpreting values</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-19-IAA-II.pdf" class="resource-card">
+                    <h4>Lecture 19: Inter-Annotator Agreement II</h4>
+                    <p>Fleiss' Kappa, Krippendorff's Alpha, Human-LLM agreement</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+            <a href="lectures/COSI-230B-2025-Lecture-20-IAA-Modeling.pdf" class="resource-card" style="margin-top: 15px;">
+                <h4>Lecture 20: IAA & Modeling Introduction</h4>
+                <p>Resolving disagreements, adjudication, gold standards, LLM-assisted adjudication</p>
+                <span class="tag pdf">PDF</span>
+            </a>
+        </div>
+
+        <!-- Week 13 -->
+        <div class="card">
+            <h3>Week 13: Modeling & Evaluation (Apr 13, 15)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-21-Modeling-I.pdf" class="resource-card">
+                    <h4>Lecture 21: Annotation-Informed Modeling I</h4>
+                    <p>Training on annotated data, handling uncertainty, multi-annotator learning</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-22-Modeling-II.pdf" class="resource-card">
+                    <h4>Lecture 22: Annotation-Informed Modeling II</h4>
+                    <p>Evaluation metrics, error analysis, LLM-as-judge, building benchmarks</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 14 -->
+        <div class="card">
+            <h3>Week 14: RLHF & Safety (Apr 20, 22)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-23-RLHF.pdf" class="resource-card">
+                    <h4>Lecture 23: Preference Data & RLHF</h4>
+                    <p>RLHF intro, preference annotation, reward modeling, DPO</p>
+                    <span class="tag pdf">PDF</span> <span class="tag llm">LLM</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-24-Safety-RedTeaming.pdf" class="resource-card">
+                    <h4>Lecture 24: Safety & Red Teaming Annotation</h4>
+                    <p>Red teaming, toxicity annotation, content moderation, ethics</p>
+                    <span class="tag pdf">PDF</span> <span class="tag llm">LLM</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Week 15 -->
+        <div class="card">
+            <h3>Week 15: Scaling & Best Practices (Apr 27, 29)</h3>
+            <div class="grid grid-2">
+                <a href="lectures/COSI-230B-2025-Lecture-25-Low-Resource.pdf" class="resource-card">
+                    <h4>Lecture 25: Low-Resource Languages & Scaling</h4>
+                    <p>Low-resource challenges, community-driven annotation, cross-lingual transfer</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="lectures/COSI-230B-2025-Lecture-26-Best-Practices.pdf" class="resource-card">
+                    <h4>Lecture 26: Best Practices & Future Directions</h4>
+                    <p>Project management, documentation, dataset release, the future of annotation</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>COSI 230B - Natural Language Annotation for Machine Learning</p>
+        <p>Brandeis University | Spring 2025</p>
+    </footer>
+</body>
+</html>

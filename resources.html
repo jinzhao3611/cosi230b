@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - COSI 230B</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="course-code">COSI 230B | Spring 2025</div>
+            <h1>Natural Language Annotation for Machine Learning</h1>
+            <p class="subtitle">Resources & Readings</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="syllabus.html">Syllabus</a></li>
+                <li><a href="schedule.html">Schedule</a></li>
+                <li><a href="lectures.html">Lectures</a></li>
+                <li><a href="activities.html">Activities</a></li>
+                <li><a href="assignments.html">Assignments</a></li>
+                <li><a href="project.html">Project</a></li>
+                <li><a href="resources.html" class="active">Resources</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-title">
+            <h2>Resources</h2>
+            <p>Textbooks, tools, and readings</p>
+        </div>
+
+        <!-- Required Materials -->
+        <div class="card">
+            <h3>Required Textbook</h3>
+            <div class="reading-item">
+                <div class="title">Natural Language Annotation for Machine Learning: A Guide to Corpus-Building for Applications</div>
+                <div class="authors">James Pustejovsky & Amber Stubbs</div>
+                <div class="venue">O'Reilly Media, 2012</div>
+                <p style="margin-top: 10px;"><a href="https://www.oreilly.com/library/view/natural-language-annotation/9781449332693/" target="_blank">Available online through O'Reilly</a></p>
+            </div>
+        </div>
+
+        <!-- Software -->
+        <div class="card">
+            <h3>Required Software</h3>
+            <ul>
+                <li><strong>Python 3.9+</strong></li>
+                <li><strong>pandas, scikit-learn, transformers</strong> (Hugging Face)</li>
+                <li><strong>LLM API access</strong> (OpenAI, Anthropic, or open-source alternatives)</li>
+            </ul>
+        </div>
+
+        <!-- Annotation Tools -->
+        <div class="card">
+            <h3>Annotation Tools</h3>
+            <div class="grid grid-2">
+                <a href="https://labelstud.io/" target="_blank" class="resource-card">
+                    <h4>Label Studio (Recommended)</h4>
+                    <p>Modern, feature-rich annotation platform with LLM integration support</p>
+                    <span class="tag">Free & Open Source</span>
+                </a>
+                <a href="https://argilla.io/" target="_blank" class="resource-card">
+                    <h4>Argilla</h4>
+                    <p>Designed for RLHF data collection and feedback annotation</p>
+                    <span class="tag">Free & Open Source</span>
+                </a>
+                <a href="https://brat.nlplab.org/" target="_blank" class="resource-card">
+                    <h4>brat</h4>
+                    <p>Classic annotation tool for sequence labeling and relation annotation</p>
+                    <span class="tag">Free & Open Source</span>
+                </a>
+                <a href="https://prodi.gy/" target="_blank" class="resource-card">
+                    <h4>Prodigy</h4>
+                    <p>Commercial tool with active learning support (if licensed)</p>
+                    <span class="tag">Commercial</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- LLM Access -->
+        <div class="card">
+            <h3>Recommended LLM Access</h3>
+            <ul>
+                <li><strong>OpenAI API:</strong> GPT-4, GPT-4o - <a href="https://platform.openai.com/" target="_blank">platform.openai.com</a></li>
+                <li><strong>Anthropic API:</strong> Claude 3.5 Sonnet, Claude 3 Opus - <a href="https://www.anthropic.com/api" target="_blank">anthropic.com/api</a></li>
+                <li><strong>Open-source:</strong> Llama 3, Mistral via <a href="https://huggingface.co/" target="_blank">Hugging Face</a> or local deployment</li>
+            </ul>
+        </div>
+
+        <!-- Foundational Readings -->
+        <div class="card">
+            <h3>Foundational Readings</h3>
+            <div class="reading-item">
+                <div class="title">Inter-annotator Agreement</div>
+                <div class="authors">Ron Artstein</div>
+                <div class="venue">Handbook of Linguistic Annotation, 2017</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">Computing Krippendorff's Alpha-Reliability</div>
+                <div class="authors">Klaus Krippendorff</div>
+                <div class="venue">2011</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">The Benefits of a Model of Annotation</div>
+                <div class="authors">Rebecca Passonneau & Bob Carpenter</div>
+                <div class="venue">TACL, 2014</div>
+            </div>
+        </div>
+
+        <!-- LLM-Based Annotation -->
+        <div class="card">
+            <h3>LLM-Based Annotation</h3>
+            <div class="reading-item">
+                <div class="title">ChatGPT Outperforms Crowd-Workers for Text-Annotation Tasks</div>
+                <div class="authors">Gilardi, Alizadeh, & Kubli</div>
+                <div class="venue">arXiv:2303.15056, 2023</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">Large Language Models as Annotators: A Survey</div>
+                <div class="authors">Tan et al.</div>
+                <div class="venue">2024</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">AnnoLLM: Making Large Language Models to Be Better Crowdsourced Annotators</div>
+                <div class="authors">He et al.</div>
+                <div class="venue">arXiv:2303.16854, 2023</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">Automated Annotation with Generative AI Requires Validation</div>
+                <div class="authors">Pangakis, Wolken, & Fasching</div>
+                <div class="venue">arXiv:2306.00176, 2023</div>
+            </div>
+        </div>
+
+        <!-- RLHF and Preference Learning -->
+        <div class="card">
+            <h3>RLHF and Preference Learning</h3>
+            <div class="reading-item">
+                <div class="title">Training language models to follow instructions with human feedback</div>
+                <div class="authors">Ouyang et al.</div>
+                <div class="venue">NeurIPS, 2022</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">Constitutional AI: Harmlessness from AI Feedback</div>
+                <div class="authors">Bai et al.</div>
+                <div class="venue">arXiv:2212.08073, 2022</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">Direct Preference Optimization</div>
+                <div class="authors">Rafailov et al.</div>
+                <div class="venue">NeurIPS, 2023</div>
+            </div>
+        </div>
+
+        <!-- LLM-as-Judge -->
+        <div class="card">
+            <h3>LLM-as-Judge</h3>
+            <div class="reading-item">
+                <div class="title">Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</div>
+                <div class="authors">Zheng et al.</div>
+                <div class="venue">arXiv:2306.05685, 2023</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment</div>
+                <div class="authors">Liu et al.</div>
+                <div class="venue">2023</div>
+            </div>
+        </div>
+
+        <!-- Low-Resource and Multilingual -->
+        <div class="card">
+            <h3>Low-Resource and Multilingual</h3>
+            <div class="reading-item">
+                <div class="title">MasakhaNER: Named Entity Recognition for African Languages</div>
+                <div class="authors">Adelani et al.</div>
+                <div class="venue">TACL, 2021</div>
+            </div>
+            <div class="reading-item">
+                <div class="title">MEGA: Multilingual Evaluation of Generative AI</div>
+                <div class="authors">Ahuja et al.</div>
+                <div class="venue">2023</div>
+            </div>
+        </div>
+
+        <!-- Library Resources -->
+        <div class="card">
+            <h3>Brandeis Library Resources</h3>
+            <p>The <a href="https://www.brandeis.edu/library/" target="_blank">Brandeis Library</a> offers resources and services including:</p>
+            <ul>
+                <li>Research & Instructional Services</li>
+                <li>Digital Scholarship Lab</li>
+                <li><a href="https://www.brandeis.edu/library/research/citation-tools/index.html" target="_blank">Citation and research assistance</a></li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>COSI 230B - Natural Language Annotation for Machine Learning</p>
+        <p>Brandeis University | Spring 2025</p>
+    </footer>
+</body>
+</html>

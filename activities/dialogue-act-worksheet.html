@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Dialogue Act Classification</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #5c6bc0, #7986cb); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #5c6bc0; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #e8eaf6; border-left: 3px solid #5c6bc0; padding: 12px 15px; margin: 12px 0; }
+        .dialogue-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .utterance { background: #fff; border-left: 3px solid #7986cb; padding: 10px 15px; margin: 8px 0; border-radius: 0 4px 4px 0; }
+        .utterance .speaker { font-weight: 600; color: #5c6bc0; font-size: 0.85rem; margin-bottom: 4px; }
+        .utterance .text { font-style: italic; }
+        .act-label { display: inline-block; background: #e8eaf6; color: #3949ab; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; margin-left: 10px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #5c6bc0; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #5c6bc0; color: white; border-color: #5c6bc0; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .act-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+        .act-table th, .act-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .act-table th { background: #e8eaf6; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #5c6bc0; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Dialogue Act Classification</h1>
+            <div class="subtitle">Understanding what speakers do with their words</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Multi-class classification (utterance-level)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Dialogue act classification identifies the <strong>communicative function</strong> of each utterance in a conversation. This is crucial for dialogue systems, chatbots, and conversational AI.</p>
+
+            <div class="definition-box">
+                <p><strong>Dialogue Act (Speech Act):</strong> The action a speaker performs through their utterance, beyond the literal meaning of the words.</p>
+                <p><strong>Key Insight:</strong> "Can you pass the salt?" is literally a question but functions as a request.</p>
+            </div>
+
+            <h3>Common Dialogue Act Categories</h3>
+            <table class="act-table">
+                <tr><th>Act</th><th>Description</th><th>Example</th></tr>
+                <tr><td>Statement</td><td>Asserting information</td><td>"The meeting starts at 3pm."</td></tr>
+                <tr><td>Question</td><td>Requesting information</td><td>"What time is the meeting?"</td></tr>
+                <tr><td>Request</td><td>Asking someone to do something</td><td>"Please send me the report."</td></tr>
+                <tr><td>Promise</td><td>Committing to future action</td><td>"I'll send it by tomorrow."</td></tr>
+                <tr><td>Acknowledgment</td><td>Confirming understanding</td><td>"Okay, got it."</td></tr>
+                <tr><td>Greeting</td><td>Social opening/closing</td><td>"Hi, how are you?"</td></tr>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Classification</h2>
+            <p>Classify each utterance with its primary dialogue act.</p>
+
+            <div class="dialogue-box">
+                <div class="utterance">
+                    <div class="speaker">Customer:</div>
+                    <div class="text">"Hello, I need help with my order."</div>
+                </div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="u1" value="greeting"> Greeting</label>
+                        <label class="radio-option"><input type="radio" name="u1" value="request"> Request</label>
+                        <label class="radio-option"><input type="radio" name="u1" value="statement"> Statement</label>
+                        <label class="radio-option"><input type="radio" name="u1" value="greeting-request"> Greeting + Request (multi-act)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <div class="utterance">
+                    <div class="speaker">Agent:</div>
+                    <div class="text">"Of course! Can you provide your order number?"</div>
+                </div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="u2" value="question"> Question</label>
+                        <label class="radio-option"><input type="radio" name="u2" value="request"> Request</label>
+                        <label class="radio-option"><input type="radio" name="u2" value="ack-question"> Acknowledgment + Question</label>
+                        <label class="radio-option"><input type="radio" name="u2" value="ack-request"> Acknowledgment + Request</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Should "Can you provide your order number?" be classified as a question or a request?</p>
+                <div class="input-group">
+                    <textarea placeholder="Explain the difference and which is more appropriate..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Indirect Speech Acts</h2>
+            <p>Sometimes the form doesn't match the function.</p>
+
+            <div class="dialogue-box">
+                <div class="utterance">
+                    <div class="speaker">Person A:</div>
+                    <div class="text">"It's cold in here."</div>
+                </div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="u3" value="statement"> Statement (just observing)</label>
+                        <label class="radio-option"><input type="radio" name="u3" value="request"> Request (close the window)</label>
+                        <label class="radio-option"><input type="radio" name="u3" value="complaint"> Complaint</label>
+                        <label class="radio-option"><input type="radio" name="u3" value="ambiguous"> Ambiguous (context-dependent)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <div class="utterance">
+                    <div class="speaker">Manager:</div>
+                    <div class="text">"I see the report isn't finished yet."</div>
+                </div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="u4" value="statement"> Statement</label>
+                        <label class="radio-option"><input type="radio" name="u4" value="request"> Indirect Request</label>
+                        <label class="radio-option"><input type="radio" name="u4" value="criticism"> Criticism</label>
+                        <label class="radio-option"><input type="radio" name="u4" value="question"> Implicit Question</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Should annotation capture the <strong>literal form</strong> or the <strong>intended function</strong>?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q2" value="form"> Literal form only</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="function"> Intended function only</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="both"> Both, with separate labels</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="context"> Depends on application context</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What are the tradeoffs?</label>
+                    <textarea placeholder="Discuss the implications of each approach..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Multi-Functional Utterances</h2>
+            <div class="dialogue-box">
+                <div class="utterance">
+                    <div class="speaker">Friend:</div>
+                    <div class="text">"Thanks for the advice! I'll definitely try that. Do you think it will work for my situation though?"</div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>This utterance performs multiple acts. Identify all that apply:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="thanks"> Thanking</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="promise"> Promise/Commitment</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="question"> Question</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="doubt"> Expressing doubt</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q3" value="request"> Request for reassurance</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How should multi-functional utterances be annotated?</label>
+                    <textarea placeholder="Propose a strategy for handling multiple acts..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Context Dependence</h2>
+            <p>The same words can have different functions in different contexts.</p>
+
+            <div class="dialogue-box">
+                <p><strong>Context A:</strong> At a restaurant</p>
+                <div class="utterance">
+                    <div class="speaker">Diner:</div>
+                    <div class="text">"Could I have some water?"</div>
+                </div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="u5a" value="question"> Question</label>
+                        <label class="radio-option"><input type="radio" name="u5a" value="request"> Request</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <p><strong>Context B:</strong> In the desert, lost</p>
+                <div class="utterance">
+                    <div class="speaker">Person:</div>
+                    <div class="text">"Could I have some water?"</div>
+                </div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="u5b" value="question"> Question</label>
+                        <label class="radio-option"><input type="radio" name="u5b" value="request"> Request</label>
+                        <label class="radio-option"><input type="radio" name="u5b" value="plea"> Desperate plea</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>How much context should annotators have access to?</p>
+                <div class="input-group">
+                    <textarea placeholder="Discuss the role of context in dialogue act annotation..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Annotate a Full Dialogue</h2>
+            <div class="dialogue-box">
+                <div class="utterance">
+                    <div class="speaker">A:</div>
+                    <div class="text">"Hey, are you busy right now?"</div>
+                    <select name="full1" style="margin-top: 8px; padding: 4px;">
+                        <option value="">Select act...</option>
+                        <option value="greeting">Greeting</option>
+                        <option value="question">Question</option>
+                        <option value="pre-request">Pre-request</option>
+                        <option value="greeting-prereq">Greeting + Pre-request</option>
+                    </select>
+                </div>
+                <div class="utterance">
+                    <div class="speaker">B:</div>
+                    <div class="text">"Not really, what's up?"</div>
+                    <select name="full2" style="margin-top: 8px; padding: 4px;">
+                        <option value="">Select act...</option>
+                        <option value="answer">Answer</option>
+                        <option value="question">Question</option>
+                        <option value="answer-question">Answer + Question</option>
+                    </select>
+                </div>
+                <div class="utterance">
+                    <div class="speaker">A:</div>
+                    <div class="text">"Could you help me move this weekend?"</div>
+                    <select name="full3" style="margin-top: 8px; padding: 4px;">
+                        <option value="">Select act...</option>
+                        <option value="question">Question</option>
+                        <option value="request">Request</option>
+                        <option value="proposal">Proposal</option>
+                    </select>
+                </div>
+                <div class="utterance">
+                    <div class="speaker">B:</div>
+                    <div class="text">"Hmm, I might have plans. What time were you thinking?"</div>
+                    <select name="full4" style="margin-top: 8px; padding: 4px;">
+                        <option value="">Select act...</option>
+                        <option value="reject">Reject</option>
+                        <option value="hedge">Hedge + Question</option>
+                        <option value="question">Question</option>
+                        <option value="negotiate">Negotiation</option>
+                    </select>
+                </div>
+                <div class="utterance">
+                    <div class="speaker">A:</div>
+                    <div class="text">"Saturday afternoon, around 2?"</div>
+                    <select name="full5" style="margin-top: 8px; padding: 4px;">
+                        <option value="">Select act...</option>
+                        <option value="answer">Answer</option>
+                        <option value="proposal">Proposal</option>
+                        <option value="answer-proposal">Answer + Proposal</option>
+                    </select>
+                </div>
+                <div class="utterance">
+                    <div class="speaker">B:</div>
+                    <div class="text">"Yeah, I can make that work. I'll be there."</div>
+                    <select name="full6" style="margin-top: 8px; padding: 4px;">
+                        <option value="">Select act...</option>
+                        <option value="accept">Accept</option>
+                        <option value="promise">Promise</option>
+                        <option value="accept-promise">Accept + Promise</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>What was the hardest utterance to classify? Why?</p>
+                <div class="input-group">
+                    <textarea placeholder="Describe the difficulty..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="indirect"> Indirect speech acts</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="multi"> Multi-functional utterances</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="granularity"> Act granularity</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="boundaries"> Utterance boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="context"> Context interpretation</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Why is dialogue act classification difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="indirect"> Indirect speech acts are common</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="multi"> Utterances often have multiple functions</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="context"> Context is needed for interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="taxonomy"> No universal taxonomy exists</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="culture"> Cultural variation in speech acts</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Dialogue acts bridge form and function—what we say vs. what we do with words.</strong></p>
+                <ul>
+                    <li>The same form can serve many functions; the same function can take many forms</li>
+                    <li>Annotation requires deciding whether to capture literal or intended meaning</li>
+                    <li>Context and common ground are essential for interpretation</li>
+                    <li>Dialogue act taxonomies are application-specific choices, not natural categories</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('dialogue-act-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            localStorage.setItem('dialogue-act-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('dialogue-act-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Response Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .session-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .session-controls input, .session-controls select {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+
+        .session-controls input {
+            width: 150px;
+            text-transform: uppercase;
+        }
+
+        .session-controls select {
+            min-width: 200px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .stats-bar {
+            background: rgba(255,255,255,0.05);
+            padding: 15px 40px;
+            display: flex;
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .main-content {
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 .question-num {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 15px;
+        }
+
+        .agreement-metrics {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .metric {
+            text-align: center;
+            flex: 1;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .metric-value.excellent { color: #4CAF50; }
+        .metric-value.good { color: #8BC34A; }
+        .metric-value.moderate { color: #FFC107; }
+        .metric-value.fair { color: #FF9800; }
+        .metric-value.poor { color: #f44336; }
+
+        .metric-label {
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .text-responses {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .text-response {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .text-response:nth-child(even) {
+            border-left-color: #2196F3;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.5);
+            font-size: 1.1em;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4CAF50;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+            backdrop-filter: blur(10px);
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Fullscreen presentation mode */
+        body.presentation-mode .header {
+            padding: 10px 20px;
+        }
+
+        body.presentation-mode .main-content {
+            padding: 15px 20px;
+        }
+
+        body.presentation-mode .card {
+            padding: 15px;
+        }
+
+        .connection-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+
+        .connection-status.connected {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+
+        .connection-status.disconnected {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+        }
+
+        .worksheet-info {
+            background: rgba(255,255,255,0.05);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .worksheet-info h2 {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .worksheet-info p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9em;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .empty-state p {
+            color: rgba(255,255,255,0.5);
+            font-size: 1.1em;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .session-code-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: #4CAF50;
+            text-align: center;
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Annotation Worksheet Dashboard</h1>
+        <div class="session-controls">
+            <input type="text" id="sessionCode" placeholder="Session Code" maxlength="6">
+            <select id="worksheetSelect">
+                <option value="">Select Worksheet...</option>
+            </select>
+            <button class="btn btn-primary" onclick="startSession()">Start Viewing</button>
+            <button class="btn btn-secondary" onclick="generateSessionCode()">New Session</button>
+            <span class="connection-status disconnected" id="connectionStatus">Disconnected</span>
+        </div>
+    </div>
+
+    <div class="stats-bar" id="statsBar" style="display: none;">
+        <div class="stat-item">
+            <div class="stat-value" id="totalResponses">0</div>
+            <div class="stat-label">Total Responses</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="avgAgreement">--</div>
+            <div class="stat-label">Avg. Agreement</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="avgKappa">--</div>
+            <div class="stat-label">Fleiss' Kappa</div>
+        </div>
+        <div class="stat-item">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>LIVE</span>
+            </div>
+            <div class="stat-label" id="lastUpdate">Waiting for responses...</div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="empty-state">
+            <h2>Welcome to the Dashboard</h2>
+            <p>Enter a session code and select a worksheet to view real-time student responses and statistics.</p>
+            <p style="margin-top: 20px;">Or click "New Session" to generate a new session code for your class.</p>
+        </div>
+    </div>
+
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">&#x26F6; Fullscreen</button>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Worksheet definitions - maps to the actual worksheets
+        const worksheets = {
+            'toxicity': { name: 'Toxicity Detection', file: 'toxicity-worksheet.html' },
+            'event-extraction': { name: 'Event Extraction', file: 'event-extraction-worksheet.html' },
+            'causal-relation': { name: 'Causal Relation', file: 'causal-relation-worksheet.html' },
+            'ner': { name: 'Named Entity Recognition', file: 'ner-worksheet.html' },
+            'sentiment': { name: 'Sentiment Analysis', file: 'sentiment-worksheet.html' },
+            'coreference': { name: 'Coreference Resolution', file: 'coreference-worksheet.html' },
+            'llm-preference': { name: 'LLM Preference (RLHF)', file: 'llm-preference-worksheet.html' },
+            'hallucination': { name: 'Hallucination Detection', file: 'hallucination-worksheet.html' },
+            'sarcasm': { name: 'Sarcasm Detection', file: 'sarcasm-worksheet.html' },
+            'stance-detection': { name: 'Stance Detection', file: 'stance-detection-worksheet.html' },
+            'qa-annotation': { name: 'Question Answering', file: 'qa-annotation-worksheet.html' },
+            'summarization-eval': { name: 'Summarization Evaluation', file: 'summarization-eval-worksheet.html' },
+            'emotion-detection': { name: 'Emotion Detection', file: 'emotion-detection-worksheet.html' },
+            'semantic-role': { name: 'Semantic Role Labeling', file: 'semantic-role-worksheet.html' },
+            'prompt-quality': { name: 'Prompt Quality', file: 'prompt-quality-worksheet.html' },
+            'word-sense': { name: 'Word Sense Disambiguation', file: 'word-sense-worksheet.html' },
+            'dialogue-act': { name: 'Dialogue Act Classification', file: 'dialogue-act-worksheet.html' },
+            'temporal-annotation': { name: 'Temporal Annotation', file: 'temporal-annotation-worksheet.html' },
+            'implicit-hate': { name: 'Implicit Hate Speech', file: 'implicit-hate-worksheet.html' },
+            'translation-quality': { name: 'Translation Quality', file: 'translation-quality-worksheet.html' },
+            'code-review': { name: 'Code Review', file: 'code-review-worksheet.html' },
+            'relation-extraction': { name: 'Relation Extraction', file: 'relation-extraction-worksheet.html' },
+            'argumentation': { name: 'Argumentation Mining', file: 'argumentation-worksheet.html' },
+            'text-simplification': { name: 'Text Simplification', file: 'text-simplification-worksheet.html' },
+            'bias-detection': { name: 'Bias Detection', file: 'bias-detection-worksheet.html' }
+        };
+
+        // Chart color palette
+        const chartColors = [
+            'rgba(76, 175, 80, 0.8)',   // Green
+            'rgba(33, 150, 243, 0.8)',  // Blue
+            'rgba(255, 193, 7, 0.8)',   // Amber
+            'rgba(156, 39, 176, 0.8)',  // Purple
+            'rgba(255, 87, 34, 0.8)',   // Deep Orange
+            'rgba(0, 188, 212, 0.8)',   // Cyan
+            'rgba(233, 30, 99, 0.8)',   // Pink
+            'rgba(139, 195, 74, 0.8)'   // Light Green
+        ];
+
+        let db = null;
+        let unsubscribe = null;
+        let currentSession = null;
+        let currentWorksheet = null;
+        let charts = {};
+        let allResponses = [];
+
+        // Initialize worksheet dropdown
+        function initWorksheetSelect() {
+            const select = document.getElementById('worksheetSelect');
+            Object.entries(worksheets).forEach(([id, info]) => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = info.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Generate random session code
+        function generateSessionCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('sessionCode').value = code;
+
+            // Show the code prominently
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="empty-state">
+                    <h2>Session Created!</h2>
+                    <p>Share this code with your students:</p>
+                    <div class="session-code-display">${code}</div>
+                    <p style="margin-top: 20px;">Students should enter this code in their worksheet before submitting.</p>
+                    <p style="margin-top: 10px;">Select a worksheet above and click "Start Viewing" to begin.</p>
+                </div>
+            `;
+        }
+
+        // Initialize Firebase
+        function initFirebase() {
+            // Load config from firebase-config.js
+            // For now, check if firebase config exists
+            if (typeof firebaseConfig !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log('Firebase initialized');
+                return true;
+            } else {
+                console.warn('Firebase config not found. Please configure firebase-config.js');
+                return false;
+            }
+        }
+
+        // Start viewing session
+        function startSession() {
+            const sessionCode = document.getElementById('sessionCode').value.toUpperCase().trim();
+            const worksheetId = document.getElementById('worksheetSelect').value;
+
+            if (!sessionCode) {
+                alert('Please enter a session code');
+                return;
+            }
+
+            if (!worksheetId) {
+                alert('Please select a worksheet');
+                return;
+            }
+
+            if (!db) {
+                // Demo mode without Firebase
+                startDemoMode(sessionCode, worksheetId);
+                return;
+            }
+
+            currentSession = sessionCode;
+            currentWorksheet = worksheetId;
+
+            // Unsubscribe from previous listener
+            if (unsubscribe) {
+                unsubscribe();
+            }
+
+            document.getElementById('statsBar').style.display = 'flex';
+            document.getElementById('connectionStatus').className = 'connection-status connected';
+            document.getElementById('connectionStatus').textContent = 'Connected';
+
+            // Subscribe to real-time updates
+            unsubscribe = db.collection('sessions')
+                .doc(sessionCode)
+                .collection(worksheetId)
+                .onSnapshot((snapshot) => {
+                    allResponses = [];
+                    snapshot.forEach(doc => {
+                        allResponses.push(doc.data());
+                    });
+                    updateDashboard(allResponses);
+                }, (error) => {
+                    console.error('Error listening to updates:', error);
+                    document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                    document.getElementById('connectionStatus').textContent = 'Error';
+                });
+        }
+
+        // Demo mode for testing without Firebase
+        function startDemoMode(sessionCode, worksheetId) {
+            currentSession = sessionCode;
+            currentWorksheet = worksheetId;
+
+            document.getElementById('statsBar').style.display = 'flex';
+            document.getElementById('connectionStatus').className = 'connection-status connected';
+            document.getElementById('connectionStatus').textContent = 'Demo Mode';
+
+            // Generate demo data
+            const demoResponses = generateDemoData(worksheetId);
+            allResponses = demoResponses;
+            updateDashboard(demoResponses);
+
+            // Simulate real-time updates
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    allResponses.push(generateSingleDemoResponse(worksheetId));
+                    updateDashboard(allResponses);
+                }
+            }, 3000);
+        }
+
+        // Generate demo data
+        function generateDemoData(worksheetId) {
+            const responses = [];
+            const numResponses = Math.floor(Math.random() * 15) + 10;
+
+            for (let i = 0; i < numResponses; i++) {
+                responses.push(generateSingleDemoResponse(worksheetId));
+            }
+            return responses;
+        }
+
+        function generateSingleDemoResponse(worksheetId) {
+            const response = {
+                timestamp: new Date().toISOString(),
+                answers: {}
+            };
+
+            // Generate answers for typical questions
+            for (let i = 1; i <= 8; i++) {
+                const qType = Math.random();
+                if (qType < 0.7) {
+                    // Multiple choice
+                    const options = ['A', 'B', 'C', 'D'];
+                    response.answers[`q${i}`] = options[Math.floor(Math.random() * options.length)];
+                } else {
+                    // Text response
+                    const textResponses = [
+                        "The context makes it ambiguous.",
+                        "I think this could be interpreted differently.",
+                        "Clear case of the first option.",
+                        "The boundary is unclear here.",
+                        "Depends on the annotator's background.",
+                        "This seems straightforward to me.",
+                        "Multiple valid interpretations exist.",
+                        "The guidelines don't cover this case well."
+                    ];
+                    response.answers[`q${i}_text`] = textResponses[Math.floor(Math.random() * textResponses.length)];
+                }
+            }
+            return response;
+        }
+
+        // Update dashboard with responses
+        function updateDashboard(responses) {
+            document.getElementById('totalResponses').textContent = responses.length;
+            document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+
+            if (responses.length === 0) {
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="empty-state">
+                        <h2>Waiting for Responses</h2>
+                        <p>Session Code: <strong>${currentSession}</strong></p>
+                        <p>Worksheet: <strong>${worksheets[currentWorksheet].name}</strong></p>
+                        <p style="margin-top: 20px;">Responses will appear here in real-time as students submit.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Analyze responses and build dashboard
+            const analysis = analyzeResponses(responses);
+            renderDashboard(analysis);
+
+            // Update global stats
+            document.getElementById('avgAgreement').textContent = analysis.avgAgreement.toFixed(0) + '%';
+            document.getElementById('avgKappa').textContent = analysis.avgKappa.toFixed(2);
+        }
+
+        // Analyze responses
+        function analyzeResponses(responses) {
+            const questions = {};
+            const textResponses = {};
+
+            // Collect all answers by question
+            responses.forEach(response => {
+                Object.entries(response.answers || {}).forEach(([key, value]) => {
+                    if (key.endsWith('_text')) {
+                        // Text response
+                        const qKey = key.replace('_text', '');
+                        if (!textResponses[qKey]) textResponses[qKey] = [];
+                        if (value && value.trim()) {
+                            textResponses[qKey].push(value);
+                        }
+                    } else {
+                        // Multiple choice
+                        if (!questions[key]) questions[key] = {};
+                        if (!questions[key][value]) questions[key][value] = 0;
+                        questions[key][value]++;
+                    }
+                });
+            });
+
+            // Calculate agreement for each question
+            let totalAgreement = 0;
+            let totalKappa = 0;
+            let questionCount = 0;
+
+            const questionAnalysis = Object.entries(questions).map(([qId, distribution]) => {
+                const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+                const options = Object.keys(distribution).sort();
+                const counts = options.map(opt => distribution[opt] || 0);
+
+                // Percentage agreement (most common answer / total)
+                const maxCount = Math.max(...counts);
+                const agreement = (maxCount / total) * 100;
+
+                // Fleiss' Kappa (simplified for binary/multi-choice)
+                const kappa = calculateFleissKappa(counts, total);
+
+                totalAgreement += agreement;
+                totalKappa += kappa;
+                questionCount++;
+
+                return {
+                    id: qId,
+                    distribution,
+                    options,
+                    counts,
+                    total,
+                    agreement,
+                    kappa,
+                    textResponses: textResponses[qId] || []
+                };
+            });
+
+            return {
+                questions: questionAnalysis.sort((a, b) => {
+                    const numA = parseInt(a.id.replace('q', ''));
+                    const numB = parseInt(b.id.replace('q', ''));
+                    return numA - numB;
+                }),
+                avgAgreement: questionCount > 0 ? totalAgreement / questionCount : 0,
+                avgKappa: questionCount > 0 ? totalKappa / questionCount : 0,
+                totalResponses: responses.length
+            };
+        }
+
+        // Calculate Fleiss' Kappa
+        function calculateFleissKappa(counts, n) {
+            if (n < 2) return 0;
+
+            const k = counts.length; // number of categories
+            const N = n; // number of subjects (responses)
+
+            // P_j for each category
+            const pj = counts.map(c => c / N);
+
+            // P_e (expected agreement)
+            const Pe = pj.reduce((sum, p) => sum + p * p, 0);
+
+            // P_o (observed agreement) - simplified
+            const Po = counts.reduce((sum, c) => sum + (c * (c - 1)), 0) / (N * (N - 1) || 1);
+
+            // Kappa
+            if (Pe === 1) return 1;
+            const kappa = (Po - Pe) / (1 - Pe);
+
+            return Math.max(-1, Math.min(1, kappa)); // Clamp to [-1, 1]
+        }
+
+        // Get Kappa interpretation class
+        function getKappaClass(kappa) {
+            if (kappa >= 0.8) return 'excellent';
+            if (kappa >= 0.6) return 'good';
+            if (kappa >= 0.4) return 'moderate';
+            if (kappa >= 0.2) return 'fair';
+            return 'poor';
+        }
+
+        // Render dashboard
+        function renderDashboard(analysis) {
+            const container = document.getElementById('mainContent');
+            container.innerHTML = '';
+
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
+            analysis.questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const questionNum = q.id.replace('q', '');
+                const kappaClass = getKappaClass(q.kappa);
+
+                card.innerHTML = `
+                    <h3>
+                        <span class="question-num">Q${questionNum}</span>
+                        Response Distribution
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chart-${q.id}"></canvas>
+                    </div>
+                    <div class="agreement-metrics">
+                        <div class="metric">
+                            <div class="metric-value ${kappaClass}">${q.agreement.toFixed(0)}%</div>
+                            <div class="metric-label">Agreement</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value ${kappaClass}">${q.kappa.toFixed(2)}</div>
+                            <div class="metric-label">Fleiss' Kappa</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${q.total}</div>
+                            <div class="metric-label">Responses</div>
+                        </div>
+                    </div>
+                    ${q.textResponses.length > 0 ? `
+                        <div style="margin-top: 15px;">
+                            <h4 style="margin-bottom: 10px; color: rgba(255,255,255,0.8);">Text Responses</h4>
+                            <div class="text-responses">
+                                ${q.textResponses.map(t => `<div class="text-response">${escapeHtml(t)}</div>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+
+                container.appendChild(card);
+
+                // Create chart
+                const ctx = document.getElementById(`chart-${q.id}`).getContext('2d');
+                charts[q.id] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: q.options,
+                        datasets: [{
+                            data: q.counts,
+                            backgroundColor: q.options.map((_, i) => chartColors[i % chartColors.length]),
+                            borderWidth: 0,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: 'rgba(255,255,255,0.7)',
+                                    stepSize: 1
+                                },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                ticks: { color: 'rgba(255,255,255,0.9)' },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                document.body.classList.add('presentation-mode');
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('presentation-mode');
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initWorksheetSelect();
+
+            // Try to load Firebase config
+            const script = document.createElement('script');
+            script.src = 'firebase-config.js';
+            script.onload = () => {
+                if (initFirebase()) {
+                    console.log('Firebase ready');
+                } else {
+                    console.log('Running in demo mode');
+                }
+            };
+            script.onerror = () => {
+                console.log('Firebase config not found, running in demo mode');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>

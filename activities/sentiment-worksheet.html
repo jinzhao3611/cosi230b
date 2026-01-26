@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Sentiment Analysis</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #8e44ad; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #f5eef8; border-left: 3px solid #9b59b6; padding: 12px 15px; margin: 12px 0; }
+        .example-card { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .example-card .example-header { font-weight: 600; color: #8e44ad; margin-bottom: 8px; }
+        .example-card .text { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 12px; font-style: italic; margin: 10px 0; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .scale-container { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 6px; }
+        .scale-option { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .scale-option input { width: 20px; height: 20px; }
+        .scale-option label { font-size: 0.8rem; text-align: center; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #9b59b6; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #9b59b6; color: white; border-color: #9b59b6; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .aspect-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9rem; }
+        .aspect-table th, .aspect-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .aspect-table th { background: #f5eef8; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #9b59b6; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Sentiment Analysis Annotation</h1>
+            <div class="subtitle">Beyond positive and negative: Understanding sentiment complexity</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Classification (ordinal/multi-dimensional)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>You are annotating product reviews for sentiment analysis. The goal is to train a model that understands customer opinions.</p>
+
+            <div class="definition-box">
+                <p><strong>Sentiment</strong> refers to the attitude, opinion, or feeling expressed in text toward a target (product, service, person, etc.).</p>
+            </div>
+
+            <h3>Label Options</h3>
+            <p><strong>Basic scheme:</strong> Positive, Negative, Neutral</p>
+            <p><strong>Extended scheme:</strong> Very Negative (-2), Negative (-1), Neutral (0), Positive (+1), Very Positive (+2)</p>
+
+            <p style="margin-top: 10px;">Sentiment seems simple, but involves difficult decisions about:</p>
+            <ul style="margin: 8px 0 8px 20px;">
+                <li>Mixed sentiments within the same text</li>
+                <li>Sarcasm and irony</li>
+                <li>Implicit vs. explicit sentiment</li>
+                <li>Aspect-level vs. document-level sentiment</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Sentiment (Warm-up)</h2>
+            <div class="example-card">
+                <div class="example-header">Review 1</div>
+                <div class="text">"This laptop is amazing! Fast, lightweight, and the battery lasts forever."</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r1" value="-2" id="r1_1">
+                        <label for="r1_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r1" value="-1" id="r1_2">
+                        <label for="r1_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r1" value="0" id="r1_3">
+                        <label for="r1_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r1" value="1" id="r1_4">
+                        <label for="r1_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r1" value="2" id="r1_5">
+                        <label for="r1_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Review 2</div>
+                <div class="text">"The product arrived on time."</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r2" value="-2" id="r2_1">
+                        <label for="r2_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r2" value="-1" id="r2_2">
+                        <label for="r2_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r2" value="0" id="r2_3">
+                        <label for="r2_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r2" value="1" id="r2_4">
+                        <label for="r2_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r2" value="2" id="r2_5">
+                        <label for="r2_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Is "arrived on time" neutral (just stating a fact) or slightly positive (meeting expectations)?</p>
+                <div class="input-group">
+                    <textarea placeholder="Explain your interpretation..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Mixed Sentiment</h2>
+            <div class="example-card">
+                <div class="example-header">Review 3</div>
+                <div class="text">"The camera quality is outstanding, but the battery life is disappointing. For the price, I expected more."</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r3" value="-2" id="r3_1">
+                        <label for="r3_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r3" value="-1" id="r3_2">
+                        <label for="r3_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r3" value="0" id="r3_3">
+                        <label for="r3_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r3" value="1" id="r3_4">
+                        <label for="r3_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r3" value="2" id="r3_5">
+                        <label for="r3_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>How should mixed sentiment be handled?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q2" value="average"> Average the sentiments (neutral)</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="dominant"> Use the dominant/final sentiment</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="mixed"> Add a "Mixed" label</label>
+                        <label class="radio-option"><input type="radio" name="q2" value="aspect"> Annotate sentiment per aspect separately</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What are the tradeoffs?</label>
+                    <textarea placeholder="Discuss pros and cons of each approach..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Sarcasm and Irony</h2>
+            <div class="example-card">
+                <div class="example-header">Review 4</div>
+                <div class="text">"Oh great, another phone that dies by noon. Exactly what I needed."</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r4" value="-2" id="r4_1">
+                        <label for="r4_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r4" value="-1" id="r4_2">
+                        <label for="r4_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r4" value="0" id="r4_3">
+                        <label for="r4_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r4" value="1" id="r4_4">
+                        <label for="r4_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r4" value="2" id="r4_5">
+                        <label for="r4_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Review 5</div>
+                <div class="text">"Five stars for being consistently inconsistent. The quality varies so much, it's like a surprise every time!"</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r5" value="-2" id="r5_1">
+                        <label for="r5_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r5" value="-1" id="r5_2">
+                        <label for="r5_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r5" value="0" id="r5_3">
+                        <label for="r5_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r5" value="1" id="r5_4">
+                        <label for="r5_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r5" value="2" id="r5_5">
+                        <label for="r5_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Should annotation capture the literal meaning or the intended meaning?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q3" value="literal"> Literal (surface) meaning</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="intended"> Intended (pragmatic) meaning</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="both"> Both, with separate labels</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How would you handle sarcasm in guidelines?</label>
+                    <textarea placeholder="Propose a rule for sarcastic reviews..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Implicit Sentiment</h2>
+            <div class="example-card">
+                <div class="example-header">Review 6</div>
+                <div class="text">"I've already ordered two more for my family members."</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r6" value="-2" id="r6_1">
+                        <label for="r6_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r6" value="-1" id="r6_2">
+                        <label for="r6_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r6" value="0" id="r6_3">
+                        <label for="r6_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r6" value="1" id="r6_4">
+                        <label for="r6_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r6" value="2" id="r6_5">
+                        <label for="r6_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-header">Review 7</div>
+                <div class="text">"I returned it the same day."</div>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="r7" value="-2" id="r7_1">
+                        <label for="r7_1">Very Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r7" value="-1" id="r7_2">
+                        <label for="r7_2">Negative</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r7" value="0" id="r7_3">
+                        <label for="r7_3">Neutral</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r7" value="1" id="r7_4">
+                        <label for="r7_4">Positive</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="r7" value="2" id="r7_5">
+                        <label for="r7_5">Very Positive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Neither review contains explicit sentiment words. Should implicit sentiment be annotated?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes, based on implied meaning</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="no"> No, only explicit sentiment</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="separate"> Yes, but mark as "implicit"</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What world knowledge is needed to interpret these reviews?</label>
+                    <textarea placeholder="Explain the inference required..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Aspect-Based Sentiment</h2>
+            <div class="example-card">
+                <div class="example-header">Review 8</div>
+                <div class="text">"The food was delicious but the service was terrible. The atmosphere was nice though, and prices are reasonable."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Annotate sentiment for each aspect:</p>
+                <table class="aspect-table">
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Sentiment</th>
+                    </tr>
+                    <tr>
+                        <td>Food quality</td>
+                        <td><select name="aspect1"><option value="">Select...</option><option value="-2">Very Negative</option><option value="-1">Negative</option><option value="0">Neutral</option><option value="1">Positive</option><option value="2">Very Positive</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Service</td>
+                        <td><select name="aspect2"><option value="">Select...</option><option value="-2">Very Negative</option><option value="-1">Negative</option><option value="0">Neutral</option><option value="1">Positive</option><option value="2">Very Positive</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Atmosphere</td>
+                        <td><select name="aspect3"><option value="">Select...</option><option value="-2">Very Negative</option><option value="-1">Negative</option><option value="0">Neutral</option><option value="1">Positive</option><option value="2">Very Positive</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td><select name="aspect4"><option value="">Select...</option><option value="-2">Very Negative</option><option value="-1">Negative</option><option value="0">Neutral</option><option value="1">Positive</option><option value="2">Very Positive</option></select></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Overall</strong></td>
+                        <td><select name="aspect5"><option value="">Select...</option><option value="-2">Very Negative</option><option value="-1">Negative</option><option value="0">Neutral</option><option value="1">Positive</option><option value="2">Very Positive</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>How did you determine the overall sentiment?</label>
+                    <textarea placeholder="Explain your aggregation strategy..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Comparative Sentiment</h2>
+            <div class="example-card">
+                <div class="example-header">Review 9</div>
+                <div class="text">"This is better than my old Samsung, but still not as good as the iPhone."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>What is the sentiment toward each product?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <p style="margin: 10px 0;"><strong>This product:</strong></p>
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q6a" value="neg"> Negative</label>
+                        <label class="radio-option"><input type="radio" name="q6a" value="neu"> Neutral</label>
+                        <label class="radio-option"><input type="radio" name="q6a" value="pos"> Positive</label>
+                        <label class="radio-option"><input type="radio" name="q6a" value="mixed"> Mixed</label>
+                    </div>
+                    <p style="margin: 10px 0;"><strong>Samsung:</strong></p>
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q6b" value="neg"> Negative</label>
+                        <label class="radio-option"><input type="radio" name="q6b" value="neu"> Neutral</label>
+                        <label class="radio-option"><input type="radio" name="q6b" value="pos"> Positive</label>
+                    </div>
+                    <p style="margin: 10px 0;"><strong>iPhone:</strong></p>
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q6c" value="neg"> Negative</label>
+                        <label class="radio-option"><input type="radio" name="q6c" value="neu"> Neutral</label>
+                        <label class="radio-option"><input type="radio" name="q6c" value="pos"> Positive</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How should comparative sentiment be handled in guidelines?</label>
+                    <textarea placeholder="Propose a rule for comparative reviews..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="scale"> Scale position (e.g., +1 vs +2)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="sarcasm"> Sarcasm interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="mixed"> Mixed sentiment handling</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="implicit"> Implicit sentiment inference</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="neutral"> Neutral vs. slightly positive/negative</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is sentiment analysis harder than it appears?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Sentiment is inherently subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Context changes interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Much sentiment is implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="granularity"> Scale granularity is arbitrary</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="mixed"> Real opinions are often mixed</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Sentiment is not a property of text—it's an interpretation that depends on context, culture, and task.</strong></p>
+                <ul>
+                    <li>The same text can have different sentiments for different targets</li>
+                    <li>Annotation guidelines encode assumptions about what sentiment means</li>
+                    <li>Simple scales hide complex, multi-dimensional opinions</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('sentiment-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            localStorage.setItem('sentiment-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('sentiment-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

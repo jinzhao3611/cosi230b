@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Event Causal Relation Extraction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a5276, #2e86ab);
+            color: white;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+        }
+
+        header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+
+        header .meta span {
+            margin-right: 20px;
+        }
+
+        header .author {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        header .objective {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            font-size: 0.9rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            color: #1a5276;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section h3 {
+            color: #333;
+            font-size: 1rem;
+            margin: 15px 0 8px 0;
+        }
+
+        .section p {
+            margin-bottom: 10px;
+        }
+
+        .definition-box {
+            background: #f0f7fb;
+            border-left: 4px solid #2e86ab;
+            padding: 12px 15px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+
+        .definition-box strong {
+            color: #1a5276;
+        }
+
+        .label-box {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin: 12px 0;
+        }
+
+        .label-box .label-item {
+            margin: 6px 0;
+            font-size: 0.9rem;
+        }
+
+        .label-box .label-name {
+            font-weight: 600;
+            color: #1a5276;
+        }
+
+        .sentence-card {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .sentence-card .sentence-header {
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .sentence-card .sentence-text {
+            font-size: 1.05rem;
+            font-style: italic;
+            background: white;
+            padding: 10px 12px;
+            border-radius: 4px;
+            border: 1px solid #ffe082;
+            margin-bottom: 10px;
+        }
+
+        .sentence-card .events {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .sentence-card .events strong {
+            color: #1a5276;
+        }
+
+        .question-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .question-box .question-header {
+            font-weight: 600;
+            color: #1a5276;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .label-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .label-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .label-option input[type="radio"],
+        .label-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 6px 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-option input[type="checkbox"],
+        .checkbox-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-top: 5px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #2e86ab;
+            box-shadow: 0 0 0 2px rgba(46, 134, 171, 0.1);
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        .choices-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .choices-container.show {
+            display: block;
+        }
+
+        .toggle-btn {
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #333;
+            margin-top: 6px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .toggle-btn.active {
+            background: #2e86ab;
+            color: white;
+            border-color: #2e86ab;
+        }
+
+        .takeaway-box {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .takeaway-box h3 {
+            color: #388e3c;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .takeaway-box ul {
+            margin-left: 20px;
+            font-size: 0.9rem;
+        }
+
+        .takeaway-box li {
+            margin: 5px 0;
+        }
+
+        .takeaway-box .one-liner {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #a5d6a7;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .toolbar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-print {
+            background: #2e86ab;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #1a5276;
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+
+        .arrow {
+            font-weight: bold;
+            color: #1a5276;
+        }
+
+        @media print {
+            body {
+                background: white;
+                font-size: 0.85rem;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            header {
+                margin-bottom: 15px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .toolbar {
+                display: none;
+            }
+
+            textarea {
+                border: 1px solid #ccc;
+                min-height: 50px;
+            }
+
+            .choices-container {
+                display: block !important;
+            }
+
+            .toggle-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Worksheet: A Hard NLP Structured Annotation Task</h1>
+            <div class="subtitle">Event Causal Relation Extraction</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Structured annotation (event detection + causal relations)</span>
+            </div>
+            <div class="objective">
+                <strong>Objective:</strong> Understand why structured annotation is harder than sequence labeling
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Background -->
+        <section class="section">
+            <h2>Background</h2>
+            <p>You are annotating data for an AI system that extracts <strong>causal relations between events</strong> from news text.</p>
+
+            <div class="definition-box">
+                <p><strong>A causal relation means that:</strong> One event (CAUSE) brings about or contributes to another event (EFFECT)</p>
+            </div>
+
+            <p>This task requires:</p>
+            <ul style="margin: 8px 0 8px 25px; font-size: 0.9rem;">
+                <li>Identifying events</li>
+                <li>Deciding whether a causal relation exists</li>
+                <li>Assigning direction (what caused what)</li>
+            </ul>
+
+            <h3>Event Definition (for this worksheet)</h3>
+            <div class="definition-box">
+                <p>An <strong>event</strong> is a real-world occurrence or action described in the text (e.g., attack, protest, collapse, evacuation, shutdown).</p>
+            </div>
+
+            <h3>Causal Relation Labels</h3>
+            <div class="label-box">
+                <div class="label-item"><span class="label-name">CAUSES</span> — Event A directly causes Event B</div>
+                <div class="label-item"><span class="label-name">ENABLED</span> — Event A made Event B possible but did not directly cause it</div>
+                <div class="label-item"><span class="label-name">NO-RELATION</span> — No causal relation is expressed</div>
+                <div class="label-item"><span class="label-name">UNCERTAIN</span> — Causality is suggested but not clearly stated</div>
+            </div>
+        </section>
+
+        <!-- Part 1 -->
+        <section class="section">
+            <h2>Part 1: Warm-up — What Counts as Causation?</h2>
+
+            <div class="question-box">
+                <div class="question-header">Question 1</div>
+                <p>Which of the following words or phrases often signal causality? (Check all that apply.)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="because"> because</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="after"> after</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="led-to"> led to</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="resulted-in"> resulted in</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="during"> during</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="triggered"> triggered</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="followed-by"> followed by</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Which one is most ambiguous? Why?</label>
+                    <textarea placeholder="Explain which word/phrase is most ambiguous and why..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 2 -->
+        <section class="section">
+            <h2>Part 2: Explicit Causation (Easier Case)</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 1</div>
+                <div class="sentence-text">"Heavy rainfall caused flooding across the region."</div>
+                <div class="events">
+                    <strong>Event A:</strong> heavy rainfall &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Event B:</strong> flooding
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 2</div>
+                <p>What is the relation between Event A and Event B?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option"><input type="radio" name="q2" value="causes"> CAUSES</label>
+                        <label class="label-option"><input type="radio" name="q2" value="enabled"> ENABLED</label>
+                        <label class="label-option"><input type="radio" name="q2" value="no-relation"> NO-RELATION</label>
+                        <label class="label-option"><input type="radio" name="q2" value="uncertain"> UNCERTAIN</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why?</label>
+                    <textarea placeholder="Explain your reasoning..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 3 -->
+        <section class="section">
+            <h2>Part 3: Temporal ≠ Causal (Classic Trap)</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 2</div>
+                <div class="sentence-text">"Flooding occurred after heavy rainfall in the region."</div>
+                <div class="events">
+                    <strong>Event A:</strong> heavy rainfall &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Event B:</strong> flooding
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 3</div>
+                <p>Is this sentence explicitly causal?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option"><input type="radio" name="q3" value="yes"> Yes</label>
+                        <label class="label-option"><input type="radio" name="q3" value="no"> No</label>
+                        <label class="label-option"><input type="radio" name="q3" value="unclear"> Unclear</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain the difference between temporal order and causal relation:</label>
+                    <textarea placeholder="What distinguishes 'A happened before B' from 'A caused B'?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 4 -->
+        <section class="section">
+            <h2>Part 4: Implicit Causality (Harder Case)</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 3</div>
+                <div class="sentence-text">"The bridge collapsed, leaving dozens stranded."</div>
+                <div class="events">
+                    <strong>Event A:</strong> bridge collapsed &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Event B:</strong> people stranded
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 4</div>
+                <p>Is Event A causally related to Event B?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option"><input type="radio" name="q4" value="causes"> CAUSES</label>
+                        <label class="label-option"><input type="radio" name="q4" value="enabled"> ENABLED</label>
+                        <label class="label-option"><input type="radio" name="q4" value="no-relation"> NO-RELATION</label>
+                        <label class="label-option"><input type="radio" name="q4" value="uncertain"> UNCERTAIN</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What makes this decision difficult?</label>
+                    <textarea placeholder="Explain the challenges in annotating this example..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 5 -->
+        <section class="section">
+            <h2>Part 5: Multi-Event Causal Chains</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 4</div>
+                <div class="sentence-text">"An explosion damaged the power station, causing widespread outages and forcing evacuations."</div>
+                <div class="events">
+                    <strong>Event A:</strong> explosion &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <strong>Event B:</strong> power station damaged &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <strong>Event C:</strong> power outages &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <strong>Event D:</strong> evacuations
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 5</div>
+                <p>Which causal relations should be annotated? (Check all that apply.)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="a-b"> A <span class="arrow">→</span> B</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="b-c"> B <span class="arrow">→</span> C</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="c-d"> C <span class="arrow">→</span> D</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="a-d"> A <span class="arrow">→</span> D</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="none"> None</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain one choice:</label>
+                    <textarea placeholder="Why did you select or not select a particular relation?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 6 -->
+        <section class="section">
+            <h2>Part 6: Negation and Counterfactuals</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 5</div>
+                <div class="sentence-text">"The evacuation was avoided because the fire was quickly contained."</div>
+                <div class="events">
+                    <strong>Event A:</strong> fire contained &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Event B:</strong> evacuation
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 6</div>
+                <p>How should this be annotated?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option"><input type="radio" name="q6" value="causes"> A CAUSES B</label>
+                        <label class="label-option"><input type="radio" name="q6" value="prevents"> A PREVENTS B</label>
+                        <label class="label-option"><input type="radio" name="q6" value="no-relation"> NO-RELATION</label>
+                        <label class="label-option"><input type="radio" name="q6" value="uncertain"> UNCERTAIN</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why is negation hard for causal annotation?</label>
+                    <textarea placeholder="Explain the challenges of annotating negated or prevented events..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 7 -->
+        <section class="section">
+            <h2>Part 7: Speculation and Modality</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 6</div>
+                <div class="sentence-text">"Officials said the strike may have triggered the supply shortage."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 7</div>
+                <p>How confident is the causal claim?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option"><input type="radio" name="q7a" value="certain"> Certain</label>
+                        <label class="label-option"><input type="radio" name="q7a" value="probable"> Probable</label>
+                        <label class="label-option"><input type="radio" name="q7a" value="speculative"> Speculative</label>
+                        <label class="label-option"><input type="radio" name="q7a" value="not-stated"> Not stated</label>
+                    </div>
+                </div>
+                <p style="margin-top: 15px;">What label would you assign?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option"><input type="radio" name="q7b" value="causes"> CAUSES</label>
+                        <label class="label-option"><input type="radio" name="q7b" value="enabled"> ENABLED</label>
+                        <label class="label-option"><input type="radio" name="q7b" value="uncertain"> UNCERTAIN</label>
+                        <label class="label-option"><input type="radio" name="q7b" value="no-relation"> NO-RELATION</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain:</label>
+                    <textarea placeholder="Why did you choose this confidence level and label?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 8 -->
+        <section class="section">
+            <h2>Part 8: World Knowledge vs Text Evidence</h2>
+
+            <div class="sentence-card">
+                <div class="sentence-header">Sentence 7</div>
+                <div class="sentence-text">"The hurricane hit the coast. Thousands of homes were destroyed."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 8</div>
+                <p>Should you annotate a causal relation?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="radio" name="q8" value="world"> Yes, based on world knowledge</label>
+                        <label class="checkbox-option"><input type="radio" name="q8" value="text"> Yes, based on textual evidence</label>
+                        <label class="checkbox-option"><input type="radio" name="q8" value="no"> No, causality is not stated</label>
+                        <label class="checkbox-option"><input type="radio" name="q8" value="uncertain"> UNCERTAIN</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why is this a hard judgment?</label>
+                    <textarea placeholder="What makes deciding between text evidence and world knowledge difficult?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 9 -->
+        <section class="section">
+            <h2>Part 9: Group Discussion</h2>
+            <p>Discuss with your group.</p>
+
+            <div class="question-box">
+                <div class="question-header">Question 9</div>
+                <p>Where did you disagree most?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="radio" name="q9" value="event-id"> Event identification</label>
+                        <label class="checkbox-option"><input type="radio" name="q9" value="relation-exists"> Relation existence</label>
+                        <label class="checkbox-option"><input type="radio" name="q9" value="direction"> Relation direction</label>
+                        <label class="checkbox-option"><input type="radio" name="q9" value="certainty"> Certainty vs speculation</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Give one concrete example:</label>
+                    <textarea placeholder="Describe a specific disagreement from your discussion..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 10 -->
+        <section class="section">
+            <h2>Part 10: Annotation Design Decisions</h2>
+
+            <div class="question-box">
+                <div class="question-header">Question 10</div>
+                <p>Which guideline would most reduce disagreement?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="radio" name="q10" value="explicit"> Only annotate explicit causal markers</label>
+                        <label class="checkbox-option"><input type="radio" name="q10" value="implicit"> Allow implicit causation</label>
+                        <label class="checkbox-option"><input type="radio" name="q10" value="separate"> Separate temporal and causal relations</label>
+                        <label class="checkbox-option"><input type="radio" name="q10" value="confidence"> Add confidence levels to relations</label>
+                        <label class="checkbox-option"><input type="radio" name="q10" value="expert"> Use expert annotators only</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why would this guideline be most effective?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 11 -->
+        <section class="section">
+            <h2>Part 11: Modeling Consequences (ML Perspective)</h2>
+
+            <div class="question-box">
+                <div class="question-header">Question 11</div>
+                <p>If annotators disagree on causality, what might a model trained on this data learn?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="checkbox" name="q11" value="spurious"> Spurious correlations</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q11" value="overconfident"> Overconfident causal predictions</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q11" value="conservative"> Conservative predictions</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q11" value="biases"> Dataset-specific biases</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain one outcome:</label>
+                    <textarea placeholder="How would disagreement affect model behavior?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Reflection -->
+        <section class="section">
+            <h2>Final Reflection</h2>
+
+            <div class="question-box">
+                <div class="question-header">Question 12</div>
+                <p>Why is causal relation extraction harder than event detection alone?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 10px;">
+                        <label class="checkbox-option"><input type="checkbox" name="q12" value="interpretation"> Requires interpretation beyond text</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q12" value="world-knowledge"> Depends on world knowledge</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q12" value="directionality"> Involves directionality</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q12" value="underspecified"> Often under-specified</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q12" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway (for class discussion)</h3>
+                <ul>
+                    <li><strong>Causality is not directly observable in text</strong>—it is inferred, interpreted, and often underspecified.</li>
+                    <li><strong>Structured annotation tasks encode theories about the world</strong>, not just labels.</li>
+                </ul>
+                <div class="one-liner">
+                    <strong>One-sentence takeaway:</strong> In structured annotation, you are modeling relationships between interpretations, not just words.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all your answers?')) {
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.value = '';
+                });
+
+                document.querySelectorAll('.toggle-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.textContent = 'Show Choices';
+                });
+
+                document.querySelectorAll('.choices-container').forEach(container => {
+                    container.classList.remove('show');
+                });
+
+                localStorage.removeItem('causal-relation-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = {
+                radios: {},
+                checkboxes: {},
+                textareas: []
+            };
+
+            document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                data.radios[radio.name] = radio.value;
+            });
+
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                if (!data.checkboxes[checkbox.name]) {
+                    data.checkboxes[checkbox.name] = [];
+                }
+                data.checkboxes[checkbox.name].push(checkbox.value);
+            });
+
+            document.querySelectorAll('textarea').forEach((textarea, index) => {
+                data.textareas[index] = textarea.value;
+            });
+
+            localStorage.setItem('causal-relation-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('causal-relation-worksheet');
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const radio = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (radio) radio.checked = true;
+                });
+
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(value => {
+                        const checkbox = document.querySelector(`input[type="checkbox"][name="${name}"][value="${value}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                });
+
+                document.querySelectorAll('textarea').forEach((textarea, index) => {
+                    if (data.textareas && data.textareas[index]) {
+                        textarea.value = data.textareas[index];
+                    }
+                });
+            } catch (e) {
+                console.error('Error loading saved progress:', e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

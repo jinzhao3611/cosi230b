@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Relation Extraction</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #7b1fa2, #9c27b0); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #7b1fa2; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #f3e5f5; border-left: 3px solid #9c27b0; padding: 12px 15px; margin: 12px 0; }
+        .text-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; line-height: 1.8; }
+        .entity { padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+        .entity-per { background: #bbdefb; color: #1565c0; }
+        .entity-org { background: #c8e6c9; color: #2e7d32; }
+        .entity-loc { background: #ffe0b2; color: #e65100; }
+        .entity-date { background: #d1c4e9; color: #512da8; }
+        .entity-misc { background: #f5f5f5; color: #616161; border: 1px solid #9e9e9e; }
+        .relation-arrow { color: #7b1fa2; font-weight: 600; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .relation-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+        .relation-table th, .relation-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .relation-table th { background: #f3e5f5; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #9c27b0; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #9c27b0; color: white; border-color: #9c27b0; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .triple-box { background: #fff; border: 1px solid #ce93d8; border-radius: 4px; padding: 10px; margin: 8px 0; font-family: monospace; font-size: 0.9rem; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #9c27b0; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Relation Extraction</h1>
+            <div class="subtitle">Identifying semantic relationships between entities in text</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Structured annotation (entity pairs + relations)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Relation extraction identifies semantic relationships between entities mentioned in text, creating structured knowledge from unstructured data.</p>
+
+            <div class="definition-box">
+                <p><strong>Relation Triple:</strong> (Subject Entity, Relation Type, Object Entity)</p>
+                <p><strong>Example:</strong> "Steve Jobs founded Apple" → (Steve Jobs, FOUNDED, Apple)</p>
+            </div>
+
+            <h3>Common Relation Types</h3>
+            <table class="relation-table">
+                <tr><th>Relation</th><th>Description</th><th>Example</th></tr>
+                <tr><td>WORKS_FOR</td><td>Employment</td><td>(John, WORKS_FOR, Google)</td></tr>
+                <tr><td>LOCATED_IN</td><td>Physical location</td><td>(Paris, LOCATED_IN, France)</td></tr>
+                <tr><td>BORN_IN</td><td>Birthplace</td><td>(Einstein, BORN_IN, Germany)</td></tr>
+                <tr><td>FOUNDED</td><td>Created organization</td><td>(Gates, FOUNDED, Microsoft)</td></tr>
+                <tr><td>SPOUSE</td><td>Married to</td><td>(Obama, SPOUSE, Michelle)</td></tr>
+                <tr><td>SUBSIDIARY_OF</td><td>Owned by</td><td>(Instagram, SUBSIDIARY_OF, Meta)</td></tr>
+            </table>
+
+            <h3>Entity Types</h3>
+            <p><span class="entity entity-per">PERSON</span> <span class="entity entity-org">ORGANIZATION</span> <span class="entity entity-loc">LOCATION</span> <span class="entity entity-date">DATE</span> <span class="entity entity-misc">MISC</span></p>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Relation Identification</h2>
+            <div class="text-box">
+                <span class="entity entity-per">Elon Musk</span> is the CEO of <span class="entity entity-org">Tesla</span>, which is headquartered in <span class="entity entity-loc">Austin, Texas</span>.
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Identify all relation triples in the sentence:</p>
+                <div class="triple-box">
+                    Triple 1: (<input type="text" style="width: 80px;" name="t1_subj" placeholder="Subject">, <select name="t1_rel"><option value="">Relation</option><option value="CEO_OF">CEO_OF</option><option value="WORKS_FOR">WORKS_FOR</option><option value="FOUNDED">FOUNDED</option><option value="LOCATED_IN">LOCATED_IN</option><option value="HEADQUARTERED_IN">HEADQUARTERED_IN</option></select>, <input type="text" style="width: 80px;" name="t1_obj" placeholder="Object">)
+                </div>
+                <div class="triple-box">
+                    Triple 2: (<input type="text" style="width: 80px;" name="t2_subj" placeholder="Subject">, <select name="t2_rel"><option value="">Relation</option><option value="CEO_OF">CEO_OF</option><option value="WORKS_FOR">WORKS_FOR</option><option value="FOUNDED">FOUNDED</option><option value="LOCATED_IN">LOCATED_IN</option><option value="HEADQUARTERED_IN">HEADQUARTERED_IN</option></select>, <input type="text" style="width: 80px;" name="t2_obj" placeholder="Object">)
+                </div>
+                <div class="input-group">
+                    <label>Is "Austin, Texas" one entity or two?</label>
+                    <textarea placeholder="Discuss entity boundary decisions..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Implicit vs. Explicit Relations</h2>
+            <div class="text-box">
+                <span class="entity entity-per">Dr. Sarah Chen</span>, a professor at <span class="entity entity-org">MIT</span>, published her findings in <span class="entity entity-misc">Nature</span> last month.
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Which relations are explicitly stated vs. inferred?</p>
+                <table class="relation-table">
+                    <tr><th>Relation</th><th>Explicit or Inferred?</th></tr>
+                    <tr>
+                        <td>(Dr. Sarah Chen, WORKS_FOR, MIT)</td>
+                        <td><select name="q2a"><option value="">Select...</option><option value="explicit">Explicit</option><option value="inferred">Inferred</option><option value="neither">Neither</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(Dr. Sarah Chen, PUBLISHED_IN, Nature)</td>
+                        <td><select name="q2b"><option value="">Select...</option><option value="explicit">Explicit</option><option value="inferred">Inferred</option><option value="neither">Neither</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(Dr. Sarah Chen, PROFESSION, professor)</td>
+                        <td><select name="q2c"><option value="">Select...</option><option value="explicit">Explicit</option><option value="inferred">Inferred</option><option value="neither">Neither</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>Should annotation include inferred relations?</label>
+                    <textarea placeholder="Discuss the tradeoffs..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Relation Directionality</h2>
+            <div class="text-box">
+                <span class="entity entity-org">Amazon</span> acquired <span class="entity entity-org">Whole Foods</span> in <span class="entity entity-date">2017</span>.
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>What is the correct direction for the acquisition relation?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q3" value="a"> (Amazon, ACQUIRED, Whole Foods)</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="b"> (Whole Foods, ACQUIRED_BY, Amazon)</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="c"> Both are valid representations</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="d"> Use symmetric relation MERGER</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How should guidelines handle relation directionality?</label>
+                    <textarea placeholder="Discuss standardization approaches..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Nested and Complex Relations</h2>
+            <div class="text-box">
+                <span class="entity entity-per">Bill Gates</span> and <span class="entity entity-per">Paul Allen</span> co-founded <span class="entity entity-org">Microsoft</span> in <span class="entity entity-loc">Albuquerque</span>.
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>How should co-founding be represented?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4a" value="separate"> Two separate triples: (Gates, FOUNDED, Microsoft) and (Allen, FOUNDED, Microsoft)</label>
+                        <label class="radio-option"><input type="radio" name="q4a" value="joint"> Joint entity: ([Gates, Allen], CO_FOUNDED, Microsoft)</label>
+                        <label class="radio-option"><input type="radio" name="q4a" value="qualified"> Qualified relation: (Gates, FOUNDED, Microsoft, with=Allen)</label>
+                        <label class="radio-option"><input type="radio" name="q4a" value="event"> Event-based: (FoundingEvent, FOUNDER, Gates), (FoundingEvent, FOUNDER, Allen)</label>
+                    </div>
+                </div>
+                <p style="margin-top: 15px;">What about the location relation?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4b" value="company"> (Microsoft, FOUNDED_IN, Albuquerque)</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="event"> (FoundingEvent, LOCATION, Albuquerque)</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="both"> Both representations are valid</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="none"> Don't annotate - not a core relation</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Negative and Uncertain Relations</h2>
+            <div class="text-box">
+                <span class="entity entity-per">John</span> used to work at <span class="entity entity-org">Google</span> but now works at <span class="entity entity-org">Meta</span>. <span class="entity entity-per">Mary</span> might join <span class="entity entity-org">Apple</span> next year.
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>How should these relations be annotated?</p>
+                <table class="relation-table">
+                    <tr><th>Statement</th><th>Relation Status</th></tr>
+                    <tr>
+                        <td>(John, WORKS_FOR, Google)</td>
+                        <td><select name="q5a"><option value="">Select...</option><option value="current">Current/True</option><option value="past">Past/Former</option><option value="negated">Negated</option><option value="none">Don't annotate</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(John, WORKS_FOR, Meta)</td>
+                        <td><select name="q5b"><option value="">Select...</option><option value="current">Current/True</option><option value="past">Past/Former</option><option value="negated">Negated</option><option value="none">Don't annotate</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>(Mary, WORKS_FOR, Apple)</td>
+                        <td><select name="q5c"><option value="">Select...</option><option value="current">Current/True</option><option value="possible">Possible/Uncertain</option><option value="future">Future</option><option value="none">Don't annotate</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>Should relation extraction capture temporal and modal information?</label>
+                    <textarea placeholder="Discuss the annotation schema design..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Annotate This Passage</h2>
+            <div class="text-box">
+                <span class="entity entity-per">Tim Cook</span>, who succeeded <span class="entity entity-per">Steve Jobs</span> as CEO of <span class="entity entity-org">Apple</span>, announced that the company would invest $1 billion in <span class="entity entity-loc">North Carolina</span>. <span class="entity entity-org">Apple</span>, based in <span class="entity entity-loc">Cupertino</span>, has been expanding its operations across the <span class="entity entity-loc">United States</span>.
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Extract all relation triples (aim for at least 5):</p>
+                <div class="input-group">
+                    <textarea placeholder="List triples in format: (Subject, RELATION, Object)&#10;Example: (Tim Cook, CEO_OF, Apple)" style="min-height: 120px;"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Which relations were hardest to decide?</label>
+                    <textarea placeholder="Describe the difficult cases..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="boundaries"> Entity boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="type"> Relation type selection</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="direction"> Relation directionality</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="implicit"> Implicit vs explicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="temporal"> Temporal aspects</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="missing"> Missing relations</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is relation extraction difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Many relations are implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="schema"> Schema design is subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="complex"> Real sentences have complex structures</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Context is needed for disambiguation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="temporal"> Temporal/modal aspects are complex</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Relation extraction turns unstructured text into structured knowledge, but requires many annotation decisions.</strong></p>
+                <ul>
+                    <li>The relation schema determines what can be captured</li>
+                    <li>Implicit relations require inference and increase annotator burden</li>
+                    <li>Directionality and temporal aspects need clear guidelines</li>
+                    <li>Entity identification and relation extraction are interdependent</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('relation-extraction-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
+            localStorage.setItem('relation-extraction-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('relation-extraction-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+                Object.entries(data.inputs || {}).forEach(([name, value]) => {
+                    const i = document.querySelector(`input[type="text"][name="${name}"]`);
+                    if (i) i.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

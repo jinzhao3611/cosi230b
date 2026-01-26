@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Toxicity Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: #0070ae;
+            color: white;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        header .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        header .meta {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        header .meta span {
+            margin-right: 20px;
+        }
+
+        header .author {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            color: #0070ae;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section h3 {
+            color: #333;
+            font-size: 1.1rem;
+            margin: 20px 0 10px 0;
+        }
+
+        .section p {
+            margin-bottom: 12px;
+        }
+
+        .definition-box {
+            background: #f8f9fa;
+            border-left: 4px solid #0070ae;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
+
+        .definition-box strong {
+            color: #0070ae;
+        }
+
+        .example-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-card .example-header {
+            font-weight: 600;
+            color: #0070ae;
+            margin-bottom: 10px;
+        }
+
+        .example-card .comment {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .label-options {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .label-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .label-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            margin-top: 5px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #0070ae;
+            box-shadow: 0 0 0 3px rgba(0, 112, 174, 0.1);
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .question-box {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .question-box .question-header {
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+
+        .results-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .results-box .results-header {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .results-stats {
+            display: flex;
+            gap: 30px;
+            margin: 15px 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat .label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .takeaway-box {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .takeaway-box h3 {
+            color: #388e3c;
+            margin-bottom: 10px;
+        }
+
+        .takeaway-box ul {
+            margin-left: 20px;
+        }
+
+        .takeaway-box li {
+            margin: 8px 0;
+        }
+
+        .other-input {
+            display: inline-block;
+            width: 200px;
+            padding: 5px 10px;
+            border: none;
+            border-bottom: 1px solid #999;
+            font-family: inherit;
+            font-size: 1rem;
+            background: transparent;
+        }
+
+        .other-input:focus {
+            outline: none;
+            border-bottom-color: #0070ae;
+        }
+
+        .choices-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .choices-container.show {
+            display: block;
+        }
+
+        .toggle-btn {
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #333;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .toggle-btn.active {
+            background: #0070ae;
+            color: white;
+            border-color: #0070ae;
+        }
+
+        .toolbar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-print {
+            background: #0070ae;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #005a8c;
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            header {
+                margin-bottom: 20px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+
+            .toolbar {
+                display: none;
+            }
+
+            textarea {
+                border: 1px solid #ccc;
+                min-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Worksheet: A Hard NLP Classification Task — Toxicity Detection</h1>
+            <div class="subtitle">Experience why annotation is difficult even for "simple" NLP tasks</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Binary classification (with ambiguity)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Background -->
+        <section class="section">
+            <h2>Background</h2>
+            <p>You are part of a team building an AI system that classifies online comments as:</p>
+            <ul style="margin: 15px 0 15px 30px;">
+                <li><strong>Toxic</strong></li>
+                <li><strong>Not Toxic</strong></li>
+            </ul>
+            <p>This system will be used for <strong>content moderation</strong>, meaning mistakes can affect real people.</p>
+            <p style="margin-top: 15px;"><strong>Your goal is to:</strong></p>
+            <ul style="margin: 10px 0 0 30px;">
+                <li>Assign labels</li>
+                <li>Reflect on disagreement</li>
+                <li>Think about annotation design decisions</li>
+            </ul>
+        </section>
+
+        <!-- Part 1 -->
+        <section class="section">
+            <h2>Part 1: Label Definition (Before Annotating)</h2>
+            <p>Read the following preliminary label definitions:</p>
+
+            <div class="definition-box">
+                <p><strong>Toxic:</strong> Language that is insulting, demeaning, or hostile toward a person or group.</p>
+                <p><strong>Not Toxic:</strong> Language that does not meet the above criteria.</p>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 1</div>
+                <p>Are these definitions sufficient to label comments consistently?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option">
+                            <input type="radio" name="q1" value="yes"> Yes
+                        </label>
+                        <label class="label-option">
+                            <input type="radio" name="q1" value="no"> No
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why or why not?</label>
+                    <textarea placeholder="Explain your reasoning..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 2 -->
+        <section class="section">
+            <h2>Part 2: Individual Annotation</h2>
+            <p>For each comment below: <strong>Assign a label</strong>, <strong>Write why you chose it</strong>, and <strong>Note any uncertainty</strong>.</p>
+
+            <!-- Example 1 -->
+            <div class="example-card">
+                <div class="example-header">Example 1</div>
+                <div class="comment">"Wow, great job."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option">
+                            <input type="radio" name="ex1" value="toxic"> Toxic
+                        </label>
+                        <label class="label-option">
+                            <input type="radio" name="ex1" value="not-toxic"> Not Toxic
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Reasoning:</label>
+                    <textarea placeholder="Why did you choose this label?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Uncertainty (if any):</label>
+                    <textarea placeholder="What made this difficult to label?"></textarea>
+                </div>
+            </div>
+
+            <!-- Example 2 -->
+            <div class="example-card">
+                <div class="example-header">Example 2</div>
+                <div class="comment">"Nice work, genius."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option">
+                            <input type="radio" name="ex2" value="toxic"> Toxic
+                        </label>
+                        <label class="label-option">
+                            <input type="radio" name="ex2" value="not-toxic"> Not Toxic
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Reasoning:</label>
+                    <textarea placeholder="Why did you choose this label?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Uncertainty (if any):</label>
+                    <textarea placeholder="What made this difficult to label?"></textarea>
+                </div>
+            </div>
+
+            <!-- Example 3 -->
+            <div class="example-card">
+                <div class="example-header">Example 3</div>
+                <div class="comment">"This idea is stupid."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option">
+                            <input type="radio" name="ex3" value="toxic"> Toxic
+                        </label>
+                        <label class="label-option">
+                            <input type="radio" name="ex3" value="not-toxic"> Not Toxic
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Reasoning:</label>
+                    <textarea placeholder="Why did you choose this label?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Uncertainty (if any):</label>
+                    <textarea placeholder="What made this difficult to label?"></textarea>
+                </div>
+            </div>
+
+            <!-- Example 4 -->
+            <div class="example-card">
+                <div class="example-header">Example 4</div>
+                <div class="comment">"Sure, that'll work. Just like last time."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option">
+                            <input type="radio" name="ex4" value="toxic"> Toxic
+                        </label>
+                        <label class="label-option">
+                            <input type="radio" name="ex4" value="not-toxic"> Not Toxic
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Reasoning:</label>
+                    <textarea placeholder="Why did you choose this label?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Uncertainty (if any):</label>
+                    <textarea placeholder="What made this difficult to label?"></textarea>
+                </div>
+            </div>
+
+            <!-- Example 5 -->
+            <div class="example-card">
+                <div class="example-header">Example 5</div>
+                <div class="comment">"I can't believe you actually think this makes sense."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="label-options">
+                        <label class="label-option">
+                            <input type="radio" name="ex5" value="toxic"> Toxic
+                        </label>
+                        <label class="label-option">
+                            <input type="radio" name="ex5" value="not-toxic"> Not Toxic
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Reasoning:</label>
+                    <textarea placeholder="Why did you choose this label?"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Uncertainty (if any):</label>
+                    <textarea placeholder="What made this difficult to label?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 3 -->
+        <section class="section">
+            <h2>Part 3: Group Comparison</h2>
+            <p>Discuss your answers with 2–3 classmates.</p>
+
+            <div class="question-box">
+                <div class="question-header">Question 2</div>
+                <p>Which examples had disagreement in your group? (Check all that apply.)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 15px;">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="disagreement" value="ex1"> Example 1
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="disagreement" value="ex2"> Example 2
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="disagreement" value="ex3"> Example 3
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="disagreement" value="ex4"> Example 4
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="disagreement" value="ex5"> Example 5
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 3</div>
+                <p>What caused the disagreement? (Check all that apply.)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 15px;">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="causes" value="sarcasm"> Sarcasm or irony
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="causes" value="context"> Lack of context
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="causes" value="hostile"> Different interpretations of "hostile"
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="causes" value="thresholds"> Different personal thresholds
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="causes" value="guidelines"> Unclear guidelines
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="causes" value="other"> Other: <input type="text" class="other-input" placeholder="Specify...">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 4 -->
+        <section class="section">
+            <h2>Part 4: Dataset-Level Decisions</h2>
+            <p>You now see the full annotation results for Example 2:</p>
+
+            <div class="results-box">
+                <div class="results-header">"Nice work, genius."</div>
+                <p>Out of 10 annotators:</p>
+                <div class="results-stats">
+                    <div class="stat">
+                        <div class="number">6</div>
+                        <div class="label">labeled Toxic</div>
+                    </div>
+                    <div class="stat">
+                        <div class="number">4</div>
+                        <div class="label">labeled Not Toxic</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 4</div>
+                <p>How should this example be handled in the dataset?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 15px;">
+                        <label class="checkbox-option">
+                            <input type="radio" name="q4" value="majority"> Use the majority label
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q4" value="remove"> Remove the example
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q4" value="ambiguous"> Add an "Ambiguous" label
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q4" value="uncertainty"> Keep all labels and model uncertainty
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q4" value="expert"> Ask expert annotators to re-label
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why did you choose this approach?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 5 -->
+        <section class="section">
+            <h2>Part 5: Revising the Task Definition</h2>
+
+            <div class="question-box">
+                <div class="question-header">Question 5</div>
+                <p>Which of the following guideline changes would most reduce disagreement?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 15px;">
+                        <label class="checkbox-option">
+                            <input type="radio" name="q5" value="sarcasm"> Explicit rules about sarcasm
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q5" value="ideas-people"> Clear distinction between attacking ideas vs. people
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q5" value="context"> Providing surrounding context
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q5" value="categories"> Adding more label categories
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="radio" name="q5" value="training"> More annotator training
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why would this change be most effective?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 6 -->
+        <section class="section">
+            <h2>Part 6: Reflection</h2>
+
+            <div class="question-box">
+                <div class="question-header">Question 6</div>
+                <p>Why is this classification task difficult even though it has only two labels?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div style="margin-top: 15px;">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="q6" value="ambiguous"> Language is ambiguous
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="q6" value="context"> Meaning depends on context
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="q6" value="norms"> Annotators bring personal norms
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="q6" value="definitions"> Label definitions are incomplete
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="q6" value="all"> All of the above
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-header">Question 7</div>
+                <p>If you trained a model on this data without resolving disagreement, what might happen?</p>
+                <div class="input-group">
+                    <textarea placeholder="Describe potential consequences..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Takeaway -->
+        <section class="section">
+            <div class="takeaway-box">
+                <h3>Key Takeaway (for class discussion)</h3>
+                <p><strong>Classification difficulty is driven by human judgment, not label count.</strong></p>
+                <p style="margin-top: 10px;">Even simple label sets can produce:</p>
+                <ul>
+                    <li>High disagreement</li>
+                    <li>Biased models</li>
+                    <li>Unstable predictions</li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all your answers?')) {
+                // Clear all radio buttons
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+
+                // Clear all checkboxes
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                // Clear all textareas
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.value = '';
+                });
+
+                // Clear other input
+                document.querySelectorAll('.other-input').forEach(input => {
+                    input.value = '';
+                });
+
+                // Reset all toggle buttons
+                document.querySelectorAll('.toggle-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.textContent = 'Show Choices';
+                });
+                document.querySelectorAll('.choices-container').forEach(container => {
+                    container.classList.remove('show');
+                });
+            }
+        }
+
+        // Auto-save to localStorage
+        function saveProgress() {
+            const data = {
+                radios: {},
+                checkboxes: {},
+                textareas: [],
+                otherInputs: []
+            };
+
+            document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                data.radios[radio.name] = radio.value;
+            });
+
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                if (!data.checkboxes[checkbox.name]) {
+                    data.checkboxes[checkbox.name] = [];
+                }
+                data.checkboxes[checkbox.name].push(checkbox.value);
+            });
+
+            document.querySelectorAll('textarea').forEach((textarea, index) => {
+                data.textareas[index] = textarea.value;
+            });
+
+            document.querySelectorAll('.other-input').forEach((input, index) => {
+                data.otherInputs[index] = input.value;
+            });
+
+            localStorage.setItem('toxicity-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('toxicity-worksheet');
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+
+                // Restore radios
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const radio = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (radio) radio.checked = true;
+                });
+
+                // Restore checkboxes
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(value => {
+                        const checkbox = document.querySelector(`input[type="checkbox"][name="${name}"][value="${value}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                });
+
+                // Restore textareas
+                document.querySelectorAll('textarea').forEach((textarea, index) => {
+                    if (data.textareas && data.textareas[index]) {
+                        textarea.value = data.textareas[index];
+                    }
+                });
+
+                // Restore other inputs
+                document.querySelectorAll('.other-input').forEach((input, index) => {
+                    if (data.otherInputs && data.otherInputs[index]) {
+                        input.value = data.otherInputs[index];
+                    }
+                });
+            } catch (e) {
+                console.error('Error loading saved progress:', e);
+            }
+        }
+
+        // Load saved progress on page load
+        document.addEventListener('DOMContentLoaded', loadProgress);
+
+        // Save progress on any input change
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

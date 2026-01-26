@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Event Extraction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #0070ae;
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        header .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        header .meta {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        header .author {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            color: #0070ae;
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section h3 {
+            color: #333;
+            font-size: 1rem;
+            margin: 14px 0 8px 0;
+        }
+
+        .section p {
+            margin-bottom: 8px;
+        }
+
+        .definition-box {
+            background: #f8f9fa;
+            border-left: 3px solid #0070ae;
+            padding: 12px 15px;
+            margin: 12px 0;
+        }
+
+        .label-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .label-item {
+            background: #f0f0f0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .label-item code {
+            background: #333;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            margin-right: 5px;
+        }
+
+        .question-box {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+
+        .question-box .q-header {
+            font-weight: 600;
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+
+        .sentence-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+
+        .sentence-box .sentence-label {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .sentence-box .sentence-text {
+            font-style: italic;
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+        }
+
+        .token-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin: 10px 0;
+        }
+
+        .token-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 70px;
+        }
+
+        .token-cell .token {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .token-cell input[type="text"] {
+            width: 100%;
+            padding: 5px 6px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 4px 4px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .token-cell input[type="text"]:focus {
+            outline: none;
+            border-color: #0070ae;
+            background: #e3f2fd;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 6px;
+            margin: 10px 0;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-option input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .radio-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .radio-option input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .choices-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .choices-container.show {
+            display: block;
+        }
+
+        .toggle-btn {
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #333;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .toggle-btn.active {
+            background: #0070ae;
+            color: white;
+            border-color: #0070ae;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 50px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-top: 4px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #0070ae;
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .takeaway-box {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+
+        .takeaway-box h3 {
+            color: #388e3c;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .takeaway-box ul {
+            margin-left: 18px;
+            font-size: 0.9rem;
+        }
+
+        .takeaway-box li {
+            margin: 4px 0;
+        }
+
+        .insight-box {
+            background: #f3e5f5;
+            border: 1px solid #ce93d8;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+
+        .insight-box h3 {
+            color: #7b1fa2;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .final-box {
+            background: #fff3e0;
+            border: 1px solid #ffcc80;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+
+        .final-box h3 {
+            color: #e65100;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .toolbar {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .btn-print {
+            background: #0070ae;
+            color: white;
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; margin-bottom: 12px; padding: 12px; }
+            .toolbar { display: none; }
+            textarea { min-height: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: A Hard NLP Sequence Labeling Task — Event Extraction</h1>
+            <div class="subtitle">Understand why sequence labeling is harder than classification</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Sequence labeling (event triggers + arguments)</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Background -->
+        <section class="section">
+            <h2>Background</h2>
+            <p>You are annotating data for an AI system that extracts <strong>events</strong> from news text.</p>
+            <p>An event consists of:</p>
+            <ul style="margin: 8px 0 8px 20px;">
+                <li>A <strong>trigger</strong> (the word or phrase that signals the event)</li>
+                <li>One or more <strong>arguments</strong> (participants, locations, times, etc.)</li>
+            </ul>
+
+            <div class="definition-box">
+                <strong>Event Type: ATTACK</strong><br>
+                An action involving physical or violent harm against a person, group, or location.
+            </div>
+
+            <h3>Annotation Labels</h3>
+            <p><strong>Trigger labels:</strong></p>
+            <div class="label-list">
+                <div class="label-item"><code>B-ATTACK</code> beginning of attack trigger</div>
+                <div class="label-item"><code>I-ATTACK</code> continuation of trigger</div>
+                <div class="label-item"><code>O</code> not part of a trigger</div>
+            </div>
+            <p><strong>Argument labels:</strong></p>
+            <div class="label-list">
+                <div class="label-item"><code>B-AGENT</code> / <code>I-AGENT</code> who carried out the attack</div>
+                <div class="label-item"><code>B-TARGET</code> / <code>I-TARGET</code> who/what was attacked</div>
+                <div class="label-item"><code>B-PLACE</code> / <code>I-PLACE</code> where it happened</div>
+            </div>
+        </section>
+
+        <!-- Part 1 -->
+        <section class="section">
+            <h2>Part 1: Warm-up (Understanding the Task)</h2>
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Which of the following could be valid attack triggers? (Check all that apply.)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="attacked"> attacked</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="killed"> killed</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="shot"> shot</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="explosion"> explosion</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="clash"> clash</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="fire"> fire</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Briefly explain one difficult case:</label>
+                    <textarea placeholder="Which word was hardest to decide?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 2 -->
+        <section class="section">
+            <h2>Part 2: Sequence Labeling (Individual)</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 1</div>
+                <div class="sentence-text">"The militants launched an attack on the military base in the city."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">The</div><input type="text" name="s1_t1"></div>
+                    <div class="token-cell"><div class="token">militants</div><input type="text" name="s1_t2"></div>
+                    <div class="token-cell"><div class="token">launched</div><input type="text" name="s1_t3"></div>
+                    <div class="token-cell"><div class="token">an</div><input type="text" name="s1_t4"></div>
+                    <div class="token-cell"><div class="token">attack</div><input type="text" name="s1_t5"></div>
+                    <div class="token-cell"><div class="token">on</div><input type="text" name="s1_t6"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s1_t7"></div>
+                    <div class="token-cell"><div class="token">military</div><input type="text" name="s1_t8"></div>
+                    <div class="token-cell"><div class="token">base</div><input type="text" name="s1_t9"></div>
+                    <div class="token-cell"><div class="token">in</div><input type="text" name="s1_t10"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s1_t11"></div>
+                    <div class="token-cell"><div class="token">city</div><input type="text" name="s1_t12"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Which word(s) did you choose as the event trigger? Why?</p>
+                <textarea placeholder="Explain your trigger choice..."></textarea>
+            </div>
+        </section>
+
+        <!-- Part 3 -->
+        <section class="section">
+            <h2>Part 3: Boundary Ambiguity</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 2</div>
+                <div class="sentence-text">"The militants carried out a deadly attack in the capital."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">The</div><input type="text" name="s2_t1"></div>
+                    <div class="token-cell"><div class="token">militants</div><input type="text" name="s2_t2"></div>
+                    <div class="token-cell"><div class="token">carried</div><input type="text" name="s2_t3"></div>
+                    <div class="token-cell"><div class="token">out</div><input type="text" name="s2_t4"></div>
+                    <div class="token-cell"><div class="token">a</div><input type="text" name="s2_t5"></div>
+                    <div class="token-cell"><div class="token">deadly</div><input type="text" name="s2_t6"></div>
+                    <div class="token-cell"><div class="token">attack</div><input type="text" name="s2_t7"></div>
+                    <div class="token-cell"><div class="token">in</div><input type="text" name="s2_t8"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s2_t9"></div>
+                    <div class="token-cell"><div class="token">capital</div><input type="text" name="s2_t10"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Is the trigger:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q3" value="attack"> "attack"</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="deadly-attack"> "deadly attack"</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="carried-out"> "carried out a deadly attack"</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why?</label>
+                    <textarea placeholder="Explain your boundary decision..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 4 -->
+        <section class="section">
+            <h2>Part 4: Trigger Ambiguity</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 3</div>
+                <div class="sentence-text">"Fighting erupted near the border late Monday."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">Fighting</div><input type="text" name="s3_t1"></div>
+                    <div class="token-cell"><div class="token">erupted</div><input type="text" name="s3_t2"></div>
+                    <div class="token-cell"><div class="token">near</div><input type="text" name="s3_t3"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s3_t4"></div>
+                    <div class="token-cell"><div class="token">border</div><input type="text" name="s3_t5"></div>
+                    <div class="token-cell"><div class="token">late</div><input type="text" name="s3_t6"></div>
+                    <div class="token-cell"><div class="token">Monday</div><input type="text" name="s3_t7"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Does this sentence contain an ATTACK event?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="no"> No</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="unclear"> Unclear</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your reasoning:</label>
+                    <textarea placeholder="Why did you make this choice?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 5 -->
+        <section class="section">
+            <h2>Part 5: Argument Ambiguity</h2>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 4</div>
+                <div class="sentence-text">"The army shelled rebel positions outside the town."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">The</div><input type="text" name="s4_t1"></div>
+                    <div class="token-cell"><div class="token">army</div><input type="text" name="s4_t2"></div>
+                    <div class="token-cell"><div class="token">shelled</div><input type="text" name="s4_t3"></div>
+                    <div class="token-cell"><div class="token">rebel</div><input type="text" name="s4_t4"></div>
+                    <div class="token-cell"><div class="token">positions</div><input type="text" name="s4_t5"></div>
+                    <div class="token-cell"><div class="token">outside</div><input type="text" name="s4_t6"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s4_t7"></div>
+                    <div class="token-cell"><div class="token">town</div><input type="text" name="s4_t8"></div>
+                </div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Which argument roles were hardest to decide?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="agent"> AGENT</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="target"> TARGET</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="place"> PLACE</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why?</label>
+                    <textarea placeholder="What made these roles difficult?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 6 -->
+        <section class="section">
+            <h2>Part 6: Group Comparison</h2>
+            <p>Discuss your annotations with your group.</p>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Where did you disagree most?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="trigger-boundaries"> Trigger boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="trigger-existence"> Trigger existence</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="arg-boundaries"> Argument boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="arg-roles"> Argument roles</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Give one concrete example:</label>
+                    <textarea placeholder="Describe a specific disagreement..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 7 -->
+        <section class="section">
+            <h2>Part 7: Annotation Design Decisions</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Which guideline change would most improve agreement?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q7" value="examples"> More trigger examples</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="boundary-rules"> Stricter boundary rules</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="multiple-triggers"> Allow multiple valid triggers</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="confidence"> Add confidence/uncertainty labels</label>
+                        <label class="radio-option"><input type="radio" name="q7" value="training"> More annotator training</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why would this be most effective?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Part 8 -->
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is event extraction harder than sequence labeling tasks like NER?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Triggers can be implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="boundaries"> Boundaries are unclear</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="syntax"> Arguments depend on syntax/semantics</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="multiple"> Multiple interpretations valid</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Sequence labeling becomes hard when labels depend on interpretation, not just word identity.</strong></p>
+                <p style="margin-top: 8px;">Event extraction requires:</p>
+                <ul>
+                    <li>Semantic understanding</li>
+                    <li>Consistent guidelines</li>
+                    <li>Acceptance of disagreement</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Part X: Aspectual Verbs -->
+        <section class="section">
+            <h2>Part X: Aspectual Verbs and Event Boundaries (Hard Case)</h2>
+            <p>Aspectual words describe the <em>beginning, continuation, or end</em> of an event, rather than the event itself.</p>
+            <p style="margin-top: 8px;"><strong>Common aspectual words:</strong> began, started, continued, stopped, resumed, ended</p>
+            <p style="margin-top: 8px;">Whether these should be included as part of an event trigger is often unclear and guideline-dependent.</p>
+
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 5</div>
+                <div class="sentence-text">"The army began shelling rebel positions near the town."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">The</div><input type="text" name="s5_t1"></div>
+                    <div class="token-cell"><div class="token">army</div><input type="text" name="s5_t2"></div>
+                    <div class="token-cell"><div class="token">began</div><input type="text" name="s5_t3"></div>
+                    <div class="token-cell"><div class="token">shelling</div><input type="text" name="s5_t4"></div>
+                    <div class="token-cell"><div class="token">rebel</div><input type="text" name="s5_t5"></div>
+                    <div class="token-cell"><div class="token">positions</div><input type="text" name="s5_t6"></div>
+                    <div class="token-cell"><div class="token">near</div><input type="text" name="s5_t7"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s5_t8"></div>
+                    <div class="token-cell"><div class="token">town</div><input type="text" name="s5_t9"></div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question X.1</div>
+                <p>Which word(s) did you label as the ATTACK trigger?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="qx1" value="shelling"> shelling</label>
+                        <label class="radio-option"><input type="radio" name="qx1" value="began-shelling"> began shelling</label>
+                        <label class="radio-option"><input type="radio" name="qx1" value="began"> began</label>
+                        <label class="radio-option"><input type="radio" name="qx1" value="none"> No attack trigger</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why did you choose this trigger span?"></textarea>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question X.2</div>
+                <p>What does "began" contribute to the meaning of the event?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="qx2" value="start"> Indicates the start of the attack</label>
+                        <label class="radio-option"><input type="radio" name="qx2" value="part"> Is part of the attack itself</label>
+                        <label class="radio-option"><input type="radio" name="qx2" value="temporal"> Only provides temporal/aspectual information</label>
+                        <label class="radio-option"><input type="radio" name="qx2" value="uncertain"> Makes the event uncertain</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain briefly:</label>
+                    <textarea placeholder="What role does 'began' play?"></textarea>
+                </div>
+            </div>
+
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 6</div>
+                <div class="sentence-text">"The fighting continued throughout the night."</div>
+                <div class="token-grid">
+                    <div class="token-cell"><div class="token">The</div><input type="text" name="s6_t1"></div>
+                    <div class="token-cell"><div class="token">fighting</div><input type="text" name="s6_t2"></div>
+                    <div class="token-cell"><div class="token">continued</div><input type="text" name="s6_t3"></div>
+                    <div class="token-cell"><div class="token">throughout</div><input type="text" name="s6_t4"></div>
+                    <div class="token-cell"><div class="token">the</div><input type="text" name="s6_t5"></div>
+                    <div class="token-cell"><div class="token">night</div><input type="text" name="s6_t6"></div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question X.3</div>
+                <p>Does this sentence describe:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="qx3" value="new"> A new ATTACK event</label>
+                        <label class="radio-option"><input type="radio" name="qx3" value="continuation"> The continuation of a previous ATTACK event</label>
+                        <label class="radio-option"><input type="radio" name="qx3" value="none"> No clear ATTACK event</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why?</label>
+                    <textarea placeholder="Explain your interpretation..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Group Discussion: Aspectual -->
+        <section class="section">
+            <h2>Group Discussion: Aspectual Decisions</h2>
+            <div class="question-box">
+                <div class="q-header">Question X.4</div>
+                <p>Should aspectual words like <em>began, continued, ended</em> be:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="qx4" value="included"> Included in the event trigger</label>
+                        <label class="radio-option"><input type="radio" name="qx4" value="separate"> Excluded from trigger but annotated separately</label>
+                        <label class="radio-option"><input type="radio" name="qx4" value="ignored"> Ignored entirely</label>
+                        <label class="radio-option"><input type="radio" name="qx4" value="context"> Treated differently depending on context</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your group's reasoning:</label>
+                    <textarea placeholder="What did your group decide and why?"></textarea>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question X.5</div>
+                <p>What guideline rule would reduce disagreement the most?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="qx5" value="core-only"> "Only label the core action verb as the trigger"</label>
+                        <label class="radio-option"><input type="radio" name="qx5" value="include-aspect"> "Include aspectual verbs if they directly modify the action"</label>
+                        <label class="radio-option"><input type="radio" name="qx5" value="separate-aspect"> "Annotate aspect separately from event type"</label>
+                        <label class="radio-option"><input type="radio" name="qx5" value="multiple-spans"> "Allow multiple valid trigger spans"</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice:</label>
+                    <textarea placeholder="Why would this rule be most effective?"></textarea>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <h3>Key Teaching Insight</h3>
+                <p>Aspectual words force annotators to decide whether an event is <em>something that happens</em>, <em>something that starts happening</em>, or <em>something that is ongoing</em>.</p>
+                <p style="margin-top: 8px;">This decision affects: trigger boundaries, event counts, and downstream temporal reasoning.</p>
+                <p style="margin-top: 8px;"><strong>One-sentence takeaway:</strong> Event annotation requires deciding what counts as the event itself versus information <em>about</em> the event.</p>
+            </div>
+        </section>
+
+        <!-- Extended Case Study -->
+        <section class="section">
+            <h2>Extended Case Study: Aspect, Intent, and Event Reality</h2>
+            <p>This section explores how aspectual words and intent expressions complicate event annotation.</p>
+
+            <h3>Part Y: Aspect vs. Core Event (Minimal Pairs)</h3>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 7</div>
+                <div class="sentence-text">"The army attacked rebel positions near the town."</div>
+            </div>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 8</div>
+                <div class="sentence-text">"The army was preparing to attack rebel positions near the town."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question Y.1</div>
+                <p>Which sentence(s) contain an ATTACK event?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="qy1" value="7-only"> Sentence 7 only</label>
+                        <label class="radio-option"><input type="radio" name="qy1" value="8-only"> Sentence 8 only</label>
+                        <label class="radio-option"><input type="radio" name="qy1" value="both"> Both</label>
+                        <label class="radio-option"><input type="radio" name="qy1" value="neither"> Neither</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your reasoning:</label>
+                    <textarea placeholder="Why did you make this choice?"></textarea>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question Y.2</div>
+                <p>What is the key difference between these sentences?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="qy2" value="intent"> One describes an event, the other describes intent</label>
+                        <label class="radio-option"><input type="radio" name="qy2" value="completed"> One is completed, the other is hypothetical</label>
+                        <label class="radio-option"><input type="radio" name="qy2" value="observable"> One is observable, the other is inferred</label>
+                        <label class="radio-option"><input type="radio" name="qy2" value="equivalent"> They are equivalent for event annotation</label>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Part Z: Aspectual Continuation vs. New Events</h3>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 9</div>
+                <div class="sentence-text">"The fighting stopped after international pressure."</div>
+            </div>
+            <div class="sentence-box">
+                <div class="sentence-label">Sentence 10</div>
+                <div class="sentence-text">"The fighting resumed the next morning."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question Z.1</div>
+                <p>How many ATTACK events are described here?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="qz1" value="one"> One continuous event</label>
+                        <label class="radio-option"><input type="radio" name="qz1" value="two"> Two separate events</label>
+                        <label class="radio-option"><input type="radio" name="qz1" value="none"> No clear event</label>
+                        <label class="radio-option"><input type="radio" name="qz1" value="depends"> Depends on guidelines</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain:</label>
+                    <textarea placeholder="How do you interpret the event structure?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guideline Design -->
+        <section class="section">
+            <h2>Guideline Design & Modeling Consequences</h2>
+
+            <div class="question-box">
+                <div class="q-header">Question AA.1</div>
+                <p>Which rule would you adopt for this project?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="qaa1" value="concrete"> Only annotate concrete, realized events</label>
+                        <label class="radio-option"><input type="radio" name="qaa1" value="include-aspect"> Annotate aspectual verbs as part of the trigger</label>
+                        <label class="radio-option"><input type="radio" name="qaa1" value="separate-status"> Separate event type from event status (started, ongoing, ended)</label>
+                        <label class="radio-option"><input type="radio" name="qaa1" value="free-choice"> Allow annotators to choose freely</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your choice and one tradeoff:</label>
+                    <textarea placeholder="What's the benefit and cost of your approach?"></textarea>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question BB.1</div>
+                <p>Suppose you include <em>began, continued, stopped</em> as part of ATTACK triggers. Which outcomes are likely? (Check all that apply.)</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="longer"> Longer trigger spans</label>
+                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="lower-iaa"> Lower inter-annotator agreement</label>
+                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="conflate"> Models conflate events with temporal structure</label>
+                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="better-temporal"> Better temporal reasoning</label>
+                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="harder-eval"> Harder evaluation</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain one effect in detail:</label>
+                    <textarea placeholder="Describe a specific consequence..."></textarea>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question BB.2</div>
+                <p>If instead you <strong>exclude</strong> aspectual words from triggers, what might the model fail to learn?</p>
+                <textarea placeholder="What information would be lost?"></textarea>
+            </div>
+        </section>
+
+        <!-- Final Reflection -->
+        <section class="section">
+            <h2>Final Reflection</h2>
+            <div class="final-box">
+                <h3>Event Annotation Philosophy</h3>
+                <p><strong>Event annotation is not just labeling what happened — it is deciding what counts as having happened.</strong></p>
+                <p style="margin-top: 10px;">Aspectual words force annotators to draw a line between:</p>
+                <ul style="margin: 8px 0 8px 20px;">
+                    <li>Events</li>
+                    <li>Intentions</li>
+                    <li>Temporal structure</li>
+                </ul>
+                <p>That line directly shapes: the dataset, the model, and downstream conclusions.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>One-Sentence Takeaway</h3>
+                <p><strong>Annotation guidelines encode a theory of events, whether we admit it or not.</strong></p>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all your answers?')) {
+                document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+                document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+                document.querySelectorAll('textarea').forEach(t => t.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('event-extraction-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], textInputs: [] };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
+            localStorage.setItem('event-extraction-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('event-extraction-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                document.querySelectorAll('input[type="text"]').forEach((t, i) => { if (data.textInputs?.[i]) t.value = data.textInputs[i]; });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

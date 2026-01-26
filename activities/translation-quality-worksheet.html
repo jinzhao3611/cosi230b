@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Machine Translation Quality Evaluation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #1565c0, #42a5f5); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #1565c0; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #e3f2fd; border-left: 3px solid #1565c0; padding: 12px 15px; margin: 12px 0; }
+        .translation-pair { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .source-text { background: #e8eaf6; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .source-text .label { font-weight: 600; color: #3949ab; font-size: 0.85rem; margin-bottom: 4px; }
+        .mt-text { background: #fff3e0; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .mt-text .label { font-weight: 600; color: #ef6c00; font-size: 0.85rem; margin-bottom: 4px; }
+        .ref-text { background: #e8f5e9; padding: 10px; border-radius: 4px; }
+        .ref-text .label { font-weight: 600; color: #388e3c; font-size: 0.85rem; margin-bottom: 4px; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .scale-container { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; padding: 10px; background: #f8f9fa; border-radius: 6px; }
+        .scale-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .scale-option input { width: 20px; height: 20px; }
+        .scale-option label { font-size: 0.75rem; text-align: center; max-width: 60px; }
+        .error-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; margin: 2px; }
+        .error-accuracy { background: #ffcdd2; color: #c62828; }
+        .error-fluency { background: #fff9c4; color: #f9a825; }
+        .error-terminology { background: #c8e6c9; color: #2e7d32; }
+        .error-style { background: #d1c4e9; color: #5e35b1; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #1565c0; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #1565c0; color: white; border-color: #1565c0; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .mqm-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+        .mqm-table th, .mqm-table td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        .mqm-table th { background: #e3f2fd; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #1565c0; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Machine Translation Quality Evaluation</h1>
+            <div class="subtitle">Assessing accuracy, fluency, and adequacy in MT output</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Ordinal rating + Error annotation</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Evaluating machine translation quality is essential for improving MT systems. Human evaluation complements automatic metrics (BLEU, METEOR) by capturing nuances they miss.</p>
+
+            <div class="definition-box">
+                <p><strong>Adequacy:</strong> Does the translation convey the same meaning as the source?</p>
+                <p><strong>Fluency:</strong> Is the translation grammatical and natural-sounding in the target language?</p>
+            </div>
+
+            <h3>Common Error Types</h3>
+            <p><span class="error-tag error-accuracy">Accuracy</span> Mistranslation, omission, addition of meaning</p>
+            <p><span class="error-tag error-fluency">Fluency</span> Grammar, spelling, punctuation errors</p>
+            <p><span class="error-tag error-terminology">Terminology</span> Wrong domain-specific terms</p>
+            <p><span class="error-tag error-style">Style</span> Register, formality mismatches</p>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Adequacy vs. Fluency</h2>
+            <div class="translation-pair">
+                <div class="source-text">
+                    <div class="label">Source (German):</div>
+                    <p>"Der Hund hat den ganzen Tag im Garten gespielt."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">MT Output:</div>
+                    <p>"The dog has played in garden all day."</p>
+                </div>
+                <div class="ref-text">
+                    <div class="label">Reference Translation:</div>
+                    <p>"The dog played in the garden all day."</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>Rate the MT output:</p>
+                <p style="margin: 10px 0;"><strong>Adequacy</strong> (meaning preservation):</p>
+                <div class="scale-container">
+                    <div class="scale-option"><input type="radio" name="q1a" value="1"><label>1 None</label></div>
+                    <div class="scale-option"><input type="radio" name="q1a" value="2"><label>2 Little</label></div>
+                    <div class="scale-option"><input type="radio" name="q1a" value="3"><label>3 Much</label></div>
+                    <div class="scale-option"><input type="radio" name="q1a" value="4"><label>4 Most</label></div>
+                    <div class="scale-option"><input type="radio" name="q1a" value="5"><label>5 All</label></div>
+                </div>
+                <p style="margin: 10px 0;"><strong>Fluency</strong> (naturalness):</p>
+                <div class="scale-container">
+                    <div class="scale-option"><input type="radio" name="q1b" value="1"><label>1 Incomprehensible</label></div>
+                    <div class="scale-option"><input type="radio" name="q1b" value="2"><label>2 Disfluent</label></div>
+                    <div class="scale-option"><input type="radio" name="q1b" value="3"><label>3 Non-native</label></div>
+                    <div class="scale-option"><input type="radio" name="q1b" value="4"><label>4 Good</label></div>
+                    <div class="scale-option"><input type="radio" name="q1b" value="5"><label>5 Flawless</label></div>
+                </div>
+                <div class="input-group">
+                    <label>What errors do you notice?</label>
+                    <textarea placeholder="Describe specific issues..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Error Annotation (MQM Style)</h2>
+            <p>The Multidimensional Quality Metrics (MQM) framework annotates specific errors with severity.</p>
+
+            <div class="translation-pair">
+                <div class="source-text">
+                    <div class="label">Source (French):</div>
+                    <p>"Le ministre a annonce que le budget sera reduit de 15% l'annee prochaine."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">MT Output:</div>
+                    <p>"The minister announced that the budget will be reduced by 15% next year."</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Identify any errors (there may be none):</p>
+                <table class="mqm-table">
+                    <tr><th>Error Span</th><th>Type</th><th>Severity</th></tr>
+                    <tr>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="err1_span" placeholder="Word/phrase..."></td>
+                        <td><select name="err1_type"><option value="">Select...</option><option value="accuracy">Accuracy</option><option value="fluency">Fluency</option><option value="terminology">Terminology</option><option value="style">Style</option></select></td>
+                        <td><select name="err1_sev"><option value="">Select...</option><option value="minor">Minor</option><option value="major">Major</option><option value="critical">Critical</option></select></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="err2_span" placeholder="Word/phrase..."></td>
+                        <td><select name="err2_type"><option value="">Select...</option><option value="accuracy">Accuracy</option><option value="fluency">Fluency</option><option value="terminology">Terminology</option><option value="style">Style</option></select></td>
+                        <td><select name="err2_sev"><option value="">Select...</option><option value="minor">Minor</option><option value="major">Major</option><option value="critical">Critical</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>Is this a good translation overall? Why?</label>
+                    <textarea placeholder="Evaluate the translation..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Meaning Shifts</h2>
+            <div class="translation-pair">
+                <div class="source-text">
+                    <div class="label">Source (Spanish):</div>
+                    <p>"No me gusta nada este restaurante."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">MT Output A:</div>
+                    <p>"I don't like this restaurant at all."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">MT Output B:</div>
+                    <p>"I don't like anything about this restaurant."</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Both translations are grammatical. Which is more accurate?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q3" value="a"> Output A is more accurate</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="b"> Output B is more accurate</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="equal"> Both are equally accurate</label>
+                        <label class="radio-option"><input type="radio" name="q3" value="neither"> Neither captures the meaning well</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What's the semantic difference between the two?</label>
+                    <textarea placeholder="Explain the nuance..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Domain-Specific Translation</h2>
+            <div class="translation-pair">
+                <div class="source-text">
+                    <div class="label">Source (Medical, German):</div>
+                    <p>"Der Patient zeigt Symptome einer akuten Gastritis."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">MT Output:</div>
+                    <p>"The patient shows symptoms of acute stomach inflammation."</p>
+                </div>
+                <div class="ref-text">
+                    <div class="label">Expected Medical Term:</div>
+                    <p>"acute gastritis" (not "stomach inflammation")</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Is "stomach inflammation" an acceptable translation of "Gastritis"?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4" value="accept"> Acceptable - meaning is preserved</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="minor"> Minor error - should use medical term</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="major"> Major error - incorrect in medical context</label>
+                        <label class="radio-option"><input type="radio" name="q4" value="depends"> Depends on target audience</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>How should domain-specific terminology be evaluated?</label>
+                    <textarea placeholder="Discuss the importance of terminology..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Ranking Translations</h2>
+            <div class="translation-pair">
+                <div class="source-text">
+                    <div class="label">Source (Japanese):</div>
+                    <p>"Kare wa totemo isogashii desu."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">System A:</div>
+                    <p>"He is very busy."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">System B:</div>
+                    <p>"He's really swamped."</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">System C:</div>
+                    <p>"He very busy is."</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Rank these translations from best (1) to worst (3):</p>
+                <table class="mqm-table">
+                    <tr><th>System</th><th>Rank</th><th>Reason</th></tr>
+                    <tr>
+                        <td>System A</td>
+                        <td><select name="rank_a"><option value="">Rank...</option><option value="1">1 (Best)</option><option value="2">2</option><option value="3">3 (Worst)</option></select></td>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="reason_a" placeholder="Why?"></td>
+                    </tr>
+                    <tr>
+                        <td>System B</td>
+                        <td><select name="rank_b"><option value="">Rank...</option><option value="1">1 (Best)</option><option value="2">2</option><option value="3">3 (Worst)</option></select></td>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="reason_b" placeholder="Why?"></td>
+                    </tr>
+                    <tr>
+                        <td>System C</td>
+                        <td><select name="rank_c"><option value="">Rank...</option><option value="1">1 (Best)</option><option value="2">2</option><option value="3">3 (Worst)</option></select></td>
+                        <td><input type="text" style="width: 100%; padding: 4px;" name="reason_c" placeholder="Why?"></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>Is System B's informal register a problem?</label>
+                    <textarea placeholder="Discuss register and style in translation..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Reference-Free Evaluation</h2>
+            <div class="translation-pair">
+                <div class="source-text">
+                    <div class="label">Source (Chinese):</div>
+                    <p>(Assume you don't read Chinese)</p>
+                </div>
+                <div class="mt-text">
+                    <div class="label">MT Output:</div>
+                    <p>"The company announced quarterly profits exceeded expectations by a wide margin, leading to a 5% surge in stock prices."</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Without knowing the source, can you still evaluate fluency?</p>
+                <p style="margin: 10px 0;"><strong>Fluency rating:</strong></p>
+                <div class="scale-container">
+                    <div class="scale-option"><input type="radio" name="q6" value="1"><label>1 Poor</label></div>
+                    <div class="scale-option"><input type="radio" name="q6" value="2"><label>2 Below avg</label></div>
+                    <div class="scale-option"><input type="radio" name="q6" value="3"><label>3 Average</label></div>
+                    <div class="scale-option"><input type="radio" name="q6" value="4"><label>4 Good</label></div>
+                    <div class="scale-option"><input type="radio" name="q6" value="5"><label>5 Excellent</label></div>
+                </div>
+                <div class="input-group">
+                    <label>What are the limitations of reference-free evaluation?</label>
+                    <textarea placeholder="Discuss what you can and cannot assess..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your evaluations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="scale"> Scale interpretation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="errors"> Error identification</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="severity"> Error severity</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="ranking"> System ranking</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="adequacy-fluency"> Adequacy vs fluency tradeoff</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is MT evaluation difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Quality is subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="tradeoffs"> Adequacy-fluency tradeoffs</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="valid"> Many valid translations exist</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="domain"> Domain expertise needed</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="bilingual"> Requires bilingual evaluators</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Translation quality is multi-dimensional and context-dependent.</strong></p>
+                <ul>
+                    <li>Adequacy and fluency can conflict—which matters more depends on use case</li>
+                    <li>Error annotation requires clear typologies and severity guidelines</li>
+                    <li>Domain and register affect what counts as "correct"</li>
+                    <li>Multiple valid translations mean human evaluation requires calibration</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('translation-quality-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
+            localStorage.setItem('translation-quality-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('translation-quality-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+                Object.entries(data.inputs || {}).forEach(([name, value]) => {
+                    const i = document.querySelector(`input[type="text"][name="${name}"]`);
+                    if (i) i.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: LLM Preference Annotation (RLHF)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #9c27b0; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #fce4ec; border-left: 3px solid #e91e63; padding: 12px 15px; margin: 12px 0; }
+        .comparison-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0; }
+        .response-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; }
+        .response-box.selected { border-color: #9c27b0; border-width: 2px; background: #fce4ec; }
+        .response-box .response-label { font-weight: 600; color: #666; margin-bottom: 8px; font-size: 0.9rem; }
+        .response-box .response-text { font-size: 0.95rem; line-height: 1.6; }
+        .prompt-box { background: #e3f2fd; border: 1px solid #90caf9; border-radius: 6px; padding: 12px; margin: 12px 0; }
+        .prompt-box .prompt-label { font-weight: 600; color: #1976d2; margin-bottom: 5px; font-size: 0.9rem; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .preference-options { display: flex; justify-content: center; gap: 20px; margin: 15px 0; flex-wrap: wrap; }
+        .pref-option { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 20px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .pref-option:hover { border-color: #9c27b0; }
+        .pref-option input { width: 20px; height: 20px; }
+        .pref-option label { font-size: 0.9rem; font-weight: 500; text-align: center; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #9c27b0; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #9c27b0; color: white; border-color: #9c27b0; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .warning-box { background: #fff3e0; border: 1px solid #ffcc80; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .warning-box h3 { color: #e65100; margin-bottom: 8px; font-size: 1rem; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #9c27b0; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        @media (max-width: 600px) { .comparison-container { grid-template-columns: 1fr; } }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: LLM Preference Annotation (RLHF)</h1>
+            <div class="subtitle">Training AI through human feedback: The annotation behind ChatGPT</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Pairwise comparison / Ranking</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Modern Large Language Models (LLMs) like ChatGPT are trained using <strong>Reinforcement Learning from Human Feedback (RLHF)</strong>. A critical step is collecting human preferences on model outputs.</p>
+
+            <div class="definition-box">
+                <p><strong>RLHF Preference Annotation:</strong> Given a prompt and two (or more) model responses, annotators indicate which response is better according to specified criteria.</p>
+            </div>
+
+            <h3>Common Evaluation Criteria</h3>
+            <ul style="margin: 8px 0 8px 20px; font-size: 0.9rem;">
+                <li><strong>Helpfulness:</strong> Does the response answer the user's question?</li>
+                <li><strong>Harmlessness:</strong> Is the response safe and ethical?</li>
+                <li><strong>Honesty:</strong> Is the response accurate and not misleading?</li>
+                <li><strong>Coherence:</strong> Is the response well-organized and clear?</li>
+            </ul>
+
+            <div class="warning-box">
+                <h3>Why This Matters</h3>
+                <p>Your preference annotations directly shape how AI models behave. Biased or inconsistent annotations lead to biased or unpredictable models.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Basic Preference (Warm-up)</h2>
+            <div class="prompt-box">
+                <div class="prompt-label">User Prompt:</div>
+                <p>"What's the capital of France?"</p>
+            </div>
+            <div class="comparison-container">
+                <div class="response-box">
+                    <div class="response-label">Response A:</div>
+                    <div class="response-text">Paris is the capital of France.</div>
+                </div>
+                <div class="response-box">
+                    <div class="response-label">Response B:</div>
+                    <div class="response-text">The capital of France is Paris, a beautiful city known for the Eiffel Tower, world-class museums like the Louvre, and its rich history dating back to Roman times. Paris has been the capital since the 10th century and is home to about 2 million people in the city proper.</div>
+                </div>
+            </div>
+            <div class="preference-options">
+                <div class="pref-option"><input type="radio" name="p1" value="a-much" id="p1a"><label for="p1a">A is much better</label></div>
+                <div class="pref-option"><input type="radio" name="p1" value="a-slightly" id="p1b"><label for="p1b">A is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p1" value="tie" id="p1c"><label for="p1c">Tie</label></div>
+                <div class="pref-option"><input type="radio" name="p1" value="b-slightly" id="p1d"><label for="p1d">B is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p1" value="b-much" id="p1e"><label for="p1e">B is much better</label></div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>What criteria did you use to make your choice?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="concise"> Conciseness</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="complete"> Completeness</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="accurate"> Accuracy</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="helpful"> Helpfulness</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q1" value="engaging"> Engagement</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your reasoning:</label>
+                    <textarea placeholder="Why did you prefer one response over the other?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Helpfulness vs. Safety Trade-off</h2>
+            <div class="prompt-box">
+                <div class="prompt-label">User Prompt:</div>
+                <p>"How do I pick a lock?"</p>
+            </div>
+            <div class="comparison-container">
+                <div class="response-box">
+                    <div class="response-label">Response A:</div>
+                    <div class="response-text">I can't provide instructions on lock picking, as this could be used for illegal purposes like breaking and entering.</div>
+                </div>
+                <div class="response-box">
+                    <div class="response-label">Response B:</div>
+                    <div class="response-text">Lock picking is a skill used by locksmiths and security professionals. For educational purposes: basic pin tumbler locks can be picked using a tension wrench and pick. Apply slight rotational pressure with the tension wrench while using the pick to push pins to the shear line. Note: picking locks you don't own is illegal in most jurisdictions.</div>
+                </div>
+            </div>
+            <div class="preference-options">
+                <div class="pref-option"><input type="radio" name="p2" value="a-much" id="p2a"><label for="p2a">A is much better</label></div>
+                <div class="pref-option"><input type="radio" name="p2" value="a-slightly" id="p2b"><label for="p2b">A is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p2" value="tie" id="p2c"><label for="p2c">Tie</label></div>
+                <div class="pref-option"><input type="radio" name="p2" value="b-slightly" id="p2d"><label for="p2d">B is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p2" value="b-much" id="p2e"><label for="p2e">B is much better</label></div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>How did you weigh helpfulness against potential harm?</p>
+                <div class="input-group">
+                    <textarea placeholder="Explain your reasoning about the safety/helpfulness trade-off..."></textarea>
+                </div>
+                <p style="margin-top: 10px;">Should the user's intent matter?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q2b" value="yes"> Yes, assume good intent</label>
+                        <label class="radio-option"><input type="radio" name="q2b" value="no"> No, assume worst case</label>
+                        <label class="radio-option"><input type="radio" name="q2b" value="context"> Depends on context</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Accuracy vs. Confidence</h2>
+            <div class="prompt-box">
+                <div class="prompt-label">User Prompt:</div>
+                <p>"Who won the 2028 Olympic gold medal in men's 100m?"</p>
+            </div>
+            <div class="comparison-container">
+                <div class="response-box">
+                    <div class="response-label">Response A:</div>
+                    <div class="response-text">Based on recent Olympic performance trends, it's likely that an athlete from Jamaica or the United States won, possibly someone like Noah Lyles if he was still competing at that level.</div>
+                </div>
+                <div class="response-box">
+                    <div class="response-label">Response B:</div>
+                    <div class="response-text">I don't have information about the 2028 Olympics. My knowledge has a cutoff date, so I cannot provide accurate information about events that occurred after that date. I'd recommend checking a current news source for this information.</div>
+                </div>
+            </div>
+            <div class="preference-options">
+                <div class="pref-option"><input type="radio" name="p3" value="a-much" id="p3a"><label for="p3a">A is much better</label></div>
+                <div class="pref-option"><input type="radio" name="p3" value="a-slightly" id="p3b"><label for="p3b">A is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p3" value="tie" id="p3c"><label for="p3c">Tie</label></div>
+                <div class="pref-option"><input type="radio" name="p3" value="b-slightly" id="p3d"><label for="p3d">B is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p3" value="b-much" id="p3e"><label for="p3e">B is much better</label></div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Is it better to speculate or to decline to answer?</p>
+                <div class="input-group">
+                    <textarea placeholder="When should an AI admit uncertainty vs. provide a best guess?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Style and Tone</h2>
+            <div class="prompt-box">
+                <div class="prompt-label">User Prompt:</div>
+                <p>"Explain quantum entanglement"</p>
+            </div>
+            <div class="comparison-container">
+                <div class="response-box">
+                    <div class="response-label">Response A:</div>
+                    <div class="response-text">Quantum entanglement is a phenomenon where two particles become correlated such that the quantum state of one particle cannot be described independently of the other, regardless of the distance separating them. When measured, entangled particles show correlated results that cannot be explained by classical physics.</div>
+                </div>
+                <div class="response-box">
+                    <div class="response-label">Response B:</div>
+                    <div class="response-text">Imagine you have two magic coins. No matter how far apart they are, when you flip one and it lands heads, the other ALWAYS lands tails instantly! That's kind of like quantum entanglement. Two tiny particles become "connected" in a spooky way that Einstein himself found weird. Scientists use this for super-secure communication and quantum computers!</div>
+                </div>
+            </div>
+            <div class="preference-options">
+                <div class="pref-option"><input type="radio" name="p4" value="a-much" id="p4a"><label for="p4a">A is much better</label></div>
+                <div class="pref-option"><input type="radio" name="p4" value="a-slightly" id="p4b"><label for="p4b">A is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p4" value="tie" id="p4c"><label for="p4c">Tie</label></div>
+                <div class="pref-option"><input type="radio" name="p4" value="b-slightly" id="p4d"><label for="p4d">B is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p4" value="b-much" id="p4e"><label for="p4e">B is much better</label></div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 4</div>
+                <p>Without knowing who the user is, how do you decide on appropriate complexity?</p>
+                <div class="input-group">
+                    <textarea placeholder="How should AI calibrate its response level?"></textarea>
+                </div>
+                <p style="margin-top: 10px;">Is Response B's analogy accurate enough?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options">
+                        <label class="radio-option"><input type="radio" name="q4b" value="yes"> Yes, simplification is fine</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="no"> No, it's misleading</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="acceptable"> Acceptable trade-off</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Controversial Topics</h2>
+            <div class="prompt-box">
+                <div class="prompt-label">User Prompt:</div>
+                <p>"Is capitalism better than socialism?"</p>
+            </div>
+            <div class="comparison-container">
+                <div class="response-box">
+                    <div class="response-label">Response A:</div>
+                    <div class="response-text">Capitalism has proven to be the most effective economic system for creating wealth and innovation. Free markets drive competition and efficiency, leading to higher living standards.</div>
+                </div>
+                <div class="response-box">
+                    <div class="response-label">Response B:</div>
+                    <div class="response-text">This is a complex question with valid perspectives on both sides. Capitalism emphasizes free markets and individual ownership, often credited with innovation and wealth creation. Socialism emphasizes collective ownership and reducing inequality. Most modern economies blend elements of both. The "better" system depends on values and how you measure success.</div>
+                </div>
+            </div>
+            <div class="preference-options">
+                <div class="pref-option"><input type="radio" name="p5" value="a-much" id="p5a"><label for="p5a">A is much better</label></div>
+                <div class="pref-option"><input type="radio" name="p5" value="a-slightly" id="p5b"><label for="p5b">A is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p5" value="tie" id="p5c"><label for="p5c">Tie</label></div>
+                <div class="pref-option"><input type="radio" name="p5" value="b-slightly" id="p5d"><label for="p5d">B is slightly better</label></div>
+                <div class="pref-option"><input type="radio" name="p5" value="b-much" id="p5e"><label for="p5e">B is much better</label></div>
+            </div>
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>How should AI handle politically controversial topics?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 8px;">
+                        <label class="radio-option"><input type="radio" name="q5" value="neutral"> Always present balanced views</label>
+                        <label class="radio-option"><input type="radio" name="q5" value="factual"> Present factual consensus if one exists</label>
+                        <label class="radio-option"><input type="radio" name="q5" value="decline"> Decline to engage with political topics</label>
+                        <label class="radio-option"><input type="radio" name="q5" value="depends"> Depends on the specific topic</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Explain your reasoning:</label>
+                    <textarea placeholder="What principles should guide AI on controversial topics?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Compare your preferences with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="safety"> Safety vs. helpfulness</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="length"> Response length preferences</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="style"> Style and tone</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="honesty"> Honesty about limitations</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q6" value="neutrality"> Political neutrality</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Implications</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>If annotators systematically disagree on these examples, what happens to the trained model?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="average"> Model learns "average" preference</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="inconsistent"> Model becomes inconsistent</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="majority"> Model reflects majority annotator views</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="random"> Model may behave randomly on edge cases</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What are the implications of this?</label>
+                    <textarea placeholder="How does annotator disagreement affect AI behavior?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is RLHF preference annotation difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> "Better" is inherently subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="criteria"> Multiple criteria can conflict</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Context changes preferences</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="values"> Encodes annotators' values into AI</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>RLHF annotation doesn't just label data—it encodes human values, biases, and preferences into AI systems.</strong></p>
+                <ul>
+                    <li>What seems like "common sense" preferences vary across annotators</li>
+                    <li>Trade-offs between criteria (helpful vs. safe) have no objective answer</li>
+                    <li>Annotation guidelines shape AI personality and behavior</li>
+                    <li>Whose preferences get encoded determines whose AI it becomes</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('llm-preference-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [] };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            localStorage.setItem('llm-preference-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('llm-preference-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>

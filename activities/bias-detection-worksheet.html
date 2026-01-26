@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worksheet: Bias Detection in Text</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #ad1457, #d81b60); color: white; padding: 20px; margin-bottom: 20px; }
+        header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.9; }
+        header .meta { margin-top: 10px; font-size: 0.85rem; opacity: 0.8; display: flex; gap: 20px; flex-wrap: wrap; }
+        header .author { margin-top: 8px; font-size: 0.85rem; opacity: 0.9; }
+        .section { background: white; border-radius: 6px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .section h2 { color: #ad1457; font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        .section h3 { color: #333; font-size: 1rem; margin: 14px 0 8px 0; }
+        .section p { margin-bottom: 8px; }
+        .definition-box { background: #fce4ec; border-left: 3px solid #d81b60; padding: 12px 15px; margin: 12px 0; }
+        .text-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 15px 0; line-height: 1.8; }
+        .example-text { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 12px; font-style: italic; margin: 10px 0; }
+        .bias-tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; margin: 2px; }
+        .bias-gender { background: #f8bbd9; color: #880e4f; }
+        .bias-racial { background: #d1c4e9; color: #4a148c; }
+        .bias-age { background: #b3e5fc; color: #01579b; }
+        .bias-socio { background: #c8e6c9; color: #1b5e20; }
+        .bias-ability { background: #ffe0b2; color: #e65100; }
+        .question-box { background: #fff8e1; border: 1px solid #ffcc02; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .question-box .q-header { font-weight: 600; color: #f57c00; margin-bottom: 10px; }
+        .bias-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+        .bias-table th, .bias-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .bias-table th { background: #fce4ec; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px; margin: 10px 0; }
+        .checkbox-option, .radio-option { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .checkbox-option input, .radio-option input { width: 16px; height: 16px; cursor: pointer; }
+        .radio-options { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        textarea { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; resize: vertical; margin-top: 4px; }
+        textarea:focus { outline: none; border-color: #d81b60; }
+        .input-group { margin: 10px 0; }
+        .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
+        .choices-container { display: none; margin-top: 10px; }
+        .choices-container.show { display: block; }
+        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
+        .toggle-btn:hover { background: #d0d0d0; }
+        .toggle-btn.active { background: #d81b60; color: white; border-color: #d81b60; }
+        .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
+        .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
+        .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
+        .takeaway-box li { margin: 4px 0; }
+        .scale-container { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 8px; background: #f8f9fa; border-radius: 6px; }
+        .scale-option { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .scale-option input { width: 18px; height: 18px; }
+        .scale-option label { font-size: 0.7rem; text-align: center; max-width: 55px; }
+        .toolbar { position: fixed; bottom: 15px; right: 15px; display: flex; gap: 8px; }
+        .toolbar button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .btn-print { background: #d81b60; color: white; }
+        .btn-clear { background: #757575; color: white; }
+        @media print {
+            body { background: white; font-size: 12px; }
+            .container { padding: 0; }
+            header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar { display: none; }
+            .choices-container { display: block !important; }
+            .toggle-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container" style="padding: 0;">
+            <h1>Worksheet: Bias Detection in Text</h1>
+            <div class="subtitle">Identifying and annotating gender, racial, and other biases</div>
+            <div class="meta">
+                <span><strong>Course:</strong> Natural Language Annotation for Machine Learning</span>
+                <span><strong>Task Type:</strong> Multi-label classification + Span annotation</span>
+            </div>
+            <div class="author"><strong>Author:</strong> Jin Zhao</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Background</h2>
+            <p>Bias in text can perpetuate stereotypes and unfair treatment. Detecting bias is crucial for building fair AI systems and understanding media representation.</p>
+
+            <div class="definition-box">
+                <p><strong>Textual Bias:</strong> Language that unfairly represents, stereotypes, or marginalizes individuals or groups based on attributes like gender, race, age, or socioeconomic status.</p>
+            </div>
+
+            <h3>Types of Bias</h3>
+            <p><span class="bias-tag bias-gender">Gender Bias</span> Stereotyping based on gender/sex</p>
+            <p><span class="bias-tag bias-racial">Racial/Ethnic Bias</span> Prejudice based on race or ethnicity</p>
+            <p><span class="bias-tag bias-age">Age Bias</span> Discrimination based on age</p>
+            <p><span class="bias-tag bias-socio">Socioeconomic Bias</span> Prejudice based on class/wealth</p>
+            <p><span class="bias-tag bias-ability">Ability Bias</span> Bias against people with disabilities</p>
+        </section>
+
+        <section class="section">
+            <h2>Part 1: Identifying Explicit Bias</h2>
+            <p>Classify each example and identify the type of bias present.</p>
+
+            <div class="text-box">
+                <div class="example-text">"For a woman, she's surprisingly good at math."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="e1" value="gender"> Gender bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e1" value="racial"> Racial bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e1" value="age"> Age bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e1" value="socio"> Socioeconomic bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e1" value="none"> No bias</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"The elderly driver was, predictably, going 20 under the speed limit."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="e2" value="gender"> Gender bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e2" value="racial"> Racial bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e2" value="age"> Age bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e2" value="socio"> Socioeconomic bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="e2" value="none"> No bias</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 1</div>
+                <p>What makes a compliment biased (as in the first example)?</p>
+                <div class="input-group">
+                    <textarea placeholder="Explain the underlying assumption..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 2: Subtle and Implicit Bias</h2>
+            <div class="text-box">
+                <div class="example-text">"The doctor examined his patient carefully. Meanwhile, the nurse prepared her supplies."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="e3" value="biased"> Biased (assumes doctor=male, nurse=female)</label>
+                        <label class="radio-option"><input type="radio" name="e3" value="neutral"> Neutral (just describes specific individuals)</label>
+                        <label class="radio-option"><input type="radio" name="e3" value="depends"> Depends on context</label>
+                        <label class="radio-option"><input type="radio" name="e3" value="ambiguous"> Ambiguous - cannot determine</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"The articulate young Black man impressed the interviewers."</div>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="e4" value="biased"> Biased (implies surprise at articulateness)</label>
+                        <label class="radio-option"><input type="radio" name="e4" value="neutral"> Neutral (just descriptive)</label>
+                        <label class="radio-option"><input type="radio" name="e4" value="positive"> Positive (compliment)</label>
+                        <label class="radio-option"><input type="radio" name="e4" value="depends"> Depends on context</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 2</div>
+                <p>Why might calling someone "articulate" be biased in certain contexts?</p>
+                <div class="input-group">
+                    <textarea placeholder="Discuss the implications..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 3: Framing and Word Choice</h2>
+            <p>The same event can be described in biased or neutral ways.</p>
+
+            <div class="text-box">
+                <p><strong>Version A:</strong> "Protesters clashed with police during the demonstration."</p>
+                <p><strong>Version B:</strong> "Rioters attacked police officers during the violent gathering."</p>
+                <p><strong>Version C:</strong> "Activists were confronted by law enforcement during the peaceful march."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 3</div>
+                <p>Rate the bias in each version:</p>
+                <table class="bias-table">
+                    <tr><th>Version</th><th>Bias Direction</th><th>Severity</th></tr>
+                    <tr>
+                        <td>Version A</td>
+                        <td><select name="q3a_dir"><option value="">Select...</option><option value="pro-protest">Pro-protesters</option><option value="pro-police">Pro-police</option><option value="neutral">Neutral</option></select></td>
+                        <td><select name="q3a_sev"><option value="">Select...</option><option value="none">None</option><option value="slight">Slight</option><option value="moderate">Moderate</option><option value="strong">Strong</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Version B</td>
+                        <td><select name="q3b_dir"><option value="">Select...</option><option value="pro-protest">Pro-protesters</option><option value="pro-police">Pro-police</option><option value="neutral">Neutral</option></select></td>
+                        <td><select name="q3b_sev"><option value="">Select...</option><option value="none">None</option><option value="slight">Slight</option><option value="moderate">Moderate</option><option value="strong">Strong</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Version C</td>
+                        <td><select name="q3c_dir"><option value="">Select...</option><option value="pro-protest">Pro-protesters</option><option value="pro-police">Pro-police</option><option value="neutral">Neutral</option></select></td>
+                        <td><select name="q3c_sev"><option value="">Select...</option><option value="none">None</option><option value="slight">Slight</option><option value="moderate">Moderate</option><option value="strong">Strong</option></select></td>
+                    </tr>
+                </table>
+                <div class="input-group">
+                    <label>Identify the specific word choices that create bias:</label>
+                    <textarea placeholder="e.g., 'rioters' vs. 'protesters' vs. 'activists'..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 4: Statistical vs. Individual Bias</h2>
+            <div class="text-box">
+                <div class="example-text">"Men are, on average, taller than women."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4a</div>
+                <p>Is this statement biased?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4a" value="biased"> Yes, reinforces gender stereotypes</label>
+                        <label class="radio-option"><input type="radio" name="q4a" value="neutral"> No, it's a statistical fact</label>
+                        <label class="radio-option"><input type="radio" name="q4a" value="depends"> Depends on context/usage</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <div class="example-text">"We need a tall person for this job, so let's hire a man."</div>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 4b</div>
+                <p>Is this statement biased?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="radio-options" style="flex-direction: column; gap: 6px;">
+                        <label class="radio-option"><input type="radio" name="q4b" value="biased"> Yes, applies group statistics to individuals</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="neutral"> No, it's statistically reasonable</label>
+                        <label class="radio-option"><input type="radio" name="q4b" value="depends"> Depends on the specific job</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>What's the difference between these two examples?</label>
+                    <textarea placeholder="Discuss statistical generalization vs. individual discrimination..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 5: Bias in AI-Generated Text</h2>
+            <div class="text-box">
+                <p><strong>Prompt:</strong> "Write a story about a CEO."</p>
+                <p><strong>AI Output:</strong> "John walked into his corner office, adjusting his tie. As CEO of the company his father had built, he felt the weight of responsibility on his shoulders. His secretary, a young woman named Lisa, brought him his morning coffee..."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 5</div>
+                <p>Identify potential biases in this AI-generated text:</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="gender-ceo"> CEO assumed to be male</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="gender-sec"> Secretary assumed to be female</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="age"> Age bias (young secretary)</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="inherited"> Inherited wealth assumption</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q5" value="dress"> Professional dress stereotypes</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Why do AI systems often produce biased outputs?</label>
+                    <textarea placeholder="Discuss training data and societal biases..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 6: Annotating a Full Passage</h2>
+            <div class="text-box">
+                <p>"The tech industry has long struggled with diversity. Despite efforts to recruit more women and minorities, the field remains dominated by young white and Asian men. Critics argue that the 'culture fit' hiring practice often favors candidates who look and think like existing employees. Meanwhile, older workers find themselves pushed out as companies chase the next young genius. Some suggest that the industry's obsession with youth ignores the value of experience."</p>
+            </div>
+
+            <div class="question-box">
+                <div class="q-header">Question 6</div>
+                <p>Analyze this passage for bias:</p>
+                <div class="input-group">
+                    <label>What biases does the passage DISCUSS (topic of the text)?</label>
+                    <textarea placeholder="List the biases mentioned as subject matter..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Does the passage itself EXHIBIT any bias (how it's written)?</label>
+                    <textarea placeholder="Identify any biased framing or language..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label>How should annotation guidelines distinguish between discussing bias and exhibiting bias?</label>
+                    <textarea placeholder="Propose a guideline..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 7: Group Discussion</h2>
+            <div class="question-box">
+                <div class="q-header">Question 7</div>
+                <p>Compare your annotations with your group. Where did you disagree?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="presence"> Whether bias is present</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="type"> Type of bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="severity"> Severity of bias</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="subtle"> Subtle vs. explicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q7" value="context"> Context interpretation</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Describe one specific disagreement:</label>
+                    <textarea placeholder="What caused the disagreement?"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Part 8: Reflection</h2>
+            <div class="question-box">
+                <div class="q-header">Question 8</div>
+                <p>Why is bias detection difficult?</p>
+                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                <div class="choices-container">
+                    <div class="checkbox-grid">
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Bias perception is subjective</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="subtle"> Much bias is subtle/implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Context is crucial</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="annotator"> Annotator background matters</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="evolving"> Social norms evolve</label>
+                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway-box">
+                <h3>Key Takeaway</h3>
+                <p><strong>Bias is often in the eye of the beholder, but annotation can still be systematic.</strong></p>
+                <ul>
+                    <li>Explicit bias is easier to identify than implicit bias</li>
+                    <li>Word choice and framing reveal underlying assumptions</li>
+                    <li>Discussing bias vs. exhibiting bias are different</li>
+                    <li>Annotator diversity is crucial for comprehensive coverage</li>
+                    <li>Guidelines must acknowledge subjectivity while providing clear criteria</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-clear" onclick="clearForm()">Clear All</button>
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <script>
+        function toggleChoices(btn) {
+            const container = btn.nextElementSibling;
+            container.classList.toggle('show');
+            btn.classList.toggle('active');
+            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
+        }
+
+        function clearForm() {
+            if (confirm('Clear all answers?')) {
+                document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+                document.querySelectorAll('textarea').forEach(i => i.value = '');
+                document.querySelectorAll('select').forEach(i => i.value = '');
+                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
+                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
+                localStorage.removeItem('bias-detection-worksheet');
+            }
+        }
+
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {} };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
+            localStorage.setItem('bias-detection-worksheet', JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('bias-detection-worksheet');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.entries(data.radios || {}).forEach(([name, value]) => {
+                    const r = document.querySelector(`input[type="radio"][name="${name}"][value="${value}"]`);
+                    if (r) r.checked = true;
+                });
+                Object.entries(data.checkboxes || {}).forEach(([name, values]) => {
+                    values.forEach(v => {
+                        const c = document.querySelector(`input[type="checkbox"][name="${name}"][value="${v}"]`);
+                        if (c) c.checked = true;
+                    });
+                });
+                document.querySelectorAll('textarea').forEach((t, i) => { if (data.textareas?.[i]) t.value = data.textareas[i]; });
+                Object.entries(data.selects || {}).forEach(([name, value]) => {
+                    const s = document.querySelector(`select[name="${name}"]`);
+                    if (s) s.value = value;
+                });
+            } catch (e) { console.error('Error loading:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+        document.addEventListener('change', saveProgress);
+        document.addEventListener('input', saveProgress);
+    </script>
+
+    <!-- Classroom Response System -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="classroom-submit.js"></script>
+
+</body>
+</html>
