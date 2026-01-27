@@ -266,36 +266,14 @@
             border-bottom-color: #0070ae;
         }
 
-        .choices-container {
-            display: none;
+        .choices-container { display: block;
+            display: block;
             margin-top: 10px;
         }
 
-        .choices-container.show {
-            display: block;
-        }
 
-        .toggle-btn {
-            background: #e0e0e0;
-            border: 1px solid #ccc;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: #333;
-            margin-top: 8px;
-            transition: all 0.2s;
-        }
 
-        .toggle-btn:hover {
-            background: #d0d0d0;
-        }
 
-        .toggle-btn.active {
-            background: #0070ae;
-            color: white;
-            border-color: #0070ae;
-        }
 
         .toolbar {
             position: fixed;
@@ -355,7 +333,7 @@
             }
 
             .toolbar {
-                display: none;
+                display: block;
             }
 
             textarea {
@@ -409,7 +387,7 @@
             <div class="question-box">
                 <div class="question-header">Question 1</div>
                 <p>Are these definitions sufficient to label comments consistently?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option">
@@ -436,7 +414,7 @@
             <div class="example-card">
                 <div class="example-header">Example 1</div>
                 <div class="comment">"Wow, great job."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option">
@@ -461,7 +439,7 @@
             <div class="example-card">
                 <div class="example-header">Example 2</div>
                 <div class="comment">"Nice work, genius."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option">
@@ -486,7 +464,7 @@
             <div class="example-card">
                 <div class="example-header">Example 3</div>
                 <div class="comment">"This idea is stupid."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option">
@@ -511,7 +489,7 @@
             <div class="example-card">
                 <div class="example-header">Example 4</div>
                 <div class="comment">"Sure, that'll work. Just like last time."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option">
@@ -536,7 +514,7 @@
             <div class="example-card">
                 <div class="example-header">Example 5</div>
                 <div class="comment">"I can't believe you actually think this makes sense."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option">
@@ -566,7 +544,7 @@
             <div class="question-box">
                 <div class="question-header">Question 2</div>
                 <p>Which examples had disagreement in your group? (Check all that apply.)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 15px;">
                         <label class="checkbox-option">
@@ -591,7 +569,7 @@
             <div class="question-box">
                 <div class="question-header">Question 3</div>
                 <p>What caused the disagreement? (Check all that apply.)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 15px;">
                         <label class="checkbox-option">
@@ -640,7 +618,7 @@
             <div class="question-box">
                 <div class="question-header">Question 4</div>
                 <p>How should this example be handled in the dataset?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 15px;">
                         <label class="checkbox-option">
@@ -674,7 +652,7 @@
             <div class="question-box">
                 <div class="question-header">Question 5</div>
                 <p>Which of the following guideline changes would most reduce disagreement?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 15px;">
                         <label class="checkbox-option">
@@ -708,7 +686,7 @@
             <div class="question-box">
                 <div class="question-header">Question 6</div>
                 <p>Why is this classification task difficult even though it has only two labels?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 15px;">
                         <label class="checkbox-option">
@@ -761,12 +739,6 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Are you sure you want to clear all your answers?')) {
@@ -790,14 +762,6 @@
                     input.value = '';
                 });
 
-                // Reset all toggle buttons
-                document.querySelectorAll('.toggle-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.textContent = 'Show Choices';
-                });
-                document.querySelectorAll('.choices-container').forEach(container => {
-                    container.classList.remove('show');
-                });
             }
         }
 

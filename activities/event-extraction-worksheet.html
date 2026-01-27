@@ -230,36 +230,14 @@
             cursor: pointer;
         }
 
-        .choices-container {
-            display: none;
+        .choices-container { display: block;
+            display: block;
             margin-top: 10px;
         }
 
-        .choices-container.show {
-            display: block;
-        }
 
-        .toggle-btn {
-            background: #e0e0e0;
-            border: 1px solid #ccc;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: #333;
-            margin-top: 8px;
-            transition: all 0.2s;
-        }
 
-        .toggle-btn:hover {
-            background: #d0d0d0;
-        }
 
-        .toggle-btn.active {
-            background: #0070ae;
-            color: white;
-            border-color: #0070ae;
-        }
 
         textarea {
             width: 100%;
@@ -385,7 +363,7 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; margin-bottom: 12px; padding: 12px; }
-            .toolbar { display: none; }
+            .toolbar { display: block; }
             textarea { min-height: 40px; }
         }
     </style>
@@ -440,7 +418,7 @@
             <div class="question-box">
                 <div class="q-header">Question 1</div>
                 <p>Which of the following could be valid attack triggers? (Check all that apply.)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q1" value="attacked"> attacked</label>
@@ -508,7 +486,7 @@
             <div class="question-box">
                 <div class="q-header">Question 3</div>
                 <p>Is the trigger:</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q3" value="attack"> "attack"</label>
@@ -542,7 +520,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>Does this sentence contain an ATTACK event?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes</label>
@@ -577,7 +555,7 @@
             <div class="question-box">
                 <div class="q-header">Question 5</div>
                 <p>Which argument roles were hardest to decide?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q5" value="agent"> AGENT</label>
@@ -599,7 +577,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6</div>
                 <p>Where did you disagree most?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q6" value="trigger-boundaries"> Trigger boundaries</label>
@@ -621,7 +599,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Which guideline change would most improve agreement?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q7" value="examples"> More trigger examples</label>
@@ -644,7 +622,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Why is event extraction harder than sequence labeling tasks like NER?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Triggers can be implicit</label>
@@ -694,7 +672,7 @@
             <div class="question-box">
                 <div class="q-header">Question X.1</div>
                 <p>Which word(s) did you label as the ATTACK trigger?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="qx1" value="shelling"> shelling</label>
@@ -712,7 +690,7 @@
             <div class="question-box">
                 <div class="q-header">Question X.2</div>
                 <p>What does "began" contribute to the meaning of the event?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="qx2" value="start"> Indicates the start of the attack</label>
@@ -743,7 +721,7 @@
             <div class="question-box">
                 <div class="q-header">Question X.3</div>
                 <p>Does this sentence describe:</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="qx3" value="new"> A new ATTACK event</label>
@@ -764,7 +742,7 @@
             <div class="question-box">
                 <div class="q-header">Question X.4</div>
                 <p>Should aspectual words like <em>began, continued, ended</em> be:</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="qx4" value="included"> Included in the event trigger</label>
@@ -782,7 +760,7 @@
             <div class="question-box">
                 <div class="q-header">Question X.5</div>
                 <p>What guideline rule would reduce disagreement the most?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="qx5" value="core-only"> "Only label the core action verb as the trigger"</label>
@@ -823,7 +801,7 @@
             <div class="question-box">
                 <div class="q-header">Question Y.1</div>
                 <p>Which sentence(s) contain an ATTACK event?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="qy1" value="7-only"> Sentence 7 only</label>
@@ -841,7 +819,7 @@
             <div class="question-box">
                 <div class="q-header">Question Y.2</div>
                 <p>What is the key difference between these sentences?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="qy2" value="intent"> One describes an event, the other describes intent</label>
@@ -865,7 +843,7 @@
             <div class="question-box">
                 <div class="q-header">Question Z.1</div>
                 <p>How many ATTACK events are described here?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="qz1" value="one"> One continuous event</label>
@@ -888,7 +866,7 @@
             <div class="question-box">
                 <div class="q-header">Question AA.1</div>
                 <p>Which rule would you adopt for this project?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="qaa1" value="concrete"> Only annotate concrete, realized events</label>
@@ -906,7 +884,7 @@
             <div class="question-box">
                 <div class="q-header">Question BB.1</div>
                 <p>Suppose you include <em>began, continued, stopped</em> as part of ATTACK triggers. Which outcomes are likely? (Check all that apply.)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="qbb1" value="longer"> Longer trigger spans</label>
@@ -957,12 +935,6 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Are you sure you want to clear all your answers?')) {
@@ -971,18 +943,6 @@
                 document.querySelectorAll('textarea').forEach(t => t.value = '');
                 document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('event-extraction-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [], textInputs: [] };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
             localStorage.setItem('event-extraction-worksheet', JSON.stringify(data));

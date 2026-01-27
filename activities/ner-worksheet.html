@@ -39,11 +39,7 @@
         textarea:focus { outline: none; border-color: #3498db; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; transition: all 0.2s; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #3498db; color: white; border-color: #3498db; }
+        .choices-container { display: block; margin-top: 10px; }
         .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
         .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
         .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
@@ -57,10 +53,8 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -122,7 +116,7 @@
             <div class="question-box">
                 <div class="q-header">Question 1</div>
                 <p>Is "White House" a location (LOC) or an organization (ORG)?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q1" value="loc"> LOC (it's a building)</label>
@@ -156,7 +150,7 @@
             <div class="question-box">
                 <div class="q-header">Question 2</div>
                 <p>Should "Cupertino headquarters" be tagged as one entity or two?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q2" value="one"> One entity: "Cupertino headquarters" (LOC)</label>
@@ -188,7 +182,7 @@
             <div class="question-box">
                 <div class="q-header">Question 3</div>
                 <p>"Washington" here refers to the U.S. government, not the city. How should it be tagged?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q3" value="loc"> LOC (surface form is a place)</label>
@@ -226,7 +220,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>Should "The" be included in "The New York Times"?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q4" value="include"> Yes, it's part of the official name</label>
@@ -250,7 +244,7 @@
             <div class="question-box">
                 <div class="q-header">Question 5</div>
                 <p>"Bank of America Tower" contains "Bank of America" (ORG) and refers to a building (LOC). How should this be handled?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q5" value="outer"> Tag only the outer entity (LOC)</label>
@@ -272,7 +266,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6</div>
                 <p>Where did you disagree most?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q6" value="type"> Entity type assignment</label>
@@ -293,7 +287,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Which guideline change would most improve annotator agreement?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q7" value="examples"> More examples for each entity type</label>
@@ -315,7 +309,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Why is NER harder than it appears?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="ambiguous"> Names are ambiguous (Apple, Washington)</label>
@@ -345,30 +339,12 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
                 document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
                 document.querySelectorAll('textarea, input[type="text"]').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('ner-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [], textInputs: [] };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
             localStorage.setItem('ner-worksheet', JSON.stringify(data));

@@ -239,36 +239,14 @@
             font-size: 0.85rem;
         }
 
-        .choices-container {
-            display: none;
+        .choices-container { display: block;
+            display: block;
             margin-top: 10px;
         }
 
-        .choices-container.show {
-            display: block;
-        }
 
-        .toggle-btn {
-            background: #e0e0e0;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #333;
-            margin-top: 6px;
-            transition: all 0.2s;
-        }
 
-        .toggle-btn:hover {
-            background: #d0d0d0;
-        }
 
-        .toggle-btn.active {
-            background: #2e86ab;
-            color: white;
-            border-color: #2e86ab;
-        }
 
         .takeaway-box {
             background: #e8f5e9;
@@ -367,7 +345,7 @@
             }
 
             .toolbar {
-                display: none;
+                display: block;
             }
 
             textarea {
@@ -375,13 +353,10 @@
                 min-height: 50px;
             }
 
-            .choices-container {
+            .choices-container { display: block;
                 display: block !important;
             }
 
-            .toggle-btn {
-                display: none;
-            }
         }
     </style>
 </head>
@@ -439,7 +414,7 @@
             <div class="question-box">
                 <div class="question-header">Question 1</div>
                 <p>Which of the following words or phrases often signal causality? (Check all that apply.)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="checkbox" name="q1" value="because"> because</label>
@@ -473,7 +448,7 @@
             <div class="question-box">
                 <div class="question-header">Question 2</div>
                 <p>What is the relation between Event A and Event B?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option"><input type="radio" name="q2" value="causes"> CAUSES</label>
@@ -504,7 +479,7 @@
             <div class="question-box">
                 <div class="question-header">Question 3</div>
                 <p>Is this sentence explicitly causal?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option"><input type="radio" name="q3" value="yes"> Yes</label>
@@ -534,7 +509,7 @@
             <div class="question-box">
                 <div class="question-header">Question 4</div>
                 <p>Is Event A causally related to Event B?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option"><input type="radio" name="q4" value="causes"> CAUSES</label>
@@ -568,7 +543,7 @@
             <div class="question-box">
                 <div class="question-header">Question 5</div>
                 <p>Which causal relations should be annotated? (Check all that apply.)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="checkbox" name="q5" value="a-b"> A <span class="arrow">→</span> B</label>
@@ -600,7 +575,7 @@
             <div class="question-box">
                 <div class="question-header">Question 6</div>
                 <p>How should this be annotated?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option"><input type="radio" name="q6" value="causes"> A CAUSES B</label>
@@ -628,7 +603,7 @@
             <div class="question-box">
                 <div class="question-header">Question 7</div>
                 <p>How confident is the causal claim?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option"><input type="radio" name="q7a" value="certain"> Certain</label>
@@ -638,7 +613,7 @@
                     </div>
                 </div>
                 <p style="margin-top: 15px;">What label would you assign?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="label-options">
                         <label class="label-option"><input type="radio" name="q7b" value="causes"> CAUSES</label>
@@ -666,7 +641,7 @@
             <div class="question-box">
                 <div class="question-header">Question 8</div>
                 <p>Should you annotate a causal relation?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="radio" name="q8" value="world"> Yes, based on world knowledge</label>
@@ -690,7 +665,7 @@
             <div class="question-box">
                 <div class="question-header">Question 9</div>
                 <p>Where did you disagree most?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="radio" name="q9" value="event-id"> Event identification</label>
@@ -713,7 +688,7 @@
             <div class="question-box">
                 <div class="question-header">Question 10</div>
                 <p>Which guideline would most reduce disagreement?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="radio" name="q10" value="explicit"> Only annotate explicit causal markers</label>
@@ -737,7 +712,7 @@
             <div class="question-box">
                 <div class="question-header">Question 11</div>
                 <p>If annotators disagree on causality, what might a model trained on this data learn?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="checkbox" name="q11" value="spurious"> Spurious correlations</label>
@@ -760,7 +735,7 @@
             <div class="question-box">
                 <div class="question-header">Question 12</div>
                 <p>Why is causal relation extraction harder than event detection alone?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div style="margin-top: 10px;">
                         <label class="checkbox-option"><input type="checkbox" name="q12" value="interpretation"> Requires interpretation beyond text</label>
@@ -791,12 +766,6 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Are you sure you want to clear all your answers?')) {
@@ -812,14 +781,7 @@
                     textarea.value = '';
                 });
 
-                document.querySelectorAll('.toggle-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.textContent = 'Show Choices';
-                });
 
-                document.querySelectorAll('.choices-container').forEach(container => {
-                    container.classList.remove('show');
-                });
 
                 localStorage.removeItem('causal-relation-worksheet');
             }

@@ -32,11 +32,7 @@
         textarea:focus { outline: none; border-color: #ff9800; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #ff9800; color: white; border-color: #ff9800; }
+        .choices-container { display: block; margin-top: 10px; }
         .confidence-scale { display: flex; justify-content: space-between; background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0; }
         .confidence-option { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .confidence-option input { width: 18px; height: 18px; }
@@ -52,10 +48,8 @@
         @media print {
             body { background: white; font-size: 12px; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -158,7 +152,7 @@
             <div class="question-box">
                 <div class="q-header">Question 2</div>
                 <p>The same sentence has opposite meanings in different contexts. How should annotation handle this?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q2" value="always-context"> Always provide context for annotation</label>
@@ -198,7 +192,7 @@
             <div class="question-box">
                 <div class="q-header">Question 3</div>
                 <p>What textual cues suggest sarcasm? (Check all that apply)</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q3" value="caps"> ALL CAPS emphasis</label>
@@ -299,7 +293,7 @@
                 <div class="q-header">Question 6</div>
                 <p>Consider the review: "This product exceeded all my expectations. It fell apart after two days. Just what I was hoping for."</p>
                 <p style="margin-top: 10px;"><strong>What is the sentiment?</strong></p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q6sent" value="positive"> Positive (literal text)</label>
@@ -319,7 +313,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Compare your annotations with your group. Where did you disagree?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q7" value="detection"> Sarcasm detection itself</label>
@@ -341,7 +335,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Why is sarcasm detection one of the hardest NLP tasks?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="context"> Requires extensive context</label>
@@ -372,30 +366,12 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
                 document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
                 document.querySelectorAll('textarea').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('sarcasm-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [] };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             localStorage.setItem('sarcasm-worksheet', JSON.stringify(data));
         }

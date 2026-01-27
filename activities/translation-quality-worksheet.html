@@ -44,11 +44,7 @@
         textarea:focus { outline: none; border-color: #1565c0; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #1565c0; color: white; border-color: #1565c0; }
+        .choices-container { display: block; margin-top: 10px; }
         .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
         .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
         .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
@@ -65,10 +61,8 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -202,7 +196,7 @@
             <div class="question-box">
                 <div class="q-header">Question 3</div>
                 <p>Both translations are grammatical. Which is more accurate?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="q3" value="a"> Output A is more accurate</label>
@@ -238,7 +232,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>Is "stomach inflammation" an acceptable translation of "Gastritis"?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="q4" value="accept"> Acceptable - meaning is preserved</label>
@@ -339,7 +333,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Compare your evaluations with your group. Where did you disagree?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q7" value="scale"> Scale interpretation</label>
@@ -361,7 +355,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Why is MT evaluation difficult?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Quality is subjective</label>
@@ -393,12 +387,6 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
@@ -407,18 +395,6 @@
                 document.querySelectorAll('select').forEach(i => i.value = '');
                 document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('translation-quality-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
             document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);

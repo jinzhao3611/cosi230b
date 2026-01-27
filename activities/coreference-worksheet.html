@@ -37,11 +37,7 @@
         textarea:focus { outline: none; border-color: #1abc9c; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #1abc9c; color: white; border-color: #1abc9c; }
+        .choices-container { display: block; margin-top: 10px; }
         .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
         .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
         .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
@@ -58,10 +54,8 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -130,7 +124,7 @@
             <div class="question-box">
                 <div class="q-header">Question 2</div>
                 <p>Who does "he" refer to?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q2" value="john"> John</label>
@@ -155,7 +149,7 @@
             <div class="question-box">
                 <div class="q-header">Question 3</div>
                 <p>Does "Dogs" (generic reference to all dogs) corefer with "My dog" (specific dog)?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q3" value="yes"> Yes, they're related</label>
@@ -179,7 +173,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>"The food" and "the waiter" are related to "a restaurant" but don't refer to the same entity. This is called <strong>bridging</strong>. Should these be linked?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes, annotate bridging relations</label>
@@ -203,7 +197,7 @@
             <div class="question-box">
                 <div class="q-header">Question 5</div>
                 <p>Do "The company announced layoffs", "This", and "The decision" all refer to the same thing?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q5" value="same"> Yes, same event/entity</label>
@@ -227,7 +221,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6a</div>
                 <p>Who does "they" refer to?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q6a" value="councilmen"> The city councilmen</label>
@@ -243,7 +237,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6b</div>
                 <p>Now who does "they" refer to?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q6b" value="councilmen"> The city councilmen</label>
@@ -294,7 +288,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Where did your group disagree?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="mention-boundaries"> Mention boundaries</label>
@@ -316,7 +310,7 @@
             <div class="question-box">
                 <div class="q-header">Question 9</div>
                 <p>Why is coreference resolution difficult?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q9" value="world-knowledge"> Requires world knowledge</label>
@@ -346,30 +340,12 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
                 document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
                 document.querySelectorAll('textarea').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('coreference-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [] };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             localStorage.setItem('coreference-worksheet', JSON.stringify(data));
         }

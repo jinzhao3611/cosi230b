@@ -35,11 +35,7 @@
         textarea:focus { outline: none; border-color: #9b59b6; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #9b59b6; color: white; border-color: #9b59b6; }
+        .choices-container { display: block; margin-top: 10px; }
         .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
         .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
         .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
@@ -56,10 +52,8 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -194,7 +188,7 @@
             <div class="question-box">
                 <div class="q-header">Question 2</div>
                 <p>How should mixed sentiment be handled?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q2" value="average"> Average the sentiments (neutral)</label>
@@ -269,7 +263,7 @@
             <div class="question-box">
                 <div class="q-header">Question 3</div>
                 <p>Should annotation capture the literal meaning or the intended meaning?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options">
                         <label class="radio-option"><input type="radio" name="q3" value="literal"> Literal (surface) meaning</label>
@@ -343,7 +337,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>Neither review contains explicit sentiment words. Should implicit sentiment be annotated?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes, based on implied meaning</label>
@@ -411,7 +405,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6</div>
                 <p>What is the sentiment toward each product?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <p style="margin: 10px 0;"><strong>This product:</strong></p>
                     <div class="radio-options">
@@ -445,7 +439,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Compare your annotations with your group. Where did you disagree?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q7" value="scale"> Scale position (e.g., +1 vs +2)</label>
@@ -467,7 +461,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Why is sentiment analysis harder than it appears?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="subjective"> Sentiment is inherently subjective</label>
@@ -497,12 +491,6 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
@@ -510,18 +498,6 @@
                 document.querySelectorAll('textarea').forEach(i => i.value = '');
                 document.querySelectorAll('select').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('sentiment-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {} };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
             localStorage.setItem('sentiment-worksheet', JSON.stringify(data));

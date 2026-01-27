@@ -37,11 +37,7 @@
         textarea:focus { outline: none; border-color: #f44336; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #f44336; color: white; border-color: #f44336; }
+        .choices-container { display: block; margin-top: 10px; }
         .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
         .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
         .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
@@ -56,10 +52,8 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -186,7 +180,7 @@
             <div class="question-box">
                 <div class="q-header">Question 2</div>
                 <p>Which parts of the summary are grounded in the source vs. hallucinated?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <p style="margin: 10px 0;"><strong>Grounded (in source):</strong></p>
                     <div class="checkbox-grid">
@@ -278,7 +272,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>Even if most information is accurate, small errors in medical contexts can be dangerous. Assess the severity of potential errors:</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q4" value="low"> Low severity: Minor details might be off but core advice is sound</label>
@@ -308,7 +302,7 @@
                     <textarea placeholder="List any contradictions or inconsistencies you notice..."></textarea>
                 </div>
                 <p style="margin-top: 10px;">How should self-contradictory responses be labeled?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
                         <label class="radio-option"><input type="radio" name="q5" value="both"> Mark both contradicting claims as hallucinations</label>
@@ -325,7 +319,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6</div>
                 <p>Compare your annotations with your group. Where did you disagree?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q6" value="boundary"> Claim boundaries</label>
@@ -347,7 +341,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Why is hallucination detection difficult?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q7" value="knowledge"> Requires extensive world knowledge</label>
@@ -379,30 +373,12 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
                 document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
                 document.querySelectorAll('textarea').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('hallucination-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [] };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             localStorage.setItem('hallucination-worksheet', JSON.stringify(data));
         }

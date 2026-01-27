@@ -34,11 +34,7 @@
         textarea:focus { outline: none; border-color: #8d6e63; }
         .input-group { margin: 10px 0; }
         .input-group label { display: block; font-weight: 500; margin-bottom: 4px; color: #555; font-size: 0.9rem; }
-        .choices-container { display: none; margin-top: 10px; }
-        .choices-container.show { display: block; }
-        .toggle-btn { background: #e0e0e0; border: 1px solid #ccc; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; margin-top: 8px; }
-        .toggle-btn:hover { background: #d0d0d0; }
-        .toggle-btn.active { background: #8d6e63; color: white; border-color: #8d6e63; }
+        .choices-container { display: block; margin-top: 10px; }
         .takeaway-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 14px; margin: 12px 0; }
         .takeaway-box h3 { color: #388e3c; margin-bottom: 8px; font-size: 1rem; }
         .takeaway-box ul { margin-left: 18px; font-size: 0.9rem; }
@@ -53,10 +49,8 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .toolbar { display: none; }
-            .choices-container { display: block !important; }
-            .toggle-btn { display: none; }
-        }
+            .toolbar { display: block; }
+            .choices-container { display: block; display: block !important; }
     </style>
 </head>
 <body>
@@ -99,7 +93,7 @@
 
             <div class="text-box">
                 <div class="example-text">"Studies show that certain neighborhoods have higher crime rates. Interesting correlation with demographics, isn't it?"</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="e1" value="explicit"> Explicit hate speech</label>
@@ -112,7 +106,7 @@
 
             <div class="text-box">
                 <div class="example-text">"I'm not racist, but I've noticed that people from that country just don't share our values."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="e2" value="explicit"> Explicit hate speech</label>
@@ -138,7 +132,7 @@
 
             <div class="text-box">
                 <div class="example-text">"They breed like rabbits. No wonder the welfare system is strained."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="s1" value="stereotype"> Stereotyping</label>
@@ -152,7 +146,7 @@
 
             <div class="text-box">
                 <div class="example-text">"I'm just concerned about preserving our cultural heritage. Is that so wrong?"</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="s2" value="stereotype"> Stereotyping</label>
@@ -166,7 +160,7 @@
 
             <div class="text-box">
                 <div class="example-text">"Why is it that one group commits 50% of violent crimes? Just stating facts."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="s3" value="stereotype"> Stereotyping</label>
@@ -208,7 +202,7 @@
                     <textarea placeholder="Describe a hateful context..."></textarea>
                 </div>
                 <p style="margin-top: 10px;">What additional information would annotators need?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q3" value="speaker"> Speaker identity/history</label>
@@ -229,7 +223,7 @@
 
             <div class="text-box">
                 <div class="example-text">"We need to secure a future for our children and their heritage."</div>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="dw1" value="benign"> Benign statement about family values</label>
@@ -243,7 +237,7 @@
             <div class="question-box">
                 <div class="q-header">Question 4</div>
                 <p>Should annotators be trained on known dog whistles and coded language?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes, essential for accurate detection</label>
@@ -303,7 +297,7 @@
             <div class="question-box">
                 <div class="q-header">Question 6</div>
                 <p>Is expressing political opinions about immigration inherently hateful?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
                         <label class="radio-option"><input type="radio" name="q6" value="no"> No, political opinions are not hate speech</label>
@@ -324,7 +318,7 @@
             <div class="question-box">
                 <div class="q-header">Question 7</div>
                 <p>Compare your annotations with your group. Where did you disagree?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q7" value="threshold"> Threshold for "hateful"</label>
@@ -346,7 +340,7 @@
             <div class="question-box">
                 <div class="q-header">Question 8</div>
                 <p>Why is implicit hate speech annotation particularly challenging?</p>
-                <button class="toggle-btn" onclick="toggleChoices(this)">Show Choices</button>
+                
                 <div class="choices-container">
                     <div class="checkbox-grid">
                         <label class="checkbox-option"><input type="checkbox" name="q8" value="knowledge"> Requires cultural/contextual knowledge</label>
@@ -379,12 +373,6 @@
     </div>
 
     <script>
-        function toggleChoices(btn) {
-            const container = btn.nextElementSibling;
-            container.classList.toggle('show');
-            btn.classList.toggle('active');
-            btn.textContent = container.classList.contains('show') ? 'Hide Choices' : 'Show Choices';
-        }
 
         function clearForm() {
             if (confirm('Clear all answers?')) {
@@ -393,18 +381,6 @@
                 document.querySelectorAll('select').forEach(i => i.value = '');
                 document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
                 document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-                document.querySelectorAll('.toggle-btn').forEach(b => { b.classList.remove('active'); b.textContent = 'Show Choices'; });
-                localStorage.removeItem('implicit-hate-worksheet');
-            }
-        }
-
-        function saveProgress() {
-            const data = { radios: {}, checkboxes: {}, textareas: [], selects: {}, inputs: {} };
-            document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
-                data.checkboxes[c.name].push(c.value);
-            });
             document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
             document.querySelectorAll('select').forEach(s => data.selects[s.name] = s.value);
             document.querySelectorAll('input[type="text"]').forEach(i => data.inputs[i.name] = i.value);
