@@ -37,6 +37,7 @@
             display: flex;
             gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .session-controls input, .session-controls select {
@@ -58,10 +59,10 @@
         }
 
         .btn {
-            padding: 10px 25px;
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
-            font-size: 1em;
+            font-size: 0.95em;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -81,9 +82,26 @@
             color: white;
         }
 
+        .btn-secondary:hover {
+            background: #1976D2;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+
         .btn-danger {
             background: #f44336;
             color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
         }
 
         .stats-bar {
@@ -195,13 +213,6 @@
             border-left-color: #2196F3;
         }
 
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255,255,255,0.5);
-            font-size: 1.1em;
-        }
-
         .live-indicator {
             display: flex;
             align-items: center;
@@ -240,7 +251,6 @@
             background: rgba(255,255,255,0.3);
         }
 
-        /* Fullscreen presentation mode */
         body.presentation-mode .header {
             padding: 10px 20px;
         }
@@ -269,24 +279,6 @@
             color: #f44336;
         }
 
-        .worksheet-info {
-            background: rgba(255,255,255,0.05);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .worksheet-info h2 {
-            font-size: 1.3em;
-            margin-bottom: 5px;
-        }
-
-        .worksheet-info p {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9em;
-        }
-
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -335,6 +327,182 @@
             border-radius: 10px;
             margin-top: 20px;
         }
+
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a2e;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .session-list {
+            margin-top: 20px;
+        }
+
+        .session-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .session-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .session-code {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4CAF50;
+            letter-spacing: 2px;
+        }
+
+        .session-meta {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+
+        .session-worksheets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .worksheet-tag {
+            background: rgba(33, 150, 243, 0.3);
+            color: #90caf9;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.85em;
+        }
+
+        .no-sessions {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .storage-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+
+        .storage-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .storage-bar-fill {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .confirm-dialog {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .confirm-dialog p {
+            margin-bottom: 15px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
     </style>
 </head>
 <body>
@@ -347,6 +515,7 @@
             </select>
             <button class="btn btn-primary" onclick="startSession()">Start Viewing</button>
             <button class="btn btn-secondary" onclick="generateSessionCode()">New Session</button>
+            <button class="btn btn-warning" onclick="openSessionManager()">Manage Sessions</button>
             <span class="connection-status disconnected" id="connectionStatus">Disconnected</span>
         </div>
     </div>
@@ -383,12 +552,50 @@
 
     <button class="fullscreen-btn" onclick="toggleFullscreen()">&#x26F6; Fullscreen</button>
 
+    <!-- Session Manager Modal -->
+    <div class="modal-overlay" id="sessionModal">
+        <div class="modal">
+            <h2>
+                Session Manager
+                <button class="modal-close" onclick="closeSessionManager()">&times;</button>
+            </h2>
+
+            <div class="storage-info">
+                <strong>Storage Usage</strong>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span id="storageUsed">Calculating...</span>
+                    <span style="color: rgba(255,255,255,0.5);">Free tier: 1 GB</span>
+                </div>
+                <div class="storage-bar">
+                    <div class="storage-bar-fill" id="storageBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>All Sessions</h3>
+                <button class="btn btn-danger btn-sm" onclick="confirmDeleteAll()" id="deleteAllBtn" style="display: none;">Delete All Sessions</button>
+            </div>
+
+            <div class="session-list" id="sessionList">
+                <div class="loading"></div>
+            </div>
+
+            <div class="confirm-dialog" id="confirmDialog" style="display: none;">
+                <p id="confirmMessage">Are you sure you want to delete this session? This cannot be undone.</p>
+                <div class="confirm-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="cancelDelete()">Cancel</button>
+                    <button class="btn btn-danger btn-sm" onclick="executeDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Worksheet definitions - maps to the actual worksheets
+        // Worksheet definitions
         const worksheets = {
             'toxicity': { name: 'Toxicity Detection', file: 'toxicity-worksheet.html' },
             'event-extraction': { name: 'Event Extraction', file: 'event-extraction-worksheet.html' },
@@ -417,16 +624,15 @@
             'bias-detection': { name: 'Bias Detection', file: 'bias-detection-worksheet.html' }
         };
 
-        // Chart color palette
         const chartColors = [
-            'rgba(76, 175, 80, 0.8)',   // Green
-            'rgba(33, 150, 243, 0.8)',  // Blue
-            'rgba(255, 193, 7, 0.8)',   // Amber
-            'rgba(156, 39, 176, 0.8)',  // Purple
-            'rgba(255, 87, 34, 0.8)',   // Deep Orange
-            'rgba(0, 188, 212, 0.8)',   // Cyan
-            'rgba(233, 30, 99, 0.8)',   // Pink
-            'rgba(139, 195, 74, 0.8)'   // Light Green
+            'rgba(76, 175, 80, 0.8)',
+            'rgba(33, 150, 243, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(156, 39, 176, 0.8)',
+            'rgba(255, 87, 34, 0.8)',
+            'rgba(0, 188, 212, 0.8)',
+            'rgba(233, 30, 99, 0.8)',
+            'rgba(139, 195, 74, 0.8)'
         ];
 
         let db = null;
@@ -435,6 +641,7 @@
         let currentWorksheet = null;
         let charts = {};
         let allResponses = [];
+        let deleteTarget = null;
 
         // Initialize worksheet dropdown
         function initWorksheetSelect() {
@@ -456,7 +663,6 @@
             }
             document.getElementById('sessionCode').value = code;
 
-            // Show the code prominently
             const mainContent = document.getElementById('mainContent');
             mainContent.innerHTML = `
                 <div class="empty-state">
@@ -471,17 +677,178 @@
 
         // Initialize Firebase
         function initFirebase() {
-            // Load config from firebase-config.js
-            // For now, check if firebase config exists
             if (typeof firebaseConfig !== 'undefined') {
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 console.log('Firebase initialized');
                 return true;
             } else {
-                console.warn('Firebase config not found. Please configure firebase-config.js');
+                console.warn('Firebase config not found');
                 return false;
             }
+        }
+
+        // Session Manager Functions
+        function openSessionManager() {
+            document.getElementById('sessionModal').classList.add('show');
+            loadAllSessions();
+        }
+
+        function closeSessionManager() {
+            document.getElementById('sessionModal').classList.remove('show');
+            document.getElementById('confirmDialog').style.display = 'none';
+        }
+
+        async function loadAllSessions() {
+            const sessionList = document.getElementById('sessionList');
+            sessionList.innerHTML = '<div class="loading"></div>';
+
+            if (!db) {
+                sessionList.innerHTML = '<div class="no-sessions">Firebase not configured. Running in demo mode.</div>';
+                document.getElementById('storageUsed').textContent = 'Demo mode - no data stored';
+                return;
+            }
+
+            try {
+                const sessionsRef = db.collection('sessions');
+                const sessionsSnapshot = await sessionsRef.get();
+
+                if (sessionsSnapshot.empty) {
+                    sessionList.innerHTML = '<div class="no-sessions">No sessions found. Create a new session to get started.</div>';
+                    document.getElementById('storageUsed').textContent = '0 sessions, 0 responses';
+                    document.getElementById('deleteAllBtn').style.display = 'none';
+                    return;
+                }
+
+                const sessions = [];
+                let totalResponses = 0;
+
+                for (const sessionDoc of sessionsSnapshot.docs) {
+                    const sessionCode = sessionDoc.id;
+                    const worksheetData = [];
+
+                    // Get all worksheets in this session
+                    const collections = await sessionDoc.ref.listCollections();
+
+                    for (const collection of collections) {
+                        const worksheetSnap = await collection.get();
+                        const count = worksheetSnap.size;
+                        totalResponses += count;
+                        if (count > 0) {
+                            worksheetData.push({
+                                id: collection.id,
+                                name: worksheets[collection.id]?.name || collection.id,
+                                count: count
+                            });
+                        }
+                    }
+
+                    if (worksheetData.length > 0) {
+                        sessions.push({
+                            code: sessionCode,
+                            worksheets: worksheetData,
+                            totalResponses: worksheetData.reduce((sum, w) => sum + w.count, 0)
+                        });
+                    }
+                }
+
+                // Update storage info
+                document.getElementById('storageUsed').textContent = `${sessions.length} session(s), ${totalResponses} total responses`;
+                const storagePercent = Math.min((totalResponses * 0.001), 100); // Rough estimate
+                document.getElementById('storageBar').style.width = storagePercent + '%';
+
+                if (sessions.length === 0) {
+                    sessionList.innerHTML = '<div class="no-sessions">No sessions with data found.</div>';
+                    document.getElementById('deleteAllBtn').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('deleteAllBtn').style.display = 'block';
+
+                // Render sessions
+                sessionList.innerHTML = sessions.map(session => `
+                    <div class="session-item">
+                        <div class="session-info">
+                            <div class="session-code">${session.code}</div>
+                            <div class="session-meta">${session.totalResponses} responses</div>
+                            <div class="session-worksheets">
+                                ${session.worksheets.map(w => `<span class="worksheet-tag">${w.name} (${w.count})</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="session-actions">
+                            <button class="btn btn-primary btn-sm" onclick="viewSession('${session.code}')">View</button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDeleteSession('${session.code}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                sessionList.innerHTML = '<div class="no-sessions">Error loading sessions. Check console for details.</div>';
+            }
+        }
+
+        function viewSession(code) {
+            document.getElementById('sessionCode').value = code;
+            closeSessionManager();
+        }
+
+        function confirmDeleteSession(code) {
+            deleteTarget = { type: 'session', code: code };
+            document.getElementById('confirmMessage').textContent =
+                `Are you sure you want to delete session "${code}" and all its responses? This cannot be undone.`;
+            document.getElementById('confirmDialog').style.display = 'block';
+        }
+
+        function confirmDeleteAll() {
+            deleteTarget = { type: 'all' };
+            document.getElementById('confirmMessage').textContent =
+                'Are you sure you want to delete ALL sessions and responses? This cannot be undone.';
+            document.getElementById('confirmDialog').style.display = 'block';
+        }
+
+        function cancelDelete() {
+            deleteTarget = null;
+            document.getElementById('confirmDialog').style.display = 'none';
+        }
+
+        async function executeDelete() {
+            if (!deleteTarget || !db) return;
+
+            document.getElementById('confirmDialog').style.display = 'none';
+            document.getElementById('sessionList').innerHTML = '<div class="loading"></div>';
+
+            try {
+                if (deleteTarget.type === 'session') {
+                    await deleteSession(deleteTarget.code);
+                } else if (deleteTarget.type === 'all') {
+                    const sessionsSnapshot = await db.collection('sessions').get();
+                    for (const doc of sessionsSnapshot.docs) {
+                        await deleteSession(doc.id);
+                    }
+                }
+
+                deleteTarget = null;
+                loadAllSessions();
+            } catch (error) {
+                console.error('Error deleting:', error);
+                alert('Error deleting session. Check console for details.');
+                loadAllSessions();
+            }
+        }
+
+        async function deleteSession(code) {
+            const sessionRef = db.collection('sessions').doc(code);
+            const collections = await sessionRef.listCollections();
+
+            for (const collection of collections) {
+                const docs = await collection.get();
+                const batch = db.batch();
+                docs.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            }
+
+            await sessionRef.delete();
         }
 
         // Start viewing session
@@ -500,7 +867,6 @@
             }
 
             if (!db) {
-                // Demo mode without Firebase
                 startDemoMode(sessionCode, worksheetId);
                 return;
             }
@@ -508,7 +874,6 @@
             currentSession = sessionCode;
             currentWorksheet = worksheetId;
 
-            // Unsubscribe from previous listener
             if (unsubscribe) {
                 unsubscribe();
             }
@@ -517,7 +882,6 @@
             document.getElementById('connectionStatus').className = 'connection-status connected';
             document.getElementById('connectionStatus').textContent = 'Connected';
 
-            // Subscribe to real-time updates
             unsubscribe = db.collection('sessions')
                 .doc(sessionCode)
                 .collection(worksheetId)
@@ -534,7 +898,6 @@
                 });
         }
 
-        // Demo mode for testing without Firebase
         function startDemoMode(sessionCode, worksheetId) {
             currentSession = sessionCode;
             currentWorksheet = worksheetId;
@@ -543,12 +906,10 @@
             document.getElementById('connectionStatus').className = 'connection-status connected';
             document.getElementById('connectionStatus').textContent = 'Demo Mode';
 
-            // Generate demo data
             const demoResponses = generateDemoData(worksheetId);
             allResponses = demoResponses;
             updateDashboard(demoResponses);
 
-            // Simulate real-time updates
             setInterval(() => {
                 if (Math.random() > 0.7) {
                     allResponses.push(generateSingleDemoResponse(worksheetId));
@@ -557,11 +918,9 @@
             }, 3000);
         }
 
-        // Generate demo data
         function generateDemoData(worksheetId) {
             const responses = [];
             const numResponses = Math.floor(Math.random() * 15) + 10;
-
             for (let i = 0; i < numResponses; i++) {
                 responses.push(generateSingleDemoResponse(worksheetId));
             }
@@ -569,37 +928,19 @@
         }
 
         function generateSingleDemoResponse(worksheetId) {
-            const response = {
-                timestamp: new Date().toISOString(),
-                answers: {}
-            };
-
-            // Generate answers for typical questions
+            const response = { timestamp: new Date().toISOString(), answers: {} };
             for (let i = 1; i <= 8; i++) {
-                const qType = Math.random();
-                if (qType < 0.7) {
-                    // Multiple choice
+                if (Math.random() < 0.7) {
                     const options = ['A', 'B', 'C', 'D'];
                     response.answers[`q${i}`] = options[Math.floor(Math.random() * options.length)];
                 } else {
-                    // Text response
-                    const textResponses = [
-                        "The context makes it ambiguous.",
-                        "I think this could be interpreted differently.",
-                        "Clear case of the first option.",
-                        "The boundary is unclear here.",
-                        "Depends on the annotator's background.",
-                        "This seems straightforward to me.",
-                        "Multiple valid interpretations exist.",
-                        "The guidelines don't cover this case well."
-                    ];
-                    response.answers[`q${i}_text`] = textResponses[Math.floor(Math.random() * textResponses.length)];
+                    const texts = ["The context makes it ambiguous.", "Clear case.", "Multiple valid interpretations.", "Guidelines unclear."];
+                    response.answers[`q${i}_text`] = texts[Math.floor(Math.random() * texts.length)];
                 }
             }
             return response;
         }
 
-        // Update dashboard with responses
         function updateDashboard(responses) {
             document.getElementById('totalResponses').textContent = responses.length;
             document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()}`;
@@ -616,32 +957,23 @@
                 return;
             }
 
-            // Analyze responses and build dashboard
             const analysis = analyzeResponses(responses);
             renderDashboard(analysis);
-
-            // Update global stats
             document.getElementById('avgAgreement').textContent = analysis.avgAgreement.toFixed(0) + '%';
             document.getElementById('avgKappa').textContent = analysis.avgKappa.toFixed(2);
         }
 
-        // Analyze responses
         function analyzeResponses(responses) {
             const questions = {};
             const textResponses = {};
 
-            // Collect all answers by question
             responses.forEach(response => {
                 Object.entries(response.answers || {}).forEach(([key, value]) => {
                     if (key.endsWith('_text')) {
-                        // Text response
                         const qKey = key.replace('_text', '');
                         if (!textResponses[qKey]) textResponses[qKey] = [];
-                        if (value && value.trim()) {
-                            textResponses[qKey].push(value);
-                        }
+                        if (value && value.trim()) textResponses[qKey].push(value);
                     } else {
-                        // Multiple choice
                         if (!questions[key]) questions[key] = {};
                         if (!questions[key][value]) questions[key][value] = 0;
                         questions[key][value]++;
@@ -649,75 +981,40 @@
                 });
             });
 
-            // Calculate agreement for each question
-            let totalAgreement = 0;
-            let totalKappa = 0;
-            let questionCount = 0;
+            let totalAgreement = 0, totalKappa = 0, questionCount = 0;
 
             const questionAnalysis = Object.entries(questions).map(([qId, distribution]) => {
                 const total = Object.values(distribution).reduce((a, b) => a + b, 0);
                 const options = Object.keys(distribution).sort();
                 const counts = options.map(opt => distribution[opt] || 0);
-
-                // Percentage agreement (most common answer / total)
                 const maxCount = Math.max(...counts);
                 const agreement = (maxCount / total) * 100;
-
-                // Fleiss' Kappa (simplified for binary/multi-choice)
                 const kappa = calculateFleissKappa(counts, total);
 
                 totalAgreement += agreement;
                 totalKappa += kappa;
                 questionCount++;
 
-                return {
-                    id: qId,
-                    distribution,
-                    options,
-                    counts,
-                    total,
-                    agreement,
-                    kappa,
-                    textResponses: textResponses[qId] || []
-                };
+                return { id: qId, distribution, options, counts, total, agreement, kappa, textResponses: textResponses[qId] || [] };
             });
 
             return {
-                questions: questionAnalysis.sort((a, b) => {
-                    const numA = parseInt(a.id.replace('q', ''));
-                    const numB = parseInt(b.id.replace('q', ''));
-                    return numA - numB;
-                }),
+                questions: questionAnalysis.sort((a, b) => parseInt(a.id.replace('q', '')) - parseInt(b.id.replace('q', ''))),
                 avgAgreement: questionCount > 0 ? totalAgreement / questionCount : 0,
                 avgKappa: questionCount > 0 ? totalKappa / questionCount : 0,
                 totalResponses: responses.length
             };
         }
 
-        // Calculate Fleiss' Kappa
         function calculateFleissKappa(counts, n) {
             if (n < 2) return 0;
-
-            const k = counts.length; // number of categories
-            const N = n; // number of subjects (responses)
-
-            // P_j for each category
-            const pj = counts.map(c => c / N);
-
-            // P_e (expected agreement)
+            const pj = counts.map(c => c / n);
             const Pe = pj.reduce((sum, p) => sum + p * p, 0);
-
-            // P_o (observed agreement) - simplified
-            const Po = counts.reduce((sum, c) => sum + (c * (c - 1)), 0) / (N * (N - 1) || 1);
-
-            // Kappa
+            const Po = counts.reduce((sum, c) => sum + (c * (c - 1)), 0) / (n * (n - 1) || 1);
             if (Pe === 1) return 1;
-            const kappa = (Po - Pe) / (1 - Pe);
-
-            return Math.max(-1, Math.min(1, kappa)); // Clamp to [-1, 1]
+            return Math.max(-1, Math.min(1, (Po - Pe) / (1 - Pe)));
         }
 
-        // Get Kappa interpretation class
         function getKappaClass(kappa) {
             if (kappa >= 0.8) return 'excellent';
             if (kappa >= 0.6) return 'good';
@@ -726,102 +1023,58 @@
             return 'poor';
         }
 
-        // Render dashboard
         function renderDashboard(analysis) {
             const container = document.getElementById('mainContent');
             container.innerHTML = '';
-
-            // Destroy existing charts
             Object.values(charts).forEach(chart => chart.destroy());
             charts = {};
 
-            analysis.questions.forEach((q, index) => {
+            analysis.questions.forEach((q) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-
                 const questionNum = q.id.replace('q', '');
                 const kappaClass = getKappaClass(q.kappa);
 
                 card.innerHTML = `
-                    <h3>
-                        <span class="question-num">Q${questionNum}</span>
-                        Response Distribution
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chart-${q.id}"></canvas>
-                    </div>
+                    <h3><span class="question-num">Q${questionNum}</span> Response Distribution</h3>
+                    <div class="chart-container"><canvas id="chart-${q.id}"></canvas></div>
                     <div class="agreement-metrics">
-                        <div class="metric">
-                            <div class="metric-value ${kappaClass}">${q.agreement.toFixed(0)}%</div>
-                            <div class="metric-label">Agreement</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value ${kappaClass}">${q.kappa.toFixed(2)}</div>
-                            <div class="metric-label">Fleiss' Kappa</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">${q.total}</div>
-                            <div class="metric-label">Responses</div>
-                        </div>
+                        <div class="metric"><div class="metric-value ${kappaClass}">${q.agreement.toFixed(0)}%</div><div class="metric-label">Agreement</div></div>
+                        <div class="metric"><div class="metric-value ${kappaClass}">${q.kappa.toFixed(2)}</div><div class="metric-label">Fleiss' Kappa</div></div>
+                        <div class="metric"><div class="metric-value">${q.total}</div><div class="metric-label">Responses</div></div>
                     </div>
                     ${q.textResponses.length > 0 ? `
-                        <div style="margin-top: 15px;">
-                            <h4 style="margin-bottom: 10px; color: rgba(255,255,255,0.8);">Text Responses</h4>
-                            <div class="text-responses">
-                                ${q.textResponses.map(t => `<div class="text-response">${escapeHtml(t)}</div>`).join('')}
-                            </div>
-                        </div>
+                        <div style="margin-top: 15px;"><h4 style="margin-bottom: 10px; color: rgba(255,255,255,0.8);">Text Responses</h4>
+                        <div class="text-responses">${q.textResponses.map(t => `<div class="text-response">${escapeHtml(t)}</div>`).join('')}</div></div>
                     ` : ''}
                 `;
-
                 container.appendChild(card);
 
-                // Create chart
                 const ctx = document.getElementById(`chart-${q.id}`).getContext('2d');
                 charts[q.id] = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: q.options,
-                        datasets: [{
-                            data: q.counts,
-                            backgroundColor: q.options.map((_, i) => chartColors[i % chartColors.length]),
-                            borderWidth: 0,
-                            borderRadius: 5
-                        }]
+                        datasets: [{ data: q.counts, backgroundColor: q.options.map((_, i) => chartColors[i % chartColors.length]), borderWidth: 0, borderRadius: 5 }]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
                         scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: 'rgba(255,255,255,0.7)',
-                                    stepSize: 1
-                                },
-                                grid: { color: 'rgba(255,255,255,0.1)' }
-                            },
-                            x: {
-                                ticks: { color: 'rgba(255,255,255,0.9)' },
-                                grid: { display: false }
-                            }
+                            y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.7)', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            x: { ticks: { color: 'rgba(255,255,255,0.9)' }, grid: { display: false } }
                         }
                     }
                 });
             });
         }
 
-        // Escape HTML
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // Toggle fullscreen
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
@@ -832,23 +1085,12 @@
             }
         }
 
-        // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             initWorksheetSelect();
-
-            // Try to load Firebase config
             const script = document.createElement('script');
             script.src = 'firebase-config.js';
-            script.onload = () => {
-                if (initFirebase()) {
-                    console.log('Firebase ready');
-                } else {
-                    console.log('Running in demo mode');
-                }
-            };
-            script.onerror = () => {
-                console.log('Firebase config not found, running in demo mode');
-            };
+            script.onload = () => { if (initFirebase()) console.log('Firebase ready'); };
+            script.onerror = () => console.log('Firebase config not found, running in demo mode');
             document.head.appendChild(script);
         });
     </script>
