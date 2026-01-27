@@ -159,6 +159,13 @@
             font-size: 0.8em;
         }
 
+        .question-subtitle {
+            margin: -10px 0 15px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95em;
+            line-height: 1.3;
+        }
+
         .chart-container {
             position: relative;
             height: 200px;
@@ -530,10 +537,6 @@
             <div class="stat-label">Avg. Agreement</div>
         </div>
         <div class="stat-item">
-            <div class="stat-value" id="avgKappa">--</div>
-            <div class="stat-label">Fleiss' Kappa</div>
-        </div>
-        <div class="stat-item">
             <div class="live-indicator">
                 <div class="live-dot"></div>
                 <span>LIVE</span>
@@ -642,6 +645,7 @@
         let charts = {};
         let allResponses = [];
         let deleteTarget = null;
+        const worksheetMetaCache = {};
 
         // Initialize worksheet dropdown
         function initWorksheetSelect() {
@@ -691,6 +695,11 @@
         // Session Manager Functions
         function openSessionManager() {
             document.getElementById('sessionModal').classList.add('show');
+            const code = document.getElementById('sessionCode').value.toUpperCase().trim();
+            if (code) {
+                ensureSessionDocument(code).finally(loadAllSessions);
+                return;
+            }
             loadAllSessions();
         }
 
@@ -723,21 +732,23 @@
                 const sessions = [];
                 let totalResponses = 0;
 
+                const worksheetIds = Object.keys(worksheets);
+
                 for (const sessionDoc of sessionsSnapshot.docs) {
                     const sessionCode = sessionDoc.id;
                     const worksheetData = [];
 
-                    // Get all worksheets in this session
-                    const collections = await sessionDoc.ref.listCollections();
-
-                    for (const collection of collections) {
-                        const worksheetSnap = await collection.get();
+                    for (const worksheetId of worksheetIds) {
+                        const worksheetSnap = await db.collection('sessions')
+                            .doc(sessionCode)
+                            .collection(worksheetId)
+                            .get();
                         const count = worksheetSnap.size;
                         totalResponses += count;
                         if (count > 0) {
                             worksheetData.push({
-                                id: collection.id,
-                                name: worksheets[collection.id]?.name || collection.id,
+                                id: worksheetId,
+                                name: worksheets[worksheetId]?.name || worksheetId,
                                 count: count
                             });
                         }
@@ -776,7 +787,7 @@
                             </div>
                         </div>
                         <div class="session-actions">
-                            <button class="btn btn-primary btn-sm" onclick="viewSession('${session.code}')">View</button>
+                            <button class="btn btn-primary btn-sm" onclick="viewSession('${session.code}', '${session.worksheets[0]?.id || ''}')">View</button>
                             <button class="btn btn-danger btn-sm" onclick="confirmDeleteSession('${session.code}')">Delete</button>
                         </div>
                     </div>
@@ -788,9 +799,15 @@
             }
         }
 
-        function viewSession(code) {
+        function viewSession(code, worksheetId) {
             document.getElementById('sessionCode').value = code;
+            if (worksheetId) {
+                document.getElementById('worksheetSelect').value = worksheetId;
+            }
             closeSessionManager();
+            if (worksheetId) {
+                startSession();
+            }
         }
 
         function confirmDeleteSession(code) {
@@ -839,10 +856,10 @@
 
         async function deleteSession(code) {
             const sessionRef = db.collection('sessions').doc(code);
-            const collections = await sessionRef.listCollections();
-
-            for (const collection of collections) {
-                const docs = await collection.get();
+            const worksheetIds = Object.keys(worksheets);
+            for (const worksheetId of worksheetIds) {
+                const docs = await sessionRef.collection(worksheetId).get();
+                if (docs.empty) continue;
                 const batch = db.batch();
                 docs.forEach(doc => batch.delete(doc.ref));
                 await batch.commit();
@@ -852,7 +869,7 @@
         }
 
         // Start viewing session
-        function startSession() {
+        async function startSession() {
             const sessionCode = document.getElementById('sessionCode').value.toUpperCase().trim();
             const worksheetId = document.getElementById('worksheetSelect').value;
 
@@ -867,12 +884,14 @@
             }
 
             if (!db) {
-                startDemoMode(sessionCode, worksheetId);
+                await startDemoMode(sessionCode, worksheetId);
                 return;
             }
 
             currentSession = sessionCode;
             currentWorksheet = worksheetId;
+            await ensureSessionDocument(sessionCode);
+            await ensureWorksheetMeta(currentWorksheet);
 
             if (unsubscribe) {
                 unsubscribe();
@@ -898,9 +917,10 @@
                 });
         }
 
-        function startDemoMode(sessionCode, worksheetId) {
+        async function startDemoMode(sessionCode, worksheetId) {
             currentSession = sessionCode;
             currentWorksheet = worksheetId;
+            await ensureWorksheetMeta(currentWorksheet);
 
             document.getElementById('statsBar').style.display = 'flex';
             document.getElementById('connectionStatus').className = 'connection-status connected';
@@ -960,12 +980,12 @@
             const analysis = analyzeResponses(responses);
             renderDashboard(analysis);
             document.getElementById('avgAgreement').textContent = analysis.avgAgreement.toFixed(0) + '%';
-            document.getElementById('avgKappa').textContent = analysis.avgKappa.toFixed(2);
         }
 
         function analyzeResponses(responses) {
             const questions = {};
             const textResponses = {};
+            const answersByQuestion = {};
 
             responses.forEach(response => {
                 Object.entries(response.answers || {}).forEach(([key, value]) => {
@@ -973,53 +993,90 @@
                         const qKey = key.replace('_text', '');
                         if (!textResponses[qKey]) textResponses[qKey] = [];
                         if (value && value.trim()) textResponses[qKey].push(value);
+                    } else if (key.startsWith('other_')) {
+                        // Treat free-text "other" inputs as text responses instead of categorical values.
+                        if (!textResponses[key]) textResponses[key] = [];
+                        if (value && String(value).trim()) textResponses[key].push(String(value).trim());
                     } else {
                         if (!questions[key]) questions[key] = {};
-                        if (!questions[key][value]) questions[key][value] = 0;
-                        questions[key][value]++;
+                        if (!answersByQuestion[key]) answersByQuestion[key] = [];
+
+                        if (Array.isArray(value)) {
+                            // Checkbox groups: count each selected option.
+                            value.forEach(v => {
+                                if (!questions[key][v]) questions[key][v] = 0;
+                                questions[key][v]++;
+                            });
+                            answersByQuestion[key].push(value);
+                        } else {
+                            if (!questions[key][value]) questions[key][value] = 0;
+                            questions[key][value]++;
+                            answersByQuestion[key].push(value);
+                        }
                     }
                 });
             });
 
-            let totalAgreement = 0, totalKappa = 0, questionCount = 0;
+            let totalAgreement = 0, questionCount = 0;
 
-            const questionAnalysis = Object.entries(questions).map(([qId, distribution]) => {
+            const questionIds = new Set([...Object.keys(questions), ...Object.keys(textResponses)]);
+            const questionAnalysis = Array.from(questionIds).map((qId) => {
+                const distribution = questions[qId] || {};
                 const total = Object.values(distribution).reduce((a, b) => a + b, 0);
                 const options = Object.keys(distribution).sort();
                 const counts = options.map(opt => distribution[opt] || 0);
-                const maxCount = Math.max(...counts);
-                const agreement = (maxCount / total) * 100;
-                const kappa = calculateFleissKappa(counts, total);
+                const answers = answersByQuestion[qId] || [];
+                const isMultiSelect = answers.some(a => Array.isArray(a));
+                const agreement = isMultiSelect
+                    ? calculateMultiSelectAgreement(answers)
+                    : calculateSingleSelectAgreement(counts, answers.length);
 
-                totalAgreement += agreement;
-                totalKappa += kappa;
-                questionCount++;
+                if (answers.length > 1) {
+                    totalAgreement += agreement;
+                    questionCount++;
+                }
 
-                return { id: qId, distribution, options, counts, total, agreement, kappa, textResponses: textResponses[qId] || [] };
+                return { id: qId, distribution, options, counts, total, agreement, responseCount: answers.length, textResponses: textResponses[qId] || [] };
             });
 
             return {
-                questions: questionAnalysis.sort((a, b) => parseInt(a.id.replace('q', '')) - parseInt(b.id.replace('q', ''))),
+                questions: questionAnalysis.sort((a, b) => getQuestionOrder(currentWorksheet, a.id) - getQuestionOrder(currentWorksheet, b.id)),
                 avgAgreement: questionCount > 0 ? totalAgreement / questionCount : 0,
-                avgKappa: questionCount > 0 ? totalKappa / questionCount : 0,
                 totalResponses: responses.length
             };
         }
 
-        function calculateFleissKappa(counts, n) {
-            if (n < 2) return 0;
-            const pj = counts.map(c => c / n);
-            const Pe = pj.reduce((sum, p) => sum + p * p, 0);
-            const Po = counts.reduce((sum, c) => sum + (c * (c - 1)), 0) / (n * (n - 1) || 1);
-            if (Pe === 1) return 1;
-            return Math.max(-1, Math.min(1, (Po - Pe) / (1 - Pe)));
+        function calculateSingleSelectAgreement(counts, totalResponses) {
+            if (totalResponses < 2 || counts.length === 0) return 0;
+            const maxCount = Math.max(...counts);
+            return (maxCount / totalResponses) * 100;
         }
 
-        function getKappaClass(kappa) {
-            if (kappa >= 0.8) return 'excellent';
-            if (kappa >= 0.6) return 'good';
-            if (kappa >= 0.4) return 'moderate';
-            if (kappa >= 0.2) return 'fair';
+        function calculateMultiSelectAgreement(answers) {
+            const valid = answers.filter(a => Array.isArray(a));
+            if (valid.length < 2) return 0;
+            let sum = 0;
+            let pairs = 0;
+            for (let i = 0; i < valid.length; i++) {
+                const setA = new Set(valid[i]);
+                for (let j = i + 1; j < valid.length; j++) {
+                    const setB = new Set(valid[j]);
+                    const union = new Set([...setA, ...setB]);
+                    let inter = 0;
+                    setA.forEach(v => { if (setB.has(v)) inter++; });
+                    const score = union.size === 0 ? 1 : inter / union.size;
+                    sum += score;
+                    pairs++;
+                }
+            }
+            return (sum / pairs) * 100;
+        }
+
+        function getAgreementClass(agreement) {
+            if (agreement >= 80) return 'excellent';
+            if (agreement >= 60) return 'good';
+            if (agreement >= 40) return 'moderate';
+            if (agreement >= 20) return 'fair';
             return 'poor';
         }
 
@@ -1032,41 +1089,323 @@
             analysis.questions.forEach((q) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                const questionNum = q.id.replace('q', '');
-                const kappaClass = getKappaClass(q.kappa);
+                const title = getQuestionTitle(currentWorksheet, q.id);
+                const agreementClass = getAgreementClass(q.agreement);
 
-                card.innerHTML = `
-                    <h3><span class="question-num">Q${questionNum}</span> Response Distribution</h3>
-                    <div class="chart-container"><canvas id="chart-${q.id}"></canvas></div>
-                    <div class="agreement-metrics">
-                        <div class="metric"><div class="metric-value ${kappaClass}">${q.agreement.toFixed(0)}%</div><div class="metric-label">Agreement</div></div>
-                        <div class="metric"><div class="metric-value ${kappaClass}">${q.kappa.toFixed(2)}</div><div class="metric-label">Fleiss' Kappa</div></div>
-                        <div class="metric"><div class="metric-value">${q.total}</div><div class="metric-label">Responses</div></div>
-                    </div>
-                    ${q.textResponses.length > 0 ? `
-                        <div style="margin-top: 15px;"><h4 style="margin-bottom: 10px; color: rgba(255,255,255,0.8);">Text Responses</h4>
-                        <div class="text-responses">${q.textResponses.map(t => `<div class="text-response">${escapeHtml(t)}</div>`).join('')}</div></div>
-                    ` : ''}
-                `;
+                const subtitle = getQuestionSubtitle(currentWorksheet, q.id);
+                const subtitleHtml = subtitle ? `<div class="question-subtitle">${escapeHtml(subtitle)}</div>` : '';
+
+                if (q.options.length === 0) {
+                    card.innerHTML = `
+                        <h3><span class="question-num">${title}</span> Text Responses</h3>
+                        ${subtitleHtml}
+                        <div class="agreement-metrics">
+                            <div class="metric"><div class="metric-value">${q.textResponses.length}</div><div class="metric-label">Responses</div></div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <div class="text-responses">${q.textResponses.map(t => `<div class="text-response">${escapeHtml(t)}</div>`).join('')}</div>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <h3><span class="question-num">${title}</span> Response Distribution</h3>
+                        ${subtitleHtml}
+                        <div class="chart-container"><canvas id="chart-${q.id}"></canvas></div>
+                        <div class="agreement-metrics">
+                            <div class="metric"><div class="metric-value ${agreementClass}">${q.agreement.toFixed(0)}%</div><div class="metric-label">Agreement</div></div>
+                            <div class="metric"><div class="metric-value">${q.responseCount}</div><div class="metric-label">Responses</div></div>
+                        </div>
+                        ${q.textResponses.length > 0 ? `
+                            <div style="margin-top: 15px;"><h4 style="margin-bottom: 10px; color: rgba(255,255,255,0.8);">Text Responses</h4>
+                            <div class="text-responses">${q.textResponses.map(t => `<div class="text-response">${escapeHtml(t)}</div>`).join('')}</div></div>
+                        ` : ''}
+                    `;
+                }
                 container.appendChild(card);
 
-                const ctx = document.getElementById(`chart-${q.id}`).getContext('2d');
-                charts[q.id] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: q.options,
-                        datasets: [{ data: q.counts, backgroundColor: q.options.map((_, i) => chartColors[i % chartColors.length]), borderWidth: 0, borderRadius: 5 }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.7)', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                            x: { ticks: { color: 'rgba(255,255,255,0.9)' }, grid: { display: false } }
+                if (q.options.length > 0) {
+                    const ctx = document.getElementById(`chart-${q.id}`).getContext('2d');
+                    charts[q.id] = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: q.options.map(opt => formatOptionLabel(currentWorksheet, q.id, opt)),
+                            datasets: [{ data: q.counts, backgroundColor: q.options.map((_, i) => chartColors[i % chartColors.length]), borderWidth: 0, borderRadius: 5 }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.7)', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                                x: { ticks: { color: 'rgba(255,255,255,0.9)' }, grid: { display: false } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
+        }
+
+        function getQuestionOrder(worksheetId, qId) {
+            const order = getQuestionMeta(worksheetId)?.order || [];
+            const idx = order.indexOf(qId);
+            return idx >= 0 ? idx : 9999;
+        }
+
+        function getQuestionTitle(worksheetId, qId) {
+            const titles = getQuestionMeta(worksheetId)?.titles || {};
+            return titles[qId] || `Q ${qId}`;
+        }
+
+        function getQuestionSubtitle(worksheetId, qId) {
+            const subtitles = getQuestionMeta(worksheetId)?.subtitles || {};
+            return subtitles[qId] || '';
+        }
+
+        function formatOptionLabel(worksheetId, qId, opt) {
+            const optionLabels = getQuestionMeta(worksheetId)?.optionLabels || {};
+            if (optionLabels[qId] && optionLabels[qId][opt]) return optionLabels[qId][opt];
+            return String(opt).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function getQuestionMeta(worksheetId) {
+            if (worksheetId === 'toxicity') {
+                return {
+                order: [
+                    'q1',
+                    'textarea_0',
+                    'ex1', 'textarea_1', 'textarea_2',
+                    'ex2', 'textarea_3', 'textarea_4',
+                    'ex3', 'textarea_5', 'textarea_6',
+                    'ex4', 'textarea_7', 'textarea_8',
+                    'ex5', 'textarea_9', 'textarea_10',
+                    'disagreement', 'causes', 'other_0',
+                    'q4', 'textarea_11',
+                    'q5', 'textarea_12',
+                    'q6',
+                    'textarea_13'
+                ],
+                titles: {
+                    q1: 'Q1: Label Definition (Sufficiency)',
+                    textarea_0: 'Q1: Why or Why Not?',
+                    ex1: 'Example 1: Label',
+                    textarea_1: 'Example 1: Reasoning',
+                    textarea_2: 'Example 1: Uncertainty',
+                    ex2: 'Example 2: Label',
+                    textarea_3: 'Example 2: Reasoning',
+                    textarea_4: 'Example 2: Uncertainty',
+                    ex3: 'Example 3: Label',
+                    textarea_5: 'Example 3: Reasoning',
+                    textarea_6: 'Example 3: Uncertainty',
+                    ex4: 'Example 4: Label',
+                    textarea_7: 'Example 4: Reasoning',
+                    textarea_8: 'Example 4: Uncertainty',
+                    ex5: 'Example 5: Label',
+                    textarea_9: 'Example 5: Reasoning',
+                    textarea_10: 'Example 5: Uncertainty',
+                    disagreement: 'Q2: Disagreement Examples',
+                    causes: 'Q3: Causes of Disagreement',
+                    other_0: 'Q3: Other Cause (Text)',
+                    q4: 'Q4: Dataset Decision',
+                    textarea_11: 'Q4: Explanation',
+                    q5: 'Q5: Guideline Change',
+                    textarea_12: 'Q5: Explanation',
+                    q6: 'Q6: Why Task Is Difficult',
+                    textarea_13: 'Q7: Consequences if Unresolved'
+                },
+                subtitles: {
+                    q1: 'Part 1 — Are these definitions sufficient to label comments consistently?',
+                    textarea_0: 'Part 1 — Explain why or why not',
+                    ex1: 'Part 2 — "Wow, great job."',
+                    textarea_1: 'Part 2 — Example 1 reasoning',
+                    textarea_2: 'Part 2 — Example 1 uncertainty',
+                    ex2: 'Part 2 — "Nice work, genius."',
+                    textarea_3: 'Part 2 — Example 2 reasoning',
+                    textarea_4: 'Part 2 — Example 2 uncertainty',
+                    ex3: 'Part 2 — "This idea is stupid."',
+                    textarea_5: 'Part 2 — Example 3 reasoning',
+                    textarea_6: 'Part 2 — Example 3 uncertainty',
+                    ex4: 'Part 2 — "Sure, that’ll work. Just like last time."',
+                    textarea_7: 'Part 2 — Example 4 reasoning',
+                    textarea_8: 'Part 2 — Example 4 uncertainty',
+                    ex5: 'Part 2 — "I can’t believe you actually think this makes sense."',
+                    textarea_9: 'Part 2 — Example 5 reasoning',
+                    textarea_10: 'Part 2 — Example 5 uncertainty',
+                    disagreement: 'Part 3 — Which examples had disagreement?',
+                    causes: 'Part 3 — What caused the disagreement?',
+                    other_0: 'Part 3 — Other cause (text)',
+                    q4: 'Part 4 — How should this example be handled in the dataset?',
+                    textarea_11: 'Part 4 — Explain your choice',
+                    q5: 'Part 5 — Guideline change to reduce disagreement?',
+                    textarea_12: 'Part 5 — Explain your choice',
+                    q6: 'Part 6 — Why is this task difficult?',
+                    textarea_13: 'Part 6 — Consequences if disagreement unresolved'
+                },
+                optionLabels: {
+                    q1: { yes: 'Yes', no: 'No' },
+                    ex1: { 'toxic': 'Toxic', 'not-toxic': 'Not Toxic' },
+                    ex2: { 'toxic': 'Toxic', 'not-toxic': 'Not Toxic' },
+                    ex3: { 'toxic': 'Toxic', 'not-toxic': 'Not Toxic' },
+                    ex4: { 'toxic': 'Toxic', 'not-toxic': 'Not Toxic' },
+                    ex5: { 'toxic': 'Toxic', 'not-toxic': 'Not Toxic' },
+                    disagreement: { ex1: 'Example 1', ex2: 'Example 2', ex3: 'Example 3', ex4: 'Example 4', ex5: 'Example 5' },
+                    causes: {
+                        sarcasm: 'Sarcasm or irony',
+                        context: 'Lack of context',
+                        hostile: 'Interpretation of hostile',
+                        thresholds: 'Different personal thresholds',
+                        guidelines: 'Unclear guidelines',
+                        other: 'Other'
+                    },
+                    q4: {
+                        majority: 'Use the majority label',
+                        remove: 'Remove the example',
+                        ambiguous: 'Add an “Ambiguous” label',
+                        uncertainty: 'Keep all labels + model uncertainty',
+                        expert: 'Ask expert annotators'
+                    },
+                    q5: {
+                        sarcasm: 'Rules about sarcasm',
+                        'ideas-people': 'Ideas vs. people distinction',
+                        context: 'Provide surrounding context',
+                        categories: 'Add more label categories',
+                        training: 'More annotator training'
+                    },
+                    q6: {
+                        ambiguous: 'Language is ambiguous',
+                        context: 'Meaning depends on context',
+                        norms: 'Different personal norms',
+                        definitions: 'Definitions are incomplete',
+                        all: 'All of the above'
+                    }
+                }
+                };
+            }
+
+            return worksheetMetaCache[worksheetId] || null;
+        }
+
+        async function ensureSessionDocument(sessionCode) {
+            if (!db || !sessionCode) return;
+            try {
+                const payload = {
+                    lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await db.collection('sessions').doc(sessionCode).set(payload, { merge: true });
+            } catch (e) {
+                console.warn('Failed to upsert session document:', e);
+            }
+        }
+
+        async function ensureWorksheetMeta(worksheetId) {
+            if (worksheetId === 'toxicity') return;
+            if (worksheetMetaCache[worksheetId]) return;
+            const file = worksheets[worksheetId]?.file;
+            if (!file) return;
+            try {
+                const resp = await fetch(file, { cache: 'no-store' });
+                if (!resp.ok) return;
+                const html = await resp.text();
+                worksheetMetaCache[worksheetId] = buildWorksheetMetaFromHtml(html);
+            } catch (e) {
+                console.warn('Failed to load worksheet metadata:', e);
+            }
+        }
+
+        function buildWorksheetMetaFromHtml(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const order = [];
+            const titles = {};
+            const subtitles = {};
+            const optionLabels = {};
+
+            const seenGroups = new Set();
+            const inputs = doc.querySelectorAll('input[type="radio"], input[type="checkbox"], textarea, .other-input');
+            const textareas = Array.from(doc.querySelectorAll('textarea'));
+            const otherInputs = Array.from(doc.querySelectorAll('.other-input'));
+
+            const addOrder = (id) => { if (!order.includes(id)) order.push(id); };
+
+            inputs.forEach((el) => {
+                if (el.tagName.toLowerCase() === 'textarea') {
+                    const idx = textareas.indexOf(el);
+                    const qId = `textarea_${idx}`;
+                    addOrder(qId);
+                    if (!titles[qId]) {
+                        const labelText = findLabelText(el) || 'Text Response';
+                        titles[qId] = labelText;
+                    }
+                    if (!subtitles[qId]) {
+                        const subtitle = findContextSubtitle(el);
+                        if (subtitle) subtitles[qId] = subtitle;
+                    }
+                    return;
+                }
+
+                if (el.classList.contains('other-input')) {
+                    const idx = otherInputs.indexOf(el);
+                    const qId = `other_${idx}`;
+                    addOrder(qId);
+                    if (!titles[qId]) titles[qId] = 'Other (Text)';
+                    if (!subtitles[qId]) {
+                        const subtitle = findContextSubtitle(el);
+                        if (subtitle) subtitles[qId] = subtitle;
+                    }
+                    return;
+                }
+
+                const name = el.getAttribute('name');
+                if (!name) return;
+                if (!seenGroups.has(name)) {
+                    addOrder(name);
+                    seenGroups.add(name);
+                    if (!titles[name]) {
+                        const header = findContextHeader(el);
+                        titles[name] = header || `Question ${name}`;
+                    }
+                    if (!subtitles[name]) {
+                        const subtitle = findContextSubtitle(el);
+                        if (subtitle) subtitles[name] = subtitle;
+                    }
+                }
+
+                const value = el.getAttribute('value') || 'value';
+                if (!optionLabels[name]) optionLabels[name] = {};
+                const label = findOptionLabel(el);
+                if (label) optionLabels[name][value] = label;
+            });
+
+            return { order, titles, subtitles, optionLabels };
+        }
+
+        function findOptionLabel(inputEl) {
+            const label = inputEl.closest('label');
+            if (!label) return '';
+            const text = label.textContent.replace(/\s+/g, ' ').trim();
+            return text || '';
+        }
+
+        function findLabelText(el) {
+            const group = el.closest('.input-group');
+            if (!group) return '';
+            const label = group.querySelector('label');
+            return label ? label.textContent.replace(/\s+/g, ' ').trim() : '';
+        }
+
+        function findContextHeader(el) {
+            const container = el.closest('.question-box, .example-card, .section, .card, .question');
+            if (!container) return '';
+            const header = container.querySelector('.question-header, .example-header, h3, h2');
+            return header ? header.textContent.replace(/\s+/g, ' ').trim() : '';
+        }
+
+        function findContextSubtitle(el) {
+            const container = el.closest('.question-box, .example-card, .section, .card, .question');
+            if (!container) return '';
+            const comment = container.querySelector('.comment');
+            if (comment) return comment.textContent.replace(/\s+/g, ' ').trim();
+            const prompt = container.querySelector('p');
+            if (prompt) return prompt.textContent.replace(/\s+/g, ' ').trim();
+            return '';
         }
 
         function escapeHtml(text) {
