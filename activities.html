@@ -26,6 +26,29 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
+        .activity-card.locked {
+            opacity: 0.45;
+            filter: grayscale(1);
+            pointer-events: none;
+            position: relative;
+        }
+        .activity-card.locked:hover {
+            transform: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .activity-card.locked::after {
+            content: "Locked";
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #9e9e9e;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.03em;
+        }
         .activity-card h4 {
             color: #003478;
             margin-bottom: 8px;
@@ -147,62 +170,62 @@
                 <p>Label comments as toxic or not toxic. Explore how sarcasm and context affect interpretation.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/sentiment-worksheet.html" class="activity-card">
+            <a href="activities/sentiment-worksheet.html" class="activity-card locked">
                 <h4>Sentiment Analysis</h4>
                 <p>Determine positive, negative, or neutral sentiment. Handle mixed emotions and implicit opinions.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/sarcasm-worksheet.html" class="activity-card">
+            <a href="activities/sarcasm-worksheet.html" class="activity-card locked">
                 <h4>Sarcasm Detection</h4>
                 <p>Identify sarcastic statements. Learn why context and tone are crucial for detection.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/emotion-detection-worksheet.html" class="activity-card">
+            <a href="activities/emotion-detection-worksheet.html" class="activity-card locked">
                 <h4>Emotion Detection</h4>
                 <p>Classify text into emotions like joy, anger, fear. Handle multi-label and intensity challenges.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/stance-detection-worksheet.html" class="activity-card">
+            <a href="activities/stance-detection-worksheet.html" class="activity-card locked">
                 <h4>Stance Detection</h4>
                 <p>Determine if text supports, opposes, or is neutral toward a target. Explore implicit stances.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/ner-worksheet.html" class="activity-card">
+            <a href="activities/ner-worksheet.html" class="activity-card locked">
                 <h4>Named Entity Recognition</h4>
                 <p>Identify and classify entities like people, organizations, locations. Handle boundary decisions.</p>
                 <span class="tag sequence">Sequence Labeling</span>
             </a>
-            <a href="activities/event-extraction-worksheet.html" class="activity-card">
+            <a href="activities/event-extraction-worksheet.html" class="activity-card locked">
                 <h4>Event Extraction</h4>
                 <p>Identify events and their participants. Understand triggers and argument structure.</p>
                 <span class="tag sequence">Sequence Labeling</span>
             </a>
-            <a href="activities/semantic-role-worksheet.html" class="activity-card">
+            <a href="activities/semantic-role-worksheet.html" class="activity-card locked">
                 <h4>Semantic Role Labeling</h4>
                 <p>Label who did what to whom. Identify agents, patients, and other semantic roles.</p>
                 <span class="tag sequence">Sequence Labeling</span>
             </a>
-            <a href="activities/coreference-worksheet.html" class="activity-card">
+            <a href="activities/coreference-worksheet.html" class="activity-card locked">
                 <h4>Coreference Resolution</h4>
                 <p>Link pronouns and mentions to entities. Handle ambiguous references and bridging.</p>
                 <span class="tag sequence">Sequence Labeling</span>
             </a>
-            <a href="activities/temporal-annotation-worksheet.html" class="activity-card">
+            <a href="activities/temporal-annotation-worksheet.html" class="activity-card locked">
                 <h4>Temporal Annotation</h4>
                 <p>Mark time expressions and temporal relations. Normalize dates and durations.</p>
                 <span class="tag sequence">Sequence Labeling</span>
             </a>
-            <a href="activities/relation-extraction-worksheet.html" class="activity-card">
+            <a href="activities/relation-extraction-worksheet.html" class="activity-card locked">
                 <h4>Relation Extraction</h4>
                 <p>Identify relationships between entities. Handle implicit and multiple relations.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/causal-relation-worksheet.html" class="activity-card">
+            <a href="activities/causal-relation-worksheet.html" class="activity-card locked">
                 <h4>Causal Relations</h4>
                 <p>Identify cause-effect relationships. Distinguish correlation from causation.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/word-sense-worksheet.html" class="activity-card">
+            <a href="activities/word-sense-worksheet.html" class="activity-card locked">
                 <h4>Word Sense Disambiguation</h4>
                 <p>Choose the correct meaning of ambiguous words. Explore sense granularity challenges.</p>
                 <span class="tag classification">Classification</span>
@@ -215,57 +238,57 @@
             <span class="count">12 worksheets</span>
         </div>
         <div class="activity-grid">
-            <a href="activities/llm-preference-worksheet.html" class="activity-card">
+            <a href="activities/llm-preference-worksheet.html" class="activity-card locked">
                 <h4>LLM Preference (RLHF)</h4>
                 <p>Compare model outputs and choose the better response. The foundation of RLHF training.</p>
                 <span class="tag llm">LLM</span>
             </a>
-            <a href="activities/hallucination-worksheet.html" class="activity-card">
+            <a href="activities/hallucination-worksheet.html" class="activity-card locked">
                 <h4>Hallucination Detection</h4>
                 <p>Identify when LLMs generate false or unsupported information. Critical for AI safety.</p>
                 <span class="tag llm">LLM</span>
             </a>
-            <a href="activities/prompt-quality-worksheet.html" class="activity-card">
+            <a href="activities/prompt-quality-worksheet.html" class="activity-card locked">
                 <h4>Prompt Quality Assessment</h4>
                 <p>Evaluate prompt clarity, specificity, and safety. Learn what makes prompts effective.</p>
                 <span class="tag llm">LLM</span>
             </a>
-            <a href="activities/summarization-eval-worksheet.html" class="activity-card">
+            <a href="activities/summarization-eval-worksheet.html" class="activity-card locked">
                 <h4>Summarization Evaluation</h4>
                 <p>Assess summary quality on faithfulness, relevance, and coherence dimensions.</p>
                 <span class="tag evaluation">Evaluation</span>
             </a>
-            <a href="activities/translation-quality-worksheet.html" class="activity-card">
+            <a href="activities/translation-quality-worksheet.html" class="activity-card locked">
                 <h4>Translation Quality</h4>
                 <p>Evaluate machine translation accuracy, fluency, and meaning preservation.</p>
                 <span class="tag evaluation">Evaluation</span>
             </a>
-            <a href="activities/text-simplification-worksheet.html" class="activity-card">
+            <a href="activities/text-simplification-worksheet.html" class="activity-card locked">
                 <h4>Text Simplification</h4>
                 <p>Evaluate if simplified text preserves meaning while improving readability.</p>
                 <span class="tag evaluation">Evaluation</span>
             </a>
-            <a href="activities/code-review-worksheet.html" class="activity-card">
+            <a href="activities/code-review-worksheet.html" class="activity-card locked">
                 <h4>Code Generation Review</h4>
                 <p>Evaluate LLM-generated code for correctness, efficiency, and best practices.</p>
                 <span class="tag llm">LLM</span>
             </a>
-            <a href="activities/qa-annotation-worksheet.html" class="activity-card">
+            <a href="activities/qa-annotation-worksheet.html" class="activity-card locked">
                 <h4>Question Answering</h4>
                 <p>Select answer spans and handle unanswerable questions. Build QA datasets.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/dialogue-act-worksheet.html" class="activity-card">
+            <a href="activities/dialogue-act-worksheet.html" class="activity-card locked">
                 <h4>Dialogue Act Classification</h4>
                 <p>Label conversational intents: questions, statements, requests. Build chatbot training data.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/argumentation-worksheet.html" class="activity-card">
+            <a href="activities/argumentation-worksheet.html" class="activity-card locked">
                 <h4>Argumentation Mining</h4>
                 <p>Identify claims, premises, and argument structure. Evaluate reasoning quality.</p>
                 <span class="tag classification">Classification</span>
             </a>
-            <a href="activities/bias-detection-worksheet.html" class="activity-card">
+            <a href="activities/bias-detection-worksheet.html" class="activity-card locked">
                 <h4>Bias Detection</h4>
                 <p>Identify various forms of bias in text: gender, racial, political, and more.</p>
                 <span class="tag llm">LLM</span>
