@@ -72,10 +72,29 @@
             }
         });
 
+        // Collect select dropdown answers
+        document.querySelectorAll('select').forEach((select, index) => {
+            if (select.closest('.submission-panel')) return;
+            const id = select.id || select.name || `select_${index}`;
+            if (select.value !== '') {
+                answers[id] = select.value;
+            }
+        });
+
         // Collect other inputs
         document.querySelectorAll('.other-input').forEach((input, index) => {
             if (input.value.trim()) {
                 answers[`other_${index}`] = input.value.trim();
+            }
+        });
+
+        // Collect text inputs (excluding session code and "other" field)
+        document.querySelectorAll('input[type="text"]').forEach((input, index) => {
+            if (input.closest('.submission-panel')) return;
+            if (input.classList.contains('other-input')) return;
+            const id = input.id || input.name || `textinput_${index}`;
+            if (input.value.trim()) {
+                answers[id + '_text'] = input.value.trim();
             }
         });
 

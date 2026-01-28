@@ -1319,9 +1319,11 @@
             const optionLabels = {};
 
             const seenGroups = new Set();
-            const inputs = doc.querySelectorAll('input[type="radio"], input[type="checkbox"], textarea, .other-input');
+            const inputs = doc.querySelectorAll('input[type="radio"], input[type="checkbox"], textarea, .other-input, select, input[type="text"]');
             const textareas = Array.from(doc.querySelectorAll('textarea'));
             const otherInputs = Array.from(doc.querySelectorAll('.other-input'));
+            const textInputs = Array.from(doc.querySelectorAll('input[type="text"]'));
+            const selects = Array.from(doc.querySelectorAll('select'));
 
             const addOrder = (id) => { if (!order.includes(id)) order.push(id); };
 
@@ -1341,11 +1343,50 @@
                     return;
                 }
 
+                if (el.tagName.toLowerCase() === 'select') {
+                    const idx = selects.indexOf(el);
+                    const name = el.getAttribute('name') || el.getAttribute('id') || `select_${idx}`;
+                    addOrder(name);
+                    if (!titles[name]) {
+                        const rowLabel = findRowLabel(el);
+                        const header = findContextHeader(el);
+                        titles[name] = rowLabel || header || `Question ${name}`;
+                    }
+                    if (!subtitles[name]) {
+                        const subtitle = findContextSubtitle(el);
+                        if (subtitle) subtitles[name] = subtitle;
+                    }
+                    if (!optionLabels[name]) optionLabels[name] = {};
+                    el.querySelectorAll('option').forEach(opt => {
+                        const value = opt.value || opt.textContent;
+                        const label = opt.textContent.replace(/\s+/g, ' ').trim();
+                        if (label) optionLabels[name][value] = label;
+                    });
+                    return;
+                }
+
                 if (el.classList.contains('other-input')) {
                     const idx = otherInputs.indexOf(el);
                     const qId = `other_${idx}`;
                     addOrder(qId);
                     if (!titles[qId]) titles[qId] = 'Other (Text)';
+                    if (!subtitles[qId]) {
+                        const subtitle = findContextSubtitle(el);
+                        if (subtitle) subtitles[qId] = subtitle;
+                    }
+                    return;
+                }
+
+                if (el.tagName.toLowerCase() === 'input' && el.type === 'text') {
+                    const idx = textInputs.indexOf(el);
+                    const qId = `${el.getAttribute('name') || el.getAttribute('id') || `textinput_${idx}`}_text`;
+                    addOrder(qId);
+                    if (!titles[qId]) {
+                        const rowLabel = findRowLabel(el);
+                        const labelText = findLabelText(el);
+                        const header = findContextHeader(el);
+                        titles[qId] = rowLabel || labelText || header || 'Text Response';
+                    }
                     if (!subtitles[qId]) {
                         const subtitle = findContextSubtitle(el);
                         if (subtitle) subtitles[qId] = subtitle;
@@ -1396,6 +1437,14 @@
             if (!container) return '';
             const header = container.querySelector('.question-header, .example-header, h3, h2');
             return header ? header.textContent.replace(/\s+/g, ' ').trim() : '';
+        }
+
+        function findRowLabel(el) {
+            const row = el.closest('tr');
+            if (!row) return '';
+            const cell = row.querySelector('th, td');
+            if (!cell) return '';
+            return cell.textContent.replace(/\s+/g, ' ').trim();
         }
 
         function findContextSubtitle(el) {
