@@ -230,14 +230,10 @@
             cursor: pointer;
         }
 
-        .choices-container { display: block;
+        .choices-container {
             display: block;
             margin-top: 10px;
         }
-
-
-
-
 
         textarea {
             width: 100%;
@@ -319,18 +315,6 @@
             font-size: 1rem;
         }
 
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        @media (max-width: 600px) {
-            .two-col {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .toolbar {
             position: fixed;
             bottom: 15px;
@@ -363,7 +347,7 @@
             .container { padding: 0; }
             header { margin-bottom: 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; margin-bottom: 12px; padding: 12px; }
-            .toolbar { display: block; }
+            .toolbar { display: none; }
             textarea { min-height: 40px; }
         }
     </style>
@@ -414,19 +398,18 @@
 
         <!-- Part 1 -->
         <section class="section">
-            <h2>Part 1: Warm-up (Understanding the Task)</h2>
+            <h2>Part 1: Warm-up</h2>
             <div class="question-box">
-                <div class="q-header">Question 1</div>
+                <div class="q-header">Q1</div>
                 <p>Which of the following could be valid attack triggers? (Check all that apply.)</p>
-                
                 <div class="choices-container">
                     <div class="checkbox-grid">
-                        <label class="checkbox-option"><input type="checkbox" name="q1" value="attacked"> attacked</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q1" value="killed"> killed</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q1" value="shot"> shot</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q1" value="explosion"> explosion</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q1" value="clash"> clash</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q1" value="fire"> fire</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p1q1" value="attacked"> attacked</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p1q1" value="killed"> killed</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p1q1" value="shot"> shot</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p1q1" value="explosion"> explosion</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p1q1" value="clash"> clash</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p1q1" value="fire"> fire</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -438,7 +421,7 @@
 
         <!-- Part 2 -->
         <section class="section">
-            <h2>Part 2: Sequence Labeling (Individual)</h2>
+            <h2>Part 2: Sequence Labeling</h2>
             <div class="sentence-box">
                 <div class="sentence-label">Sentence 1</div>
                 <div class="sentence-text">"The militants launched an attack on the military base in the city."</div>
@@ -458,7 +441,7 @@
                 </div>
             </div>
             <div class="question-box">
-                <div class="q-header">Question 2</div>
+                <div class="q-header">Q1</div>
                 <p>Which word(s) did you choose as the event trigger? Why?</p>
                 <textarea placeholder="Explain your trigger choice..."></textarea>
             </div>
@@ -484,14 +467,13 @@
                 </div>
             </div>
             <div class="question-box">
-                <div class="q-header">Question 3</div>
+                <div class="q-header">Q1</div>
                 <p>Is the trigger:</p>
-                
                 <div class="choices-container">
                     <div class="radio-options">
-                        <label class="radio-option"><input type="radio" name="q3" value="attack"> "attack"</label>
-                        <label class="radio-option"><input type="radio" name="q3" value="deadly-attack"> "deadly attack"</label>
-                        <label class="radio-option"><input type="radio" name="q3" value="carried-out"> "carried out a deadly attack"</label>
+                        <label class="radio-option"><input type="radio" name="p3q1" value="attack"> "attack"</label>
+                        <label class="radio-option"><input type="radio" name="p3q1" value="deadly-attack"> "deadly attack"</label>
+                        <label class="radio-option"><input type="radio" name="p3q1" value="carried-out"> "carried out a deadly attack"</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -518,14 +500,13 @@
                 </div>
             </div>
             <div class="question-box">
-                <div class="q-header">Question 4</div>
+                <div class="q-header">Q1</div>
                 <p>Does this sentence contain an ATTACK event?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options">
-                        <label class="radio-option"><input type="radio" name="q4" value="yes"> Yes</label>
-                        <label class="radio-option"><input type="radio" name="q4" value="no"> No</label>
-                        <label class="radio-option"><input type="radio" name="q4" value="unclear"> Unclear</label>
+                        <label class="radio-option"><input type="radio" name="p4q1" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="p4q1" value="no"> No</label>
+                        <label class="radio-option"><input type="radio" name="p4q1" value="unclear"> Unclear</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -553,14 +534,13 @@
                 </div>
             </div>
             <div class="question-box">
-                <div class="q-header">Question 5</div>
+                <div class="q-header">Q1</div>
                 <p>Which argument roles were hardest to decide?</p>
-                
                 <div class="choices-container">
                     <div class="checkbox-grid">
-                        <label class="checkbox-option"><input type="checkbox" name="q5" value="agent"> AGENT</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q5" value="target"> TARGET</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q5" value="place"> PLACE</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p5q1" value="agent"> AGENT</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p5q1" value="target"> TARGET</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p5q1" value="place"> PLACE</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -572,41 +552,34 @@
 
         <!-- Part 6 -->
         <section class="section">
-            <h2>Part 6: Group Comparison</h2>
-            <p>Discuss your annotations with your group.</p>
+            <h2>Part 6: Reflecting on Disagreement</h2>
+            <p>Looking back at your annotations in Parts 2–5, consider where other annotators might make different choices.</p>
             <div class="question-box">
-                <div class="q-header">Question 6</div>
-                <p>Where did you disagree most?</p>
-                
+                <div class="q-header">Q1</div>
+                <p>Where do you think annotators would disagree most?</p>
                 <div class="choices-container">
                     <div class="checkbox-grid">
-                        <label class="checkbox-option"><input type="checkbox" name="q6" value="trigger-boundaries"> Trigger boundaries</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q6" value="trigger-existence"> Trigger existence</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q6" value="arg-boundaries"> Argument boundaries</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q6" value="arg-roles"> Argument roles</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p6q1" value="trigger-boundaries"> Trigger boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p6q1" value="trigger-existence"> Trigger existence</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p6q1" value="arg-boundaries"> Argument boundaries</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p6q1" value="arg-roles"> Argument roles</label>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>Give one concrete example:</label>
-                    <textarea placeholder="Describe a specific disagreement..."></textarea>
+                    <label>Give one concrete example of a likely disagreement:</label>
+                    <textarea placeholder="Describe a specific case where you think annotators would differ..."></textarea>
                 </div>
             </div>
-        </section>
-
-        <!-- Part 7 -->
-        <section class="section">
-            <h2>Part 7: Annotation Design Decisions</h2>
             <div class="question-box">
-                <div class="q-header">Question 7</div>
+                <div class="q-header">Q2</div>
                 <p>Which guideline change would most improve agreement?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 8px;">
-                        <label class="radio-option"><input type="radio" name="q7" value="examples"> More trigger examples</label>
-                        <label class="radio-option"><input type="radio" name="q7" value="boundary-rules"> Stricter boundary rules</label>
-                        <label class="radio-option"><input type="radio" name="q7" value="multiple-triggers"> Allow multiple valid triggers</label>
-                        <label class="radio-option"><input type="radio" name="q7" value="confidence"> Add confidence/uncertainty labels</label>
-                        <label class="radio-option"><input type="radio" name="q7" value="training"> More annotator training</label>
+                        <label class="radio-option"><input type="radio" name="p6q2" value="examples"> More trigger examples</label>
+                        <label class="radio-option"><input type="radio" name="p6q2" value="boundary-rules"> Stricter boundary rules</label>
+                        <label class="radio-option"><input type="radio" name="p6q2" value="multiple-triggers"> Allow multiple valid triggers</label>
+                        <label class="radio-option"><input type="radio" name="p6q2" value="confidence"> Add confidence/uncertainty labels</label>
+                        <label class="radio-option"><input type="radio" name="p6q2" value="training"> More annotator training</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -616,39 +589,28 @@
             </div>
         </section>
 
-        <!-- Part 8 -->
+        <!-- Part 7 -->
         <section class="section">
-            <h2>Part 8: Reflection</h2>
+            <h2>Part 7: Why Event Extraction Is Hard</h2>
             <div class="question-box">
-                <div class="q-header">Question 8</div>
-                <p>Why is event extraction harder than sequence labeling tasks like NER?</p>
-                
+                <div class="q-header">Q1</div>
+                <p>Why is event extraction harder than sequence labeling tasks like NER? (Check all that apply.)</p>
                 <div class="choices-container">
                     <div class="checkbox-grid">
-                        <label class="checkbox-option"><input type="checkbox" name="q8" value="implicit"> Triggers can be implicit</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q8" value="boundaries"> Boundaries are unclear</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q8" value="syntax"> Arguments depend on syntax/semantics</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q8" value="multiple"> Multiple interpretations valid</label>
-                        <label class="checkbox-option"><input type="checkbox" name="q8" value="all"> All of the above</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p7q1" value="implicit"> Triggers can be implicit</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p7q1" value="boundaries"> Boundaries are unclear</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p7q1" value="syntax"> Arguments depend on syntax/semantics</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p7q1" value="multiple"> Multiple interpretations valid</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p7q1" value="all"> All of the above</label>
                     </div>
                 </div>
             </div>
 
-            <div class="takeaway-box">
-                <h3>Key Takeaway</h3>
-                <p><strong>Sequence labeling becomes hard when labels depend on interpretation, not just word identity.</strong></p>
-                <p style="margin-top: 8px;">Event extraction requires:</p>
-                <ul>
-                    <li>Semantic understanding</li>
-                    <li>Consistent guidelines</li>
-                    <li>Acceptance of disagreement</li>
-                </ul>
-            </div>
         </section>
 
-        <!-- Part X: Aspectual Verbs -->
+        <!-- Part 8 -->
         <section class="section">
-            <h2>Part X: Aspectual Verbs and Event Boundaries (Hard Case)</h2>
+            <h2>Part 8: Aspectual Verbs and Event Boundaries</h2>
             <p>Aspectual words describe the <em>beginning, continuation, or end</em> of an event, rather than the event itself.</p>
             <p style="margin-top: 8px;"><strong>Common aspectual words:</strong> began, started, continued, stopped, resumed, ended</p>
             <p style="margin-top: 8px;">Whether these should be included as part of an event trigger is often unclear and guideline-dependent.</p>
@@ -670,15 +632,14 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question X.1</div>
+                <div class="q-header">Q1</div>
                 <p>Which word(s) did you label as the ATTACK trigger?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options">
-                        <label class="radio-option"><input type="radio" name="qx1" value="shelling"> shelling</label>
-                        <label class="radio-option"><input type="radio" name="qx1" value="began-shelling"> began shelling</label>
-                        <label class="radio-option"><input type="radio" name="qx1" value="began"> began</label>
-                        <label class="radio-option"><input type="radio" name="qx1" value="none"> No attack trigger</label>
+                        <label class="radio-option"><input type="radio" name="p8q1" value="shelling"> shelling</label>
+                        <label class="radio-option"><input type="radio" name="p8q1" value="began-shelling"> began shelling</label>
+                        <label class="radio-option"><input type="radio" name="p8q1" value="began"> began</label>
+                        <label class="radio-option"><input type="radio" name="p8q1" value="none"> No attack trigger</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -688,15 +649,14 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question X.2</div>
+                <div class="q-header">Q2</div>
                 <p>What does "began" contribute to the meaning of the event?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
-                        <label class="radio-option"><input type="radio" name="qx2" value="start"> Indicates the start of the attack</label>
-                        <label class="radio-option"><input type="radio" name="qx2" value="part"> Is part of the attack itself</label>
-                        <label class="radio-option"><input type="radio" name="qx2" value="temporal"> Only provides temporal/aspectual information</label>
-                        <label class="radio-option"><input type="radio" name="qx2" value="uncertain"> Makes the event uncertain</label>
+                        <label class="radio-option"><input type="radio" name="p8q2" value="start"> Indicates the start of the attack</label>
+                        <label class="radio-option"><input type="radio" name="p8q2" value="part"> Is part of the attack itself</label>
+                        <label class="radio-option"><input type="radio" name="p8q2" value="temporal"> Only provides temporal/aspectual information</label>
+                        <label class="radio-option"><input type="radio" name="p8q2" value="uncertain"> Makes the event uncertain</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -719,14 +679,13 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question X.3</div>
+                <div class="q-header">Q3</div>
                 <p>Does this sentence describe:</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
-                        <label class="radio-option"><input type="radio" name="qx3" value="new"> A new ATTACK event</label>
-                        <label class="radio-option"><input type="radio" name="qx3" value="continuation"> The continuation of a previous ATTACK event</label>
-                        <label class="radio-option"><input type="radio" name="qx3" value="none"> No clear ATTACK event</label>
+                        <label class="radio-option"><input type="radio" name="p8q3" value="new"> A new ATTACK event</label>
+                        <label class="radio-option"><input type="radio" name="p8q3" value="continuation"> The continuation of a previous ATTACK event</label>
+                        <label class="radio-option"><input type="radio" name="p8q3" value="none"> No clear ATTACK event</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -736,37 +695,35 @@
             </div>
         </section>
 
-        <!-- Group Discussion: Aspectual -->
+        <!-- Part 9 -->
         <section class="section">
-            <h2>Group Discussion: Aspectual Decisions</h2>
+            <h2>Part 9: Aspectual Decisions</h2>
             <div class="question-box">
-                <div class="q-header">Question X.4</div>
+                <div class="q-header">Q1</div>
                 <p>Should aspectual words like <em>began, continued, ended</em> be:</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
-                        <label class="radio-option"><input type="radio" name="qx4" value="included"> Included in the event trigger</label>
-                        <label class="radio-option"><input type="radio" name="qx4" value="separate"> Excluded from trigger but annotated separately</label>
-                        <label class="radio-option"><input type="radio" name="qx4" value="ignored"> Ignored entirely</label>
-                        <label class="radio-option"><input type="radio" name="qx4" value="context"> Treated differently depending on context</label>
+                        <label class="radio-option"><input type="radio" name="p9q1" value="included"> Included in the event trigger</label>
+                        <label class="radio-option"><input type="radio" name="p9q1" value="separate"> Excluded from trigger but annotated separately</label>
+                        <label class="radio-option"><input type="radio" name="p9q1" value="ignored"> Ignored entirely</label>
+                        <label class="radio-option"><input type="radio" name="p9q1" value="context"> Treated differently depending on context</label>
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>Explain your group's reasoning:</label>
-                    <textarea placeholder="What did your group decide and why?"></textarea>
+                    <label>Explain your reasoning:</label>
+                    <textarea placeholder="Why did you choose this approach?"></textarea>
                 </div>
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question X.5</div>
+                <div class="q-header">Q2</div>
                 <p>What guideline rule would reduce disagreement the most?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
-                        <label class="radio-option"><input type="radio" name="qx5" value="core-only"> "Only label the core action verb as the trigger"</label>
-                        <label class="radio-option"><input type="radio" name="qx5" value="include-aspect"> "Include aspectual verbs if they directly modify the action"</label>
-                        <label class="radio-option"><input type="radio" name="qx5" value="separate-aspect"> "Annotate aspect separately from event type"</label>
-                        <label class="radio-option"><input type="radio" name="qx5" value="multiple-spans"> "Allow multiple valid trigger spans"</label>
+                        <label class="radio-option"><input type="radio" name="p9q2" value="core-only"> "Only label the core action verb as the trigger"</label>
+                        <label class="radio-option"><input type="radio" name="p9q2" value="include-aspect"> "Include aspectual verbs if they directly modify the action"</label>
+                        <label class="radio-option"><input type="radio" name="p9q2" value="separate-aspect"> "Annotate aspect separately from event type"</label>
+                        <label class="radio-option"><input type="radio" name="p9q2" value="multiple-spans"> "Allow multiple valid trigger spans"</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -775,20 +732,13 @@
                 </div>
             </div>
 
-            <div class="insight-box">
-                <h3>Key Teaching Insight</h3>
-                <p>Aspectual words force annotators to decide whether an event is <em>something that happens</em>, <em>something that starts happening</em>, or <em>something that is ongoing</em>.</p>
-                <p style="margin-top: 8px;">This decision affects: trigger boundaries, event counts, and downstream temporal reasoning.</p>
-                <p style="margin-top: 8px;"><strong>One-sentence takeaway:</strong> Event annotation requires deciding what counts as the event itself versus information <em>about</em> the event.</p>
-            </div>
         </section>
 
-        <!-- Extended Case Study -->
+        <!-- Part 10 -->
         <section class="section">
-            <h2>Extended Case Study: Aspect, Intent, and Event Reality</h2>
-            <p>This section explores how aspectual words and intent expressions complicate event annotation.</p>
+            <h2>Part 10: Aspect, Intent, and Event Reality</h2>
 
-            <h3>Part Y: Aspect vs. Core Event (Minimal Pairs)</h3>
+            <h3>Aspect vs. Core Event</h3>
             <div class="sentence-box">
                 <div class="sentence-label">Sentence 7</div>
                 <div class="sentence-text">"The army attacked rebel positions near the town."</div>
@@ -799,15 +749,14 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question Y.1</div>
+                <div class="q-header">Q1</div>
                 <p>Which sentence(s) contain an ATTACK event?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options">
-                        <label class="radio-option"><input type="radio" name="qy1" value="7-only"> Sentence 7 only</label>
-                        <label class="radio-option"><input type="radio" name="qy1" value="8-only"> Sentence 8 only</label>
-                        <label class="radio-option"><input type="radio" name="qy1" value="both"> Both</label>
-                        <label class="radio-option"><input type="radio" name="qy1" value="neither"> Neither</label>
+                        <label class="radio-option"><input type="radio" name="p10q1" value="7-only"> Sentence 7 only</label>
+                        <label class="radio-option"><input type="radio" name="p10q1" value="8-only"> Sentence 8 only</label>
+                        <label class="radio-option"><input type="radio" name="p10q1" value="both"> Both</label>
+                        <label class="radio-option"><input type="radio" name="p10q1" value="neither"> Neither</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -817,20 +766,19 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question Y.2</div>
+                <div class="q-header">Q2</div>
                 <p>What is the key difference between these sentences?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
-                        <label class="radio-option"><input type="radio" name="qy2" value="intent"> One describes an event, the other describes intent</label>
-                        <label class="radio-option"><input type="radio" name="qy2" value="completed"> One is completed, the other is hypothetical</label>
-                        <label class="radio-option"><input type="radio" name="qy2" value="observable"> One is observable, the other is inferred</label>
-                        <label class="radio-option"><input type="radio" name="qy2" value="equivalent"> They are equivalent for event annotation</label>
+                        <label class="radio-option"><input type="radio" name="p10q2" value="intent"> One describes an event, the other describes intent</label>
+                        <label class="radio-option"><input type="radio" name="p10q2" value="completed"> One is completed, the other is hypothetical</label>
+                        <label class="radio-option"><input type="radio" name="p10q2" value="observable"> One is observable, the other is inferred</label>
+                        <label class="radio-option"><input type="radio" name="p10q2" value="equivalent"> They are equivalent for event annotation</label>
                     </div>
                 </div>
             </div>
 
-            <h3>Part Z: Aspectual Continuation vs. New Events</h3>
+            <h3>Continuation vs. New Events</h3>
             <div class="sentence-box">
                 <div class="sentence-label">Sentence 9</div>
                 <div class="sentence-text">"The fighting stopped after international pressure."</div>
@@ -841,15 +789,14 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question Z.1</div>
+                <div class="q-header">Q3</div>
                 <p>How many ATTACK events are described here?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options">
-                        <label class="radio-option"><input type="radio" name="qz1" value="one"> One continuous event</label>
-                        <label class="radio-option"><input type="radio" name="qz1" value="two"> Two separate events</label>
-                        <label class="radio-option"><input type="radio" name="qz1" value="none"> No clear event</label>
-                        <label class="radio-option"><input type="radio" name="qz1" value="depends"> Depends on guidelines</label>
+                        <label class="radio-option"><input type="radio" name="p10q3" value="one"> One continuous event</label>
+                        <label class="radio-option"><input type="radio" name="p10q3" value="two"> Two separate events</label>
+                        <label class="radio-option"><input type="radio" name="p10q3" value="none"> No clear event</label>
+                        <label class="radio-option"><input type="radio" name="p10q3" value="depends"> Depends on guidelines</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -859,20 +806,19 @@
             </div>
         </section>
 
-        <!-- Guideline Design -->
+        <!-- Part 11 -->
         <section class="section">
-            <h2>Guideline Design & Modeling Consequences</h2>
+            <h2>Part 11: Guideline Design and Modeling Consequences</h2>
 
             <div class="question-box">
-                <div class="q-header">Question AA.1</div>
+                <div class="q-header">Q1</div>
                 <p>Which rule would you adopt for this project?</p>
-                
                 <div class="choices-container">
                     <div class="radio-options" style="flex-direction: column; gap: 6px;">
-                        <label class="radio-option"><input type="radio" name="qaa1" value="concrete"> Only annotate concrete, realized events</label>
-                        <label class="radio-option"><input type="radio" name="qaa1" value="include-aspect"> Annotate aspectual verbs as part of the trigger</label>
-                        <label class="radio-option"><input type="radio" name="qaa1" value="separate-status"> Separate event type from event status (started, ongoing, ended)</label>
-                        <label class="radio-option"><input type="radio" name="qaa1" value="free-choice"> Allow annotators to choose freely</label>
+                        <label class="radio-option"><input type="radio" name="p11q1" value="concrete"> Only annotate concrete, realized events</label>
+                        <label class="radio-option"><input type="radio" name="p11q1" value="include-aspect"> Annotate aspectual verbs as part of the trigger</label>
+                        <label class="radio-option"><input type="radio" name="p11q1" value="separate-status"> Separate event type from event status (started, ongoing, ended)</label>
+                        <label class="radio-option"><input type="radio" name="p11q1" value="free-choice"> Allow annotators to choose freely</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -882,16 +828,15 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question BB.1</div>
+                <div class="q-header">Q2</div>
                 <p>Suppose you include <em>began, continued, stopped</em> as part of ATTACK triggers. Which outcomes are likely? (Check all that apply.)</p>
-                
                 <div class="choices-container">
                     <div class="checkbox-grid">
-                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="longer"> Longer trigger spans</label>
-                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="lower-iaa"> Lower inter-annotator agreement</label>
-                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="conflate"> Models conflate events with temporal structure</label>
-                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="better-temporal"> Better temporal reasoning</label>
-                        <label class="checkbox-option"><input type="checkbox" name="qbb1" value="harder-eval"> Harder evaluation</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p11q2" value="longer"> Longer trigger spans</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p11q2" value="lower-iaa"> Lower inter-annotator agreement</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p11q2" value="conflate"> Models conflate events with temporal structure</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p11q2" value="better-temporal"> Better temporal reasoning</label>
+                        <label class="checkbox-option"><input type="checkbox" name="p11q2" value="harder-eval"> Harder evaluation</label>
                     </div>
                 </div>
                 <div class="input-group">
@@ -901,32 +846,12 @@
             </div>
 
             <div class="question-box">
-                <div class="q-header">Question BB.2</div>
+                <div class="q-header">Q3</div>
                 <p>If instead you <strong>exclude</strong> aspectual words from triggers, what might the model fail to learn?</p>
                 <textarea placeholder="What information would be lost?"></textarea>
             </div>
         </section>
 
-        <!-- Final Reflection -->
-        <section class="section">
-            <h2>Final Reflection</h2>
-            <div class="final-box">
-                <h3>Event Annotation Philosophy</h3>
-                <p><strong>Event annotation is not just labeling what happened — it is deciding what counts as having happened.</strong></p>
-                <p style="margin-top: 10px;">Aspectual words force annotators to draw a line between:</p>
-                <ul style="margin: 8px 0 8px 20px;">
-                    <li>Events</li>
-                    <li>Intentions</li>
-                    <li>Temporal structure</li>
-                </ul>
-                <p>That line directly shapes: the dataset, the model, and downstream conclusions.</p>
-            </div>
-
-            <div class="takeaway-box">
-                <h3>One-Sentence Takeaway</h3>
-                <p><strong>Annotation guidelines encode a theory of events, whether we admit it or not.</strong></p>
-            </div>
-        </section>
     </div>
 
     <div class="toolbar">
@@ -935,6 +860,19 @@
     </div>
 
     <script>
+        function saveProgress() {
+            const data = { radios: {}, checkboxes: {}, textareas: [], textInputs: [] };
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
+                data.radios[r.name] = r.value;
+            });
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                if (!data.checkboxes[c.name]) data.checkboxes[c.name] = [];
+                data.checkboxes[c.name].push(c.value);
+            });
+            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
+            document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
+            localStorage.setItem('event-extraction-worksheet', JSON.stringify(data));
+        }
 
         function clearForm() {
             if (confirm('Are you sure you want to clear all your answers?')) {
@@ -942,10 +880,8 @@
                 document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
                 document.querySelectorAll('textarea').forEach(t => t.value = '');
                 document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
-                document.querySelectorAll('.choices-container').forEach(c => c.classList.remove('show'));
-            document.querySelectorAll('textarea').forEach((t, i) => data.textareas[i] = t.value);
-            document.querySelectorAll('input[type="text"]').forEach((t, i) => data.textInputs[i] = t.value);
-            localStorage.setItem('event-extraction-worksheet', JSON.stringify(data));
+                localStorage.removeItem('event-extraction-worksheet');
+            }
         }
 
         function loadProgress() {
@@ -972,12 +908,6 @@
         document.addEventListener('change', saveProgress);
         document.addEventListener('input', saveProgress);
     </script>
-
-    <!-- Classroom Response System -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="classroom-submit.js"></script>
 
 </body>
 </html>
