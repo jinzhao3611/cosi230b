@@ -242,6 +242,11 @@ main {
     font-style: italic;
 }
 
+.schedule-table tr.presentation {
+    background: #e3f2fd;
+    font-weight: 500;
+}
+
 .schedule-table tr.current {
     background: #e8f5e9;
     font-weight: 500;
