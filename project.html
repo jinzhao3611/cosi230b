@@ -50,47 +50,79 @@
         </div>
 
         <div class="card">
+            <h3>Project Documents</h3>
+            <div class="grid grid-2">
+                <a href="project/COSI-230B-Project overview.pdf" class="resource-card">
+                    <h4>Project Overview</h4>
+                    <p>Full project description, milestones, and expectations</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="project/Group Contract Instructions.pdf" class="resource-card">
+                    <h4>Group Contract Instructions</h4>
+                    <p>Template for assigning roles and responsibilities within your group</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+                <a href="project/Annotation Goal Presentations Instructions.pdf" class="resource-card">
+                    <h4>Annotation Goal Presentation Instructions</h4>
+                    <p>Guidelines for the Week 9 annotation goal presentation</p>
+                    <span class="tag pdf">PDF</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Getting to Know Your Group</h3>
+            <p>Before diving into the project, take time to establish your team:</p>
+            <ul>
+                <li>Find out your common interests in annotation tasks</li>
+                <li>Find regular times to meet in person outside of class — this is critical for project quality</li>
+                <li>Identify what skills and resources each person brings:
+                    <ul>
+                        <li>Knowledge of potential datasets</li>
+                        <li>Ideas for initial schema, workflows, etc.</li>
+                        <li>Specific skills (programming, data processing, writing, project management, etc.)</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
             <h3>Project Timeline</h3>
             <div class="timeline">
                 <div class="timeline-item">
-                    <h4>Form Groups & Choose Dataset</h4>
-                    <div class="date">Week 3 (Jan 28)</div>
-                    <p>Form groups of 3-4 students. Choose a raw dataset for annotation.</p>
+                    <h4>Group Contract</h4>
+                    <div class="date">Due Wed 2/25 by 11:59pm</div>
+                    <p>A document assigning responsibility for specific tasks within the project. Divide work by skill — every member participates in annotation. Include group members, skills, task assignments, communication plan, meeting schedule, and data sharing plan. Submit signed document on LATTE.</p>
                 </div>
                 <div class="timeline-item">
-                    <h4>Conceptualize Annotation Task</h4>
-                    <div class="date">Week 4 (Feb 4)</div>
-                    <p>Submit written description of your annotation task design.</p>
+                    <h4>Draft Annotation Schema</h4>
+                    <div class="date">Due March 9</div>
+                    <p>In-class presentation and write-up on your topic, dataset, and goals. Include an intuitive design for tagset and attributes, a small pilot annotation, and a brief literature review. Schema does not need to be fully formalized yet.</p>
                 </div>
                 <div class="timeline-item">
-                    <h4>Group Presentations: Task Design</h4>
-                    <div class="date">Week 7 (Feb 25)</div>
-                    <p>Present your chosen task to the class for feedback.</p>
+                    <h4>Annotation Goal Presentations</h4>
+                    <div class="date">Week 9 (Mar 9, 11) — Slides due on LATTE by 3/9 @ 9:00am</div>
+                    <p>10-minute group presentation covering: planned dataset and sampling technique, document balance (genre, time period, authorship), data source and size, copyright/licensing, existing annotations, planned task and goals, and discussion of 2-3 relevant papers.</p>
                 </div>
                 <div class="timeline-item">
-                    <h4>Draft 1 Guidelines + Pilot Annotations</h4>
-                    <div class="date">Week 9 (Mar 11)</div>
-                    <p>First draft of annotation guidelines. Begin pilot annotations.</p>
+                    <h4>MAMA/MATTER Cycle</h4>
+                    <div class="date">March</div>
+                    <p>Perform parallel, independent pilot annotation on a subset of your corpus. Measure inter-annotator agreement (IAA), review disagreements, consider task complexity. Revise guidelines and repeat until you achieve satisfactory IAA.</p>
                 </div>
                 <div class="timeline-item">
-                    <h4>Draft 2 Guidelines</h4>
-                    <div class="date">Week 10 (Mar 18)</div>
-                    <p>Revised guidelines based on pilot annotation experience.</p>
+                    <h4>Full Annotation Specification</h4>
+                    <div class="date">Due late March</div>
+                    <p>Formal annotation schema, v1.0 of guidelines, and presentation. The specification must be clear enough for non-group annotators, with relevant examples (positive and negative) and expected edge cases. Schema should be operationalized within an annotation tool.</p>
                 </div>
                 <div class="timeline-item">
-                    <h4>Inter-Annotator Agreement Evaluation</h4>
-                    <div class="date">Week 11 (Mar 25)</div>
-                    <p>Calculate and report IAA metrics. Discuss disagreements.</p>
+                    <h4>Full Annotation Task</h4>
+                    <div class="date">April</div>
+                    <p>Your group will <strong>not</strong> annotate its own task — each group will be given the schema and specification from another group. Grading is based on meeting deadlines and following the other group's instructions.</p>
                 </div>
                 <div class="timeline-item">
-                    <h4>Adjudicated Gold Standard Dataset</h4>
-                    <div class="date">Week 13 (Apr 15)</div>
-                    <p>Submit final adjudicated dataset with resolved disagreements.</p>
-                </div>
-                <div class="timeline-item">
-                    <h4>Final Report & Presentation</h4>
-                    <div class="date">Weeks 16-17 (Apr 30 - May 12)</div>
-                    <p>Submit final paper and present to the class.</p>
+                    <h4>Annotation Report & Final Presentation</h4>
+                    <div class="date">Due during finals week in May</div>
+                    <p>In-class presentation, ACL-style paper (4 pages), and peer evaluation.</p>
                 </div>
             </div>
         </div>
@@ -98,11 +130,23 @@
         <div class="card">
             <h3>Deliverables</h3>
 
-            <h4>Final Paper</h4>
+            <h4>Final Paper (ACL-style, 4 pages)</h4>
             <ul>
-                <li>4-page paper using LaTeX ACL/LREC format</li>
-                <li>Describes annotation schema, guidelines, dataset, and IAA evaluation</li>
-                <li>Follows academic paper structure (Introduction, Related Work, Methodology, Results, Discussion)</li>
+                <li>Overview of task goals and annotation specification</li>
+                <li>Characterization of your dataset (data distribution, annotation distribution, etc.)</li>
+                <li>Difficulties during data collection (solved and unsolved), with possible improvements for future iterations</li>
+                <li>Annotation quality:
+                    <ul>
+                        <li>Quantitative analysis of annotation reliability and interpretation</li>
+                        <li>Qualitative analysis of annotator disagreements</li>
+                    </ul>
+                </li>
+                <li>Machine learning experiment:
+                    <ul>
+                        <li>Experimental design — baseline system, baseline features, features engineered from annotations</li>
+                        <li>Experimental results</li>
+                    </ul>
+                </li>
             </ul>
 
             <h4>Final Presentation</h4>
