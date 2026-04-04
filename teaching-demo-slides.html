@@ -1,0 +1,3169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Binary Search Trees — CS35 Teaching Demo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #fafafa;
+    --fg: #1a1a2e;
+    --accent: #6C3483;
+    --accent2: #2471A3;
+    --accent-light: #E8DAEF;
+    --green: #27AE60;
+    --red: #E74C3C;
+    --orange: #E67E22;
+    --gray: #7f8c8d;
+    --light-gray: #ecf0f1;
+    --code-bg: #2d2d2d;
+    --notes-bg: #1e1e2e;
+  }
+
+  html, body {
+    height: 100%; font-family: 'Inter', sans-serif;
+    background: var(--fg); overflow: hidden;
+  }
+
+  /* ========== LAYOUT ========== */
+  .app {
+    display: flex; height: 100vh; width: 100vw;
+  }
+
+  .slide-area {
+    flex: 1; position: relative; overflow: hidden;
+    transition: flex 0.3s ease;
+  }
+
+  /* ========== NOTES PANEL ========== */
+  .notes-panel {
+    width: 420px; min-width: 420px;
+    background: var(--notes-bg);
+    color: #ccc;
+    overflow-y: auto;
+    padding: 20px 24px;
+    font-size: 0.92em;
+    line-height: 1.6;
+    border-left: 3px solid var(--accent);
+    transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
+  }
+  .notes-panel.hidden {
+    width: 0; min-width: 0; padding: 0; border: none; overflow: hidden;
+  }
+
+  .notes-panel h3 {
+    color: var(--accent-light);
+    font-size: 1em;
+    margin: 18px 0 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+  }
+  .notes-panel h3:first-child { margin-top: 0; }
+
+  .notes-panel .timing {
+    background: var(--accent);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95em;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  .notes-panel .say {
+    background: rgba(108,52,131,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    margin: 8px 0;
+    border-radius: 0 8px 8px 0;
+    color: #e0c8ee;
+    font-size: 0.95em;
+  }
+  .notes-panel .say::before {
+    content: 'SAY:';
+    display: block;
+    font-weight: 800;
+    font-size: 0.75em;
+    color: var(--accent-light);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .notes-panel .do-item {
+    background: rgba(36,113,163,0.15);
+    border-left: 3px solid var(--accent2);
+    padding: 8px 14px;
+    margin: 6px 0;
+    border-radius: 0 8px 8px 0;
+    color: #a9d4f0;
+    font-size: 0.9em;
+  }
+  .notes-panel .do-item::before {
+    content: 'DO:';
+    display: block;
+    font-weight: 800;
+    font-size: 0.75em;
+    color: #7ec8e3;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .notes-panel .check-item {
+    background: rgba(39,174,96,0.12);
+    border-left: 3px solid var(--green);
+    padding: 8px 14px;
+    margin: 6px 0;
+    border-radius: 0 8px 8px 0;
+    color: #8fd5a6;
+    font-size: 0.9em;
+  }
+  .notes-panel .check-item::before {
+    content: 'CHECK:';
+    display: block;
+    font-weight: 800;
+    font-size: 0.75em;
+    color: var(--green);
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .notes-panel .warn-item {
+    background: rgba(231,76,60,0.12);
+    border-left: 3px solid var(--red);
+    padding: 8px 14px;
+    margin: 6px 0;
+    border-radius: 0 8px 8px 0;
+    color: #f0a8a0;
+    font-size: 0.9em;
+  }
+  .notes-panel .warn-item::before {
+    content: 'REMEMBER:';
+    display: block;
+    font-weight: 800;
+    font-size: 0.75em;
+    color: var(--red);
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .notes-panel .answer {
+    background: rgba(230,126,34,0.12);
+    border-left: 3px solid var(--orange);
+    padding: 8px 14px;
+    margin: 6px 0;
+    border-radius: 0 8px 8px 0;
+    color: #f0c8a0;
+    font-size: 0.9em;
+  }
+  .notes-panel .answer::before {
+    content: 'ANSWER KEY:';
+    display: block;
+    font-weight: 800;
+    font-size: 0.75em;
+    color: var(--orange);
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .notes-panel ul {
+    padding-left: 18px; margin: 4px 0;
+  }
+  .notes-panel li { margin: 4px 0; }
+
+  .notes-panel .transition {
+    text-align: center;
+    color: var(--accent-light);
+    font-weight: 600;
+    padding: 10px;
+    margin-top: 14px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    font-size: 0.9em;
+  }
+
+  /* ========== SLIDES ========== */
+  .slide {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--bg);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 50px 70px;
+  }
+  .slide.active { display: flex; }
+
+  /* Title slide */
+  .slide.title-slide {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white; text-align: center;
+    justify-content: center; align-items: center;
+  }
+  .slide.title-slide h1 {
+    font-size: 3em; font-weight: 800; margin-bottom: 12px; line-height: 1.2;
+  }
+  .slide.title-slide .subtitle {
+    font-size: 1.4em; color: #E8DAEF; margin-bottom: 30px;
+  }
+  .slide.title-slide .context-line {
+    font-size: 1.05em; color: #aaa; max-width: 700px; line-height: 1.5;
+  }
+  .slide.title-slide .agenda-bar {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin: 30px 0 0 0;
+  }
+  .slide.title-slide .agenda-item {
+    background: rgba(255,255,255,0.08);
+    padding: 10px 20px; border-radius: 10px;
+    font-size: 0.95em; color: #ddd;
+  }
+  .slide.title-slide .agenda-item .num {
+    color: var(--accent-light); font-weight: 700; margin-right: 6px;
+  }
+  .slide.title-slide .course-tag {
+    position: absolute; top: 35px; left: 45px;
+    font-size: 0.9em; color: #888; font-weight: 500;
+  }
+
+  /* Regular slide styling */
+  .slide h2 {
+    font-size: 2.2em; font-weight: 700; color: var(--fg); margin-bottom: 24px;
+  }
+  .slide h3 {
+    font-size: 1.3em; font-weight: 600; color: var(--accent); margin: 16px 0 10px 0;
+  }
+  .slide p, .slide li {
+    font-size: 1.2em; line-height: 1.6; color: #333;
+  }
+  .slide ul { list-style: none; padding: 0; }
+  .slide ul li {
+    padding: 8px 0 8px 32px; position: relative;
+  }
+  .slide ul li::before {
+    content: ''; position: absolute; left: 0; top: 16px;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  }
+
+  /* Revealable steps */
+  .reveal-step { opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; }
+  .reveal-step.revealed { opacity: 1; visibility: visible; }
+
+  /* Objectives */
+  .objectives-list li { font-size: 1.15em; }
+  .objectives-list li::before { display: none; }
+  .obj-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: var(--accent); color: white; border-radius: 50%;
+    text-align: center; line-height: 30px;
+    font-size: 0.65em; font-weight: 700; margin-right: 8px; vertical-align: middle;
+  }
+  .objectives-list li strong { color: var(--accent); }
+
+  /* Property box */
+  .property-box {
+    background: linear-gradient(135deg, #E8DAEF, #D4E6F1);
+    border-left: 6px solid var(--accent);
+    border-radius: 12px; padding: 26px 30px;
+    margin: 16px 0; font-size: 1.25em; line-height: 1.7;
+  }
+  .property-box strong { color: var(--accent); }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--code-bg); color: #f8f8f2;
+    font-family: 'Fira Code', monospace; font-size: 1.05em;
+    padding: 22px 26px; border-radius: 12px;
+    line-height: 1.65; margin: 12px 0;
+    white-space: pre; overflow-x: auto;
+  }
+  .code-block .kw { color: #c678dd; }
+  .code-block .fn { color: #61afef; }
+  .code-block .cm { color: #5c6370; font-style: italic; }
+  .code-block .op { color: #56b6c2; }
+  .code-block .pr { color: #e5c07b; }
+  .code-block .highlight-line {
+    background: rgba(108,52,131,0.25); display: block;
+    margin: 0 -26px; padding: 0 26px;
+  }
+
+  /* Two-column */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; align-items: start; flex: 1;
+  }
+
+  /* Tree SVG */
+  .tree-diagram { display: flex; justify-content: center; align-items: center; }
+  .tree-diagram svg { max-width: 100%; height: auto; }
+  .node-circle { fill: white; stroke: var(--accent); stroke-width: 2.5; }
+  .node-text { font-family: 'Inter'; font-size: 18px; font-weight: 600; fill: var(--fg); text-anchor: middle; dominant-baseline: central; }
+  .edge-line { stroke: #555; stroke-width: 2; }
+  .highlight-node { fill: #E8DAEF; stroke: var(--accent); stroke-width: 3; }
+  .bad-node { fill: #FADBD8; stroke: var(--red); stroke-width: 3; }
+  .search-path { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 6,4; }
+  .new-node { fill: #D5F5E3; stroke: var(--green); stroke-width: 3; }
+  .label-text { font-family: 'Inter'; font-size: 13px; fill: var(--gray); text-anchor: middle; }
+  .region-text { font-family: 'Inter'; font-size: 14px; font-weight: 600; text-anchor: middle; }
+
+  /* Activity box */
+  .activity-box {
+    background: linear-gradient(135deg, #FEF9E7, #FFF3CD);
+    border: 2px solid var(--orange); border-radius: 12px;
+    padding: 20px 26px; margin: 12px 0; font-size: 1.15em;
+  }
+  .activity-box .label {
+    font-weight: 700; color: var(--orange);
+    font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+  }
+
+  /* Check grid */
+  .check-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1;
+  }
+  .check-card {
+    background: white; border-radius: 16px; padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 3px solid transparent; text-align: center;
+  }
+  .check-card.valid { border-color: var(--green); }
+  .check-card.invalid { border-color: var(--red); }
+  .check-card .verdict { font-size: 1.4em; font-weight: 700; margin-top: 10px; }
+  .check-card.valid .verdict { color: var(--green); }
+  .check-card.invalid .verdict { color: var(--red); }
+
+  /* Runtime cards */
+  .runtime-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1;
+  }
+  .runtime-card {
+    background: white; border-radius: 16px; padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
+  }
+  .runtime-card h3 { text-align: center; margin-bottom: 12px; }
+  .runtime-card .big-o { font-size: 2em; font-weight: 700; margin-top: 12px; }
+  .runtime-card.good .big-o { color: var(--green); }
+  .runtime-card.bad .big-o { color: var(--red); }
+  .runtime-card .detail { font-size: 0.95em; color: var(--gray); margin-top: 4px; }
+
+  /* Exit ticket */
+  .exit-ticket {
+    background: white; border-radius: 16px; padding: 24px 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin: 10px 0;
+  }
+  .exit-ticket .q {
+    font-size: 1.15em; padding: 10px 0;
+    border-bottom: 1px solid var(--light-gray);
+    display: flex; gap: 10px;
+  }
+  .exit-ticket .q:last-child { border-bottom: none; }
+  .q-num {
+    background: var(--accent); color: white;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8em; flex-shrink: 0;
+  }
+
+  /* Summary */
+  .summary-box {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    color: white; border-radius: 16px;
+    padding: 24px 30px; font-size: 1.3em; line-height: 1.5;
+    text-align: center; margin: 12px 0;
+  }
+
+  /* Vocab terms */
+  .vocab-row { display: flex; gap: 24px; align-items: flex-start; flex: 1; }
+  .vocab-terms { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .vocab-term {
+    background: white; border-radius: 10px; padding: 12px 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06); font-size: 1.1em;
+  }
+  .vocab-term strong { color: var(--accent2); }
+
+  /* Trace table */
+  .trace-table {
+    width: 100%; border-collapse: collapse; font-size: 1.05em; margin: 10px 0;
+  }
+  .trace-table th {
+    background: var(--accent); color: white; padding: 10px 14px;
+    text-align: left; font-weight: 600;
+  }
+  .trace-table td {
+    padding: 10px 14px; border-bottom: 1px solid #eee;
+  }
+  .trace-table tr:nth-child(even) { background: #f8f8ff; }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%; border-collapse: collapse; font-size: 1.05em; margin: 10px 0;
+  }
+  .compare-table th {
+    background: var(--accent); color: white; padding: 10px 14px;
+    text-align: center; font-weight: 600;
+  }
+  .compare-table td {
+    padding: 10px 14px; border-bottom: 1px solid #eee; text-align: center;
+  }
+  .compare-table tr:nth-child(even) { background: #f8f8ff; }
+  .compare-table td:first-child { text-align: left; font-weight: 600; }
+
+  /* Slide footer */
+  .slide-footer {
+    position: absolute; bottom: 18px; left: 70px; right: 70px;
+    display: flex; justify-content: space-between;
+    font-size: 0.8em; color: var(--gray);
+  }
+
+  /* Progress */
+  .progress-bar {
+    position: absolute; top: 0; left: 0;
+    height: 4px; background: var(--accent);
+    transition: width 0.3s ease; z-index: 100;
+  }
+
+  /* Top bar */
+  .top-bar {
+    position: absolute; top: 8px; right: 12px; z-index: 200;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .top-bar button {
+    background: rgba(0,0,0,0.5); color: white; border: none;
+    padding: 5px 12px; border-radius: 6px; font-size: 0.75em;
+    cursor: pointer; font-family: 'Inter';
+  }
+  .top-bar button:hover { background: var(--accent); }
+  .top-bar .timer {
+    background: var(--accent); color: white;
+    padding: 5px 14px; border-radius: 6px;
+    font-weight: 700; font-size: 0.85em;
+    font-family: 'Fira Code', monospace;
+    min-width: 70px; text-align: center;
+  }
+  .top-bar .slide-counter {
+    color: #999; font-size: 0.8em;
+  }
+  .top-bar select {
+    background: rgba(0,0,0,0.5); color: white; border: none;
+    padding: 5px 8px; border-radius: 6px; font-size: 0.75em;
+    cursor: pointer; font-family: 'Inter';
+    max-width: 200px;
+  }
+  .top-bar select:hover { background: var(--accent); }
+  .top-bar select option { background: #1e1e2e; color: white; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="slide-area" id="slideArea">
+    <div class="progress-bar" id="progress"></div>
+    <div class="top-bar">
+      <select id="goToSlide" onchange="goToSlide(this.value)">
+        <option value="0">1 - Title</option>
+        <option value="1">2 - Guessing Game</option>
+        <option value="2">3 - Dictionary ADT</option>
+        <option value="3">4 - Objectives</option>
+        <option value="4">5 - Vocabulary</option>
+        <option value="5">6 - BST Property</option>
+        <option value="6">7 - Is This a BST?</option>
+        <option value="7">8 - Range Checking</option>
+        <option value="8">9 - Search</option>
+        <option value="9">10 - Search: Not Found</option>
+        <option value="10">11 - Pair: Search</option>
+        <option value="11">12 - Insertion</option>
+        <option value="12">13 - Pair: Insert Two</option>
+        <option value="13">14 - BST Node Class</option>
+        <option value="14">15 - More Checks + Shape</option>
+        <option value="15">16 - FindMin / FindMax</option>
+        <option value="16">17 - In-Order Traversal</option>
+        <option value="17">18 - Deletion: 3 Cases</option>
+        <option value="18">19 - Pair: Deletion</option>
+        <option value="19">20 - Runtime O(h)</option>
+        <option value="20">21 - Dict Implementations</option>
+        <option value="21">22 - Exit Ticket</option>
+      </select>
+      <span class="slide-counter" id="slideCounter">1 / 22</span>
+      <div class="timer" id="timer">00:00</div>
+      <button onclick="toggleTimer()" id="timerBtn">Start</button>
+      <button onclick="toggleNotes()">Notes [N]</button>
+    </div>
+
+<!-- ==================== SLIDE 1: Title ==================== -->
+<div class="slide title-slide active" id="slide-0">
+  <div class="course-tag">CS 35 &mdash; Data Structures &amp; Algorithms</div>
+  <h1>Binary Search Trees</h1>
+  <div style="font-size:1.6em; font-weight:600; color:#E8DAEF; margin-bottom:20px; letter-spacing:0.5px;">
+    BST = binary tree + ordering invariant
+  </div>
+  <div class="subtitle">Invariant <span style="font-size:0.65em; color:#bbb;">(the rule)</span> &rarr; Search <span style="font-size:0.65em; color:#bbb;">(how we use it)</span> &rarr; Insert <span style="font-size:0.65em; color:#bbb;">(how we maintain it)</span></div>
+  <div class="context-line" style="margin-top:30px;">
+    A way to implement a <strong>dictionary</strong> (key-value store) where we can search and insert efficiently&mdash;when the tree stays shallow.
+  </div>
+</div>
+
+<!-- ==================== SLIDE 2: Remember the Guessing Game? ==================== -->
+<div class="slide" id="slide-1">
+  <h2>Remember the Guessing Game?</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:36px; flex:1; align-items:start;">
+    <div>
+      <!-- Callback -->
+      <div style="background:linear-gradient(135deg,#E8DAEF,#D4E6F1); border-radius:16px; padding:24px 28px; margin-bottom:16px;">
+        <div style="font-size:1.15em; line-height:1.7;">
+          When we learned binary search, we played a game:<br>
+          <em>"Pick a number 1&ndash;100, I'll find it in &le;7 guesses."</em>
+        </div>
+        <div style="margin-top:12px; font-size:1.05em; color:var(--accent); font-weight:600;">
+          That works because the data is <strong>sorted</strong> &mdash; we halve the range each time.
+        </div>
+      </div>
+      <!-- The problem -->
+      <div class="reveal-step" style="background:linear-gradient(135deg,#FEF9E7,#FFF3CD); border:2px solid var(--orange); border-radius:16px; padding:24px 28px; margin-bottom:16px;">
+        <div style="font-size:1.3em; font-weight:700; margin-bottom:8px; color:var(--orange);">But what if data keeps arriving?</div>
+        <div style="font-size:1.05em; line-height:1.6; margin-bottom:10px;">
+          We have a sorted array. Now <strong>insert 42</strong>:
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; align-items:center;">
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">7</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">15</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">23</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">38</span>
+          <span style="background:#FADBD8; padding:6px 14px; border-radius:6px; font-weight:700; font-family:'Fira Code',monospace; font-size:0.95em; color:var(--red); border:2px dashed var(--red);">42?</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">51</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">67</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">84</span>
+          <span style="background:white; padding:6px 14px; border-radius:6px; font-weight:600; font-family:'Fira Code',monospace; font-size:0.95em;">93</span>
+        </div>
+        <div style="font-size:1.05em; color:var(--red); font-weight:600;">
+          Must <strong>shift 51, 67, 84, 93</strong> to make room&hellip; O(n)!
+        </div>
+      </div>
+      <!-- Punchline -->
+      <div class="reveal-step" style="background:linear-gradient(135deg,#1a1a2e,#0f3460); color:white; border-radius:14px; padding:18px 24px; text-align:center; font-size:1.1em; line-height:1.6;">
+        Sorted arrays: fast <strong>search</strong>, slow <strong>insert</strong>.<br>
+        <span style="color:#E8DAEF; font-size:1.15em; font-weight:700;">What if the structure itself supported both?</span>
+      </div>
+    </div>
+    <div>
+      <!-- What we know -->
+      <div style="background:white; border-radius:16px; padding:22px 26px; box-shadow:0 3px 16px rgba(0,0,0,0.07); margin-bottom:16px;">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--gray); font-weight:600; margin-bottom:10px;">What we already know</div>
+        <div style="font-size:1.1em; line-height:1.8; padding:4px 0;">
+          <span style="color:var(--green); font-weight:600;">Binary search</span> on a sorted array &rarr; O(log n) search<br>
+          Each comparison <strong>halves</strong> the search space<br>
+          <span style="color:var(--gray); font-size:0.9em;">The guessing game was exactly this!</span>
+        </div>
+      </div>
+      <!-- The tradeoff -->
+      <div class="reveal-step" style="background:white; border-radius:16px; padding:22px 26px; box-shadow:0 3px 16px rgba(0,0,0,0.07); margin-bottom:16px;">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--gray); font-weight:600; margin-bottom:10px;">Sorted Array: The Tradeoff</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="text-align:center; padding:12px; background:#E8F8F5; border-radius:10px;">
+            <div style="font-size:0.85em; color:var(--gray);">Search</div>
+            <div style="font-size:1.5em; font-weight:700; color:var(--green);">O(log n)</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:#FADBD8; border-radius:10px;">
+            <div style="font-size:0.85em; color:var(--gray);">Insert</div>
+            <div style="font-size:1.5em; font-weight:700; color:var(--red);">O(n)</div>
+          </div>
+        </div>
+      </div>
+      <!-- BST preview -->
+      <div class="reveal-step" style="background:white; border-radius:16px; padding:22px 26px; box-shadow:0 3px 16px rgba(0,0,0,0.07);">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:600; margin-bottom:10px;">Today's answer: BST</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="text-align:center; padding:12px; background:#E8F8F5; border-radius:10px;">
+            <div style="font-size:0.85em; color:var(--gray);">Search</div>
+            <div style="font-size:1.5em; font-weight:700; color:var(--green);">O(log n)</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:#E8F8F5; border-radius:10px;">
+            <div style="font-size:0.85em; color:var(--gray);">Insert</div>
+            <div style="font-size:1.5em; font-weight:700; color:var(--green);">O(log n)</div>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:10px; font-size:1em; color:var(--accent); font-weight:600;">
+          Same halving idea &mdash; but in a <em>tree</em>!
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>2 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 3: The Dictionary ADT ==================== -->
+<div class="slide" id="slide-2">
+  <h2>The Dictionary ADT</h2>
+  <p style="font-size:1.15em; margin-bottom:18px;">
+    A <strong>dictionary</strong> (also called a <strong>map</strong>) stores <strong>key&ndash;value</strong> pairs and supports three core operations:
+  </p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:start; flex:1;">
+    <div>
+      <div class="code-block" style="font-size:1em;"><span class="fn">insert</span>(key, value)   <span class="cm"># add or update</span>
+<span class="fn">search</span>(key)          <span class="cm"># find the value</span>
+<span class="fn">remove</span>(key)          <span class="cm"># delete entry</span></div>
+      <div class="reveal-step" style="background:white; border-radius:14px; padding:20px 24px; box-shadow:0 3px 16px rgba(0,0,0,0.07); margin-top:16px;">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--gray); font-weight:600; margin-bottom:10px;">Concrete Example: Student Records</div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px 18px; font-size:1.05em;">
+          <span style="font-family:'Fira Code',monospace; font-weight:600; color:var(--accent);">10234</span><span>&rarr; "Alice Chen"</span>
+          <span style="font-family:'Fira Code',monospace; font-weight:600; color:var(--accent);">10587</span><span>&rarr; "Bob Smith"</span>
+          <span style="font-family:'Fira Code',monospace; font-weight:600; color:var(--accent);">10891</span><span>&rarr; "Carol Lee"</span>
+        </div>
+        <div style="margin-top:10px; font-size:0.95em; color:var(--gray);">Key = student ID, Value = name</div>
+      </div>
+    </div>
+    <div>
+      <div class="reveal-step" style="background:white; border-radius:14px; padding:20px 24px; box-shadow:0 3px 16px rgba(0,0,0,0.07); margin-bottom:16px;">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--gray); font-weight:600; margin-bottom:10px;">Where you've seen dictionaries</div>
+        <div style="font-size:1.05em; line-height:1.8;">
+          &bull; Python <code style="background:#eee; padding:2px 8px; border-radius:4px;">dict</code><br>
+          &bull; Phone contacts: name &rarr; number<br>
+          &bull; DNS: domain &rarr; IP address<br>
+          &bull; Compiler: variable name &rarr; memory address
+        </div>
+      </div>
+      <div class="reveal-step" style="background:linear-gradient(135deg,#1a1a2e,#0f3460); color:white; border-radius:14px; padding:18px 24px; text-align:center; font-size:1.1em; line-height:1.6;">
+        Today we learn one implementation:<br>
+        <span style="color:#E8DAEF; font-size:1.2em; font-weight:700;">the Binary Search Tree</span>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>3 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 4: Today's Objectives (UPDATE) ==================== -->
+<div class="slide" id="slide-3">
+  <h2>Today's Objectives</h2>
+  <p style="font-size:1.05em; color:var(--gray); margin-bottom:20px;">By the end of today's class, you will be able to:</p>
+  <ul class="objectives-list">
+    <li class="reveal-step">
+      <span class="obj-num">1</span>
+      <strong>State the BST invariant</strong> precisely and decide whether a given tree is a valid BST
+    </li>
+    <li class="reveal-step">
+      <span class="obj-num">2</span>
+      <strong>Trace search</strong> for a key and justify each step using the invariant
+    </li>
+    <li class="reveal-step">
+      <span class="obj-num">3</span>
+      <strong>Perform insertion</strong> while maintaining the invariant
+    </li>
+    <li class="reveal-step">
+      <span class="obj-num">4</span>
+      <strong>Find min/max</strong> and produce sorted output via <strong>in-order traversal</strong>
+    </li>
+    <li class="reveal-step">
+      <span class="obj-num">5</span>
+      <strong>Describe the three cases of deletion</strong> and trace them on a tree
+    </li>
+    <li class="reveal-step">
+      <span class="obj-num">6</span>
+      <strong>Explain why runtime is O(h)</strong> and what that means for balanced vs degenerate trees
+    </li>
+    <li class="reveal-step">
+      <span class="obj-num">7</span>
+      <strong>Compare BSTs to other dictionary implementations</strong> (arrays, hash tables)
+    </li>
+  </ul>
+  <p class="reveal-step" style="font-size:1em; color:var(--gray); margin-top:16px;">
+    <em>h</em> = height of the tree (we'll define this precisely soon)
+  </p>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>4 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 5: Binary Tree Vocabulary (KEEP) ==================== -->
+<div class="slide" id="slide-4">
+  <h2>Quick Recap: Binary Tree Terms</h2>
+  <div class="vocab-row">
+    <div class="tree-diagram" style="flex:1.2;">
+      <svg width="380" height="310" viewBox="0 0 380 310">
+        <!-- Edges -->
+        <g class="vocab-hl" data-vocab="edge" style="opacity:0.2; transition: opacity 0.4s;">
+          <line x1="190" y1="50" x2="100" y2="140" class="edge-line" stroke-width="3"/>
+          <line x1="190" y1="50" x2="280" y2="140" class="edge-line" stroke-width="3"/>
+          <line x1="100" y1="140" x2="55" y2="230" class="edge-line" stroke-width="3"/>
+          <line x1="100" y1="140" x2="145" y2="230" class="edge-line" stroke-width="3"/>
+          <line x1="280" y1="140" x2="325" y2="230" class="edge-line" stroke-width="3"/>
+          <text x="138" y="82" class="label-text" fill="var(--accent2)" font-weight="600">edge</text>
+        </g>
+        <!-- Edges (always visible, thin) -->
+        <line x1="190" y1="50" x2="100" y2="140" class="edge-line"/>
+        <line x1="190" y1="50" x2="280" y2="140" class="edge-line"/>
+        <line x1="100" y1="140" x2="55" y2="230" class="edge-line"/>
+        <line x1="100" y1="140" x2="145" y2="230" class="edge-line"/>
+        <line x1="280" y1="140" x2="325" y2="230" class="edge-line"/>
+        <!-- Root annotation -->
+        <g class="vocab-hl" data-vocab="root" style="opacity:0; transition: opacity 0.4s;">
+          <text x="256" y="34" class="label-text" fill="var(--accent)" font-weight="700" font-size="15px" text-anchor="start">root</text>
+          <line x1="248" y1="38" x2="216" y2="46" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="190" cy="50" r="28" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="4,3"/>
+        </g>
+        <!-- Leaf annotations -->
+        <g class="vocab-hl" data-vocab="leaf" style="opacity:0; transition: opacity 0.4s;">
+          <text x="55" y="268" class="label-text" fill="var(--green)" font-weight="700" font-size="14px">leaf</text>
+          <text x="145" y="268" class="label-text" fill="var(--green)" font-weight="700" font-size="14px">leaf</text>
+          <text x="325" y="268" class="label-text" fill="var(--green)" font-weight="700" font-size="14px">leaf</text>
+          <circle cx="55" cy="230" r="28" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="4,3"/>
+          <circle cx="145" cy="230" r="28" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="4,3"/>
+          <circle cx="325" cy="230" r="28" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="4,3"/>
+        </g>
+        <!-- Left/Right child annotations -->
+        <g class="vocab-hl" data-vocab="child" style="opacity:0; transition: opacity 0.4s;">
+          <text x="60" y="118" style="font-family:'Inter'; font-size:12px; fill:var(--accent2); font-weight:600; text-anchor:middle;">left child</text>
+          <text x="320" y="118" style="font-family:'Inter'; font-size:12px; fill:var(--accent2); font-weight:600; text-anchor:middle;">right child</text>
+        </g>
+        <!-- Subtree bracket -->
+        <g class="vocab-hl" data-vocab="subtree" style="opacity:0; transition: opacity 0.4s;">
+          <rect x="22" y="105" width="160" height="170" rx="10" fill="rgba(36,113,163,0.08)" stroke="var(--accent2)" stroke-width="2" stroke-dasharray="5,4"/>
+          <text x="102" y="295" class="label-text" fill="var(--accent2)" font-weight="700" font-size="14px">left subtree of 8</text>
+        </g>
+        <!-- Height annotation -->
+        <g class="vocab-hl" data-vocab="height" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="195" y1="52" x2="108" y2="138" stroke="var(--orange)" stroke-width="3" stroke-dasharray="6,3"/>
+          <line x1="104" y1="142" x2="60" y2="228" stroke="var(--orange)" stroke-width="3" stroke-dasharray="6,3"/>
+          <text x="20" y="210" style="font-family:'Inter'; font-size:12px; fill:var(--orange); font-weight:700;">h = 2</text>
+        </g>
+        <!-- Nodes (always visible) -->
+        <g class="vocab-hl" data-vocab="node" style="opacity:0.35; transition: opacity 0.4s;">
+          <circle cx="190" cy="50" r="27" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="4,3"/>
+        </g>
+        <circle cx="190" cy="50" r="24" class="node-circle" style="fill:#E8DAEF;"/>
+        <text x="190" y="50" class="node-text">8</text>
+        <circle cx="100" cy="140" r="24" class="node-circle"/>
+        <text x="100" y="140" class="node-text">3</text>
+        <circle cx="280" cy="140" r="24" class="node-circle"/>
+        <text x="280" y="140" class="node-text">12</text>
+        <circle cx="55" cy="230" r="24" class="node-circle"/>
+        <text x="55" y="230" class="node-text">1</text>
+        <circle cx="145" cy="230" r="24" class="node-circle"/>
+        <text x="145" y="230" class="node-text">6</text>
+        <circle cx="325" cy="230" r="24" class="node-circle"/>
+        <text x="325" y="230" class="node-text">14</text>
+      </svg>
+    </div>
+    <div class="vocab-terms">
+      <div class="vocab-term reveal-step" data-vocab-trigger="node"><strong>Node</strong> &mdash; stores a key (like 8, 3, 12&hellip;)</div>
+      <div class="vocab-term reveal-step" data-vocab-trigger="edge"><strong>Edge</strong> &mdash; link from a parent to its child</div>
+      <div class="vocab-term reveal-step" data-vocab-trigger="root"><strong>Root</strong> &mdash; the topmost node (no parent)</div>
+      <div class="vocab-term reveal-step" data-vocab-trigger="leaf"><strong>Leaf</strong> &mdash; a node with <em>no</em> children</div>
+      <div class="vocab-term reveal-step" data-vocab-trigger="child"><strong>Left / Right child</strong> &mdash; at most 2 per node</div>
+      <div class="vocab-term reveal-step" data-vocab-trigger="subtree"><strong>Subtree</strong> &mdash; a node and <em>ALL</em> of its descendants (not just immediate children!)</div>
+      <div class="vocab-term reveal-step" data-vocab-trigger="height"><strong>Height (h)</strong> &mdash; longest path from root to a leaf</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>5 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 6: BST Property (KEEP) ==================== -->
+<div class="slide" id="slide-5">
+  <h2>The BST Property <span style="font-size:0.45em; color:var(--gray);">(the invariant)</span></h2>
+  <div class="two-col">
+    <div>
+      <div class="property-box">
+        For a node with key <strong>K</strong>:<br><br>
+        <span class="reveal-step">&bull; Every key in the <strong>left subtree</strong> is <strong>&lt; K</strong></span><br>
+        <span class="reveal-step">&bull; Every key in the <strong>right subtree</strong> is <strong>&ge; K</strong></span><br><br>
+        <span class="reveal-step">This must hold for <em><strong>every</strong></em> node in the tree.</span>
+      </div>
+      <p class="reveal-step" style="font-size:1em; color:var(--gray); margin-top:12px;">
+        <strong>Invariant</strong> = a condition that <em>must remain true</em> before and after every operation.
+      </p>
+    </div>
+    <div class="tree-diagram">
+      <svg width="340" height="300" viewBox="0 0 340 300">
+        <!-- Shaded regions -->
+        <rect x="10" y="80" width="155" height="200" rx="12" fill="#E8F8F5" opacity="0.6"/>
+        <rect x="175" y="80" width="155" height="200" rx="12" fill="#EBF5FB" opacity="0.6"/>
+        <text x="87" y="272" class="region-text" fill="var(--green)">ALL &lt; 8</text>
+        <text x="252" y="272" class="region-text" fill="var(--accent2)">ALL &ge; 8</text>
+        <!-- Edges -->
+        <line x1="170" y1="50" x2="85" y2="140" class="edge-line"/>
+        <line x1="170" y1="50" x2="255" y2="140" class="edge-line"/>
+        <line x1="85" y1="140" x2="42" y2="225" class="edge-line"/>
+        <line x1="85" y1="140" x2="128" y2="225" class="edge-line"/>
+        <line x1="255" y1="140" x2="298" y2="225" class="edge-line"/>
+        <!-- Nodes -->
+        <circle cx="170" cy="50" r="26" class="highlight-node"/>
+        <text x="170" y="50" class="node-text" style="font-size:20px;">8</text>
+        <text x="204" y="42" style="font-family:'Inter'; font-size:15px; fill:var(--accent); font-weight:700;">K</text>
+        <circle cx="85" cy="140" r="24" class="node-circle"/>
+        <text x="85" y="140" class="node-text">3</text>
+        <circle cx="255" cy="140" r="24" class="node-circle"/>
+        <text x="255" y="140" class="node-text">12</text>
+        <circle cx="42" cy="225" r="24" class="node-circle"/>
+        <text x="42" y="225" class="node-text">1</text>
+        <circle cx="128" cy="225" r="24" class="node-circle"/>
+        <text x="128" y="225" class="node-text">6</text>
+        <circle cx="298" cy="225" r="24" class="node-circle"/>
+        <text x="298" y="225" class="node-text">14</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>6 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 7: Is This a BST? (KEEP) ==================== -->
+<div class="slide" id="slide-6">
+  <h2>Check: Is This a BST?</h2>
+  <div class="activity-box" style="margin-bottom:16px;">
+    <div class="label">Think (10 sec) &rarr; Pair (30 sec) &rarr; Share</div>
+    Thumbs up or thumbs down for each tree. If it's invalid, <strong>which node</strong> violates the property and <strong>why</strong>?
+  </div>
+  <div class="check-grid">
+    <div class="check-card">
+      <h3 style="margin-bottom:8px;">Tree A</h3>
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <line x1="110" y1="35" x2="55" y2="95" class="edge-line"/>
+        <line x1="110" y1="35" x2="165" y2="95" class="edge-line"/>
+        <line x1="55" y1="95" x2="28" y2="155" class="edge-line"/>
+        <line x1="55" y1="95" x2="82" y2="155" class="edge-line"/>
+        <circle cx="110" cy="35" r="20" class="node-circle"/>
+        <text x="110" y="35" class="node-text" style="font-size:16px;">15</text>
+        <circle cx="55" cy="95" r="20" class="node-circle"/>
+        <text x="55" y="95" class="node-text" style="font-size:16px;">10</text>
+        <circle cx="165" cy="95" r="20" class="node-circle"/>
+        <text x="165" y="95" class="node-text" style="font-size:16px;">20</text>
+        <circle cx="28" cy="155" r="20" class="node-circle"/>
+        <text x="28" y="155" class="node-text" style="font-size:16px;">7</text>
+        <circle cx="82" cy="155" r="20" class="node-circle"/>
+        <text x="82" y="155" class="node-text" style="font-size:16px;">12</text>
+      </svg>
+      <div class="verdict reveal-step" style="color:var(--green);">Valid BST &#10003;</div>
+    </div>
+    <div class="check-card">
+      <h3 style="margin-bottom:8px;">Tree B</h3>
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <line x1="110" y1="35" x2="55" y2="95" class="edge-line"/>
+        <line x1="110" y1="35" x2="165" y2="95" class="edge-line"/>
+        <line x1="55" y1="95" x2="28" y2="155" class="edge-line"/>
+        <line x1="55" y1="95" x2="82" y2="155" class="edge-line"/>
+        <circle cx="110" cy="35" r="20" class="node-circle"/>
+        <text x="110" y="35" class="node-text" style="font-size:16px;">15</text>
+        <circle cx="55" cy="95" r="20" class="node-circle"/>
+        <text x="55" y="95" class="node-text" style="font-size:16px;">10</text>
+        <circle cx="165" cy="95" r="20" class="node-circle"/>
+        <text x="165" y="95" class="node-text" style="font-size:16px;">20</text>
+        <circle cx="28" cy="155" r="20" class="node-circle"/>
+        <text x="28" y="155" class="node-text" style="font-size:16px;">6</text>
+        <!-- Bad node: 17 is right child of 10 (17 > 10, looks fine!) but in left subtree of 15 (17 > 15, violation!) -->
+        <circle cx="82" cy="155" r="20" class="node-circle" id="node11-normal"/>
+        <text x="82" y="155" class="node-text" style="font-size:16px;" id="node11-text-normal">17</text>
+        <circle cx="82" cy="155" r="20" class="bad-node" id="node11-bad" style="display:none;"/>
+        <text x="82" y="155" class="node-text" style="font-size:16px; display:none;" fill="var(--red)" id="node11-text-bad">17</text>
+      </svg>
+      <div class="verdict reveal-step" style="color:var(--red);" data-reveal-action="highlight-node11">NOT a BST &#10007;</div>
+      <p class="reveal-step" style="font-size:0.9em; color:var(--gray); margin-top:4px;">
+        17 is the right child of 10 &mdash; and 17 &gt; 10, so <em>locally it looks correct</em>.<br>
+        But 17 is in the <strong>left subtree of 15</strong>, so it must be &lt; 15. It's not!
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>7 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 8: BST Validity = Range Checking ==================== -->
+<div class="slide" id="slide-7">
+  <h2>One More Check &mdash; Valid or Invalid?</h2>
+  <div class="two-col">
+    <div>
+      <div class="activity-box" style="margin-bottom:10px;">
+        <div class="label">Think (10 sec) &rarr; Pair (30 sec)</div>
+        Is this tree a valid BST? Why or why not?
+      </div>
+      <div style="text-align:center;">
+        <svg width="280" height="220" viewBox="0 0 280 220">
+          <line x1="140" y1="30" x2="70" y2="85" class="edge-line"/>
+          <line x1="140" y1="30" x2="210" y2="85" class="edge-line"/>
+          <line x1="70" y1="85" x2="35" y2="140" class="edge-line"/>
+          <line x1="70" y1="85" x2="105" y2="140" class="edge-line"/>
+          <line x1="210" y1="85" x2="175" y2="140" class="edge-line"/>
+          <line x1="210" y1="85" x2="245" y2="140" class="edge-line"/>
+          <line x1="175" y1="140" x2="155" y2="195" class="edge-line"/>
+          <circle cx="140" cy="30" r="18" class="node-circle"/><text x="140" y="30" class="node-text" style="font-size:14px;">20</text>
+          <circle cx="70" cy="85" r="18" class="node-circle"/><text x="70" y="85" class="node-text" style="font-size:14px;">10</text>
+          <circle cx="210" cy="85" r="18" class="node-circle"/><text x="210" y="85" class="node-text" style="font-size:14px;">30</text>
+          <circle cx="35" cy="140" r="18" class="node-circle"/><text x="35" y="140" class="node-text" style="font-size:14px;">5</text>
+          <circle cx="105" cy="140" r="18" class="node-circle"/><text x="105" y="140" class="node-text" style="font-size:14px;">15</text>
+          <circle cx="175" cy="140" r="18" class="node-circle"/><text x="175" y="140" class="node-text" style="font-size:14px;">25</text>
+          <circle cx="245" cy="140" r="18" class="node-circle"/><text x="245" y="140" class="node-text" style="font-size:14px;">35</text>
+          <circle cx="155" cy="195" r="18" class="node-circle" style="stroke:var(--orange); stroke-width:3;"/><text x="155" y="195" class="node-text" style="font-size:14px; fill:var(--orange);">22</text>
+        </svg>
+      </div>
+      <!-- Wrong thinking -->
+      <div class="reveal-step" style="background:#FADBD8; border-left:4px solid var(--red); border-radius:0 10px 10px 0; padding:12px 16px; margin-top:8px; font-size:0.95em;">
+        <strong style="color:var(--red);">Common wrong reasoning:</strong><br>
+        "22 is left child of 25 &rarr; OK (22 &lt; 25).<br>
+        But 22 is left of 30... and 22 &lt; 30... wait, is 22 in the right subtree of 20? 22 &gt; 20... hmm..."<br>
+        <span style="color:var(--red); font-weight:600;">Students get confused and guess "invalid."</span>
+      </div>
+      <!-- Correct thinking -->
+      <div class="reveal-step" style="background:#D5F5E3; border-left:4px solid var(--green); border-radius:0 10px 10px 0; padding:12px 16px; margin-top:8px; font-size:0.95em;">
+        <strong style="color:var(--green);">Correct reasoning &mdash; check ALL ancestors:</strong><br>
+        22 is in <strong>right</strong> subtree of 20 &rarr; must be &gt; 20 &#10003;<br>
+        22 is in <strong>left</strong> subtree of 30 &rarr; must be &lt; 30 &#10003;<br>
+        22 is in <strong>left</strong> subtree of 25 &rarr; must be &lt; 25 &#10003;<br>
+        <span style="color:var(--green); font-weight:700;">Valid! Range = (20, 25) and 22 is inside it.</span>
+      </div>
+      <!-- Bridge -->
+      <div class="reveal-step" style="font-size:0.95em; color:var(--gray); text-align:center; margin-top:8px; font-weight:600;">
+        Checking by hand is error-prone. <strong>How do we do this systematically?</strong>
+      </div>
+    </div>
+    <div>
+      <div class="reveal-step">
+        <div class="property-box" style="font-size:1.05em;">
+          <strong>Mental model:</strong> each node lives in a <strong>legal interval</strong>.<br><br>
+          &bull; Going <strong>left</strong> &rarr; shrink the <strong>upper bound</strong><br>
+          &bull; Going <strong>right</strong> &rarr; raise the <strong>lower bound</strong><br><br>
+          Tracks <em>all</em> ancestor constraints, not just the parent.
+        </div>
+      </div>
+      <div class="reveal-step" style="margin-top:12px;">
+        <div class="code-block" style="font-size:0.92em;"><span class="kw">def</span> <span class="fn">is_valid</span>(<span class="pr">node</span>, <span class="pr">min</span>, <span class="pr">max</span>):
+    <span class="kw">if</span> node <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span> <span class="op">True</span>
+
+    <span class="kw">if</span> node.value <span class="op">&lt;=</span> min <span class="kw">or</span> node.value <span class="op">&gt;=</span> max:
+        <span class="kw">return</span> <span class="op">False</span>
+
+    <span class="kw">return</span> (
+        <span class="fn">is_valid</span>(node.<span class="pr">left</span>, min, node.value)
+        <span class="kw">and</span>
+        <span class="fn">is_valid</span>(node.<span class="pr">right</span>, node.value, max)
+    )</div>
+      </div>
+      <div class="reveal-step" style="background:#fff3cd; border-radius:10px; padding:12px 16px; margin-top:10px; font-size:0.95em;">
+        <strong style="color:var(--orange);">BST validity = range checking, not parent checking.</strong><br>
+        Node 22's range: go right from 20 (min=20), go left from 30... wait, left from 25 (max=25). Range = <strong>(20, 25)</strong>. 22 is in range!
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>8 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 9: Search Algorithm ==================== -->
+<div class="slide" id="slide-8">
+  <h2>Search Algorithm</h2>
+  <div class="two-col">
+    <div>
+      <p style="font-size:1.1em; margin-bottom:12px;">
+        <strong>Key idea:</strong> at each node, the invariant tells us which side to explore. We never check both.
+      </p>
+      <div class="code-block"><span class="kw">def</span> <span class="fn">search</span>(<span class="pr">node</span>, <span class="pr">key</span>):
+    <span class="kw">if</span> node <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span> <span class="op">False</span>     <span class="cm"># fell off tree</span>
+
+    <span class="kw">if</span> key <span class="op">==</span> node.key:
+        <span class="kw">return</span> <span class="op">True</span>      <span class="cm"># found it!</span>
+
+    <span class="kw">elif</span> key <span class="op">&lt;</span> node.key:
+        <span class="cm"># must be in left subtree</span>
+        <span class="kw">return</span> <span class="fn">search</span>(node.<span class="pr">left</span>, key)
+
+    <span class="kw">else</span>:
+        <span class="cm"># must be in right subtree</span>
+        <span class="kw">return</span> <span class="fn">search</span>(node.<span class="pr">right</span>, key)</div>
+    </div>
+    <div>
+      <h3>Example: search(root, 7)</h3>
+      <svg width="320" height="300" viewBox="0 0 320 300">
+        <!-- All edges (always visible, thin) -->
+        <line x1="160" y1="48" x2="80" y2="125" class="edge-line"/>
+        <line x1="160" y1="48" x2="240" y2="125" class="edge-line"/>
+        <line x1="80" y1="125" x2="40" y2="200" class="edge-line"/>
+        <line x1="80" y1="125" x2="120" y2="200" class="edge-line"/>
+        <line x1="120" y1="200" x2="150" y2="265" class="edge-line"/>
+        <!-- All nodes (start as plain circles) -->
+        <circle cx="160" cy="48" r="24" class="node-circle" id="search-n8"/>
+        <text x="160" y="48" class="node-text">8</text>
+        <circle cx="80" cy="125" r="24" class="node-circle" id="search-n3"/>
+        <text x="80" y="125" class="node-text">3</text>
+        <circle cx="240" cy="125" r="24" class="node-circle"/>
+        <text x="240" y="125" class="node-text">12</text>
+        <circle cx="40" cy="200" r="24" class="node-circle"/>
+        <text x="40" y="200" class="node-text">1</text>
+        <circle cx="120" cy="200" r="24" class="node-circle" id="search-n6"/>
+        <text x="120" y="200" class="node-text">6</text>
+        <circle cx="150" cy="265" r="24" class="node-circle" id="search-n7"/>
+        <text x="150" y="265" class="node-text" id="search-n7-text">7</text>
+        <!-- Step annotations (hidden, revealed one by one) -->
+        <g class="search-step" data-search-step="1" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="160" y1="48" x2="80" y2="125" class="search-path"/>
+          <text x="200" y="40" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">7 &lt; 8 &rarr; go LEFT</text>
+        </g>
+        <g class="search-step" data-search-step="2" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="80" y1="125" x2="120" y2="200" class="search-path"/>
+          <text x="20" y="105" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">7 &gt; 3 &rarr; go RIGHT</text>
+        </g>
+        <g class="search-step" data-search-step="3" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="120" y1="200" x2="150" y2="265" class="search-path"/>
+          <text x="157" y="192" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">7 &gt; 6 &rarr; go RIGHT</text>
+        </g>
+        <g class="search-step" data-search-step="4" style="opacity:0; transition: opacity 0.4s;">
+          <text x="188" y="268" style="font-family:'Inter'; font-size:14px; fill:var(--green); font-weight:700;">Found!</text>
+        </g>
+      </svg>
+      <table class="trace-table" style="margin-top:8px; font-size:0.9em;">
+        <tr><th>Step</th><th>At node</th><th>Compare</th><th>Go</th></tr>
+        <tr class="reveal-step" data-reveal-action="search-step-1"><td>1</td><td>8</td><td>7 &lt; 8</td><td>Left</td></tr>
+        <tr class="reveal-step" data-reveal-action="search-step-2"><td>2</td><td>3</td><td>7 &gt; 3</td><td>Right</td></tr>
+        <tr class="reveal-step" data-reveal-action="search-step-3"><td>3</td><td>6</td><td>7 &gt; 6</td><td>Right</td></tr>
+        <tr class="reveal-step" data-reveal-action="search-step-4"><td>4</td><td>7</td><td>7 == 7</td><td style="color:var(--green); font-weight:700;">Found!</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>9 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 9: Search Not Found (NEW) ==================== -->
+<div class="slide" id="slide-9">
+  <h2>Search: Not Found</h2>
+  <div class="two-col">
+    <div>
+      <p style="font-size:1.1em; margin-bottom:12px;">
+        What happens when the key <strong>isn't in the tree</strong>? We walk until we reach <code style="background:#eee; padding:2px 8px; border-radius:4px;">None</code>.
+      </p>
+      <h3>Example: search(root, 9)</h3>
+      <p style="font-size:1em; color:var(--gray); margin-bottom:10px;">Search for 9 on the standard tree (8, 3, 12, 1, 6, 14).</p>
+      <table class="trace-table">
+        <tr><th>Step</th><th>At node</th><th>Compare</th><th>Go</th></tr>
+        <tr class="reveal-step" data-reveal-action="nf-step-1"><td>1</td><td>8</td><td>9 &gt; 8</td><td>Right</td></tr>
+        <tr class="reveal-step" data-reveal-action="nf-step-2"><td>2</td><td>12</td><td>9 &lt; 12</td><td>Left</td></tr>
+        <tr class="reveal-step" data-reveal-action="nf-step-3"><td>3</td><td>None</td><td>&mdash;</td><td style="color:var(--red); font-weight:700;">Not found!</td></tr>
+      </table>
+      <div class="reveal-step" style="background:linear-gradient(135deg,#FADBD8,#F5B7B1); border-radius:12px; padding:16px 20px; margin-top:14px; font-size:1.05em;">
+        <strong style="color:var(--red);">"Falling off the tree"</strong> means the key doesn't exist.<br>
+        Node 12 has no left child, so we reach <code>None</code> &rarr; return <code>False</code>.
+      </div>
+    </div>
+    <div class="tree-diagram">
+      <svg width="320" height="280" viewBox="0 0 320 280">
+        <!-- All edges (always visible) -->
+        <line x1="160" y1="48" x2="80" y2="125" class="edge-line"/>
+        <line x1="160" y1="48" x2="240" y2="125" class="edge-line"/>
+        <line x1="80" y1="125" x2="40" y2="200" class="edge-line"/>
+        <line x1="80" y1="125" x2="120" y2="200" class="edge-line"/>
+        <line x1="240" y1="125" x2="290" y2="200" class="edge-line"/>
+        <!-- All nodes (start plain) -->
+        <circle cx="160" cy="48" r="24" class="node-circle" id="nf-n8"/>
+        <text x="160" y="48" class="node-text">8</text>
+        <circle cx="80" cy="125" r="24" class="node-circle"/>
+        <text x="80" y="125" class="node-text">3</text>
+        <circle cx="240" cy="125" r="24" class="node-circle" id="nf-n12"/>
+        <text x="240" y="125" class="node-text">12</text>
+        <circle cx="40" cy="200" r="24" class="node-circle"/>
+        <text x="40" y="200" class="node-text">1</text>
+        <circle cx="120" cy="200" r="24" class="node-circle"/>
+        <text x="120" y="200" class="node-text">6</text>
+        <circle cx="290" cy="200" r="24" class="node-circle"/>
+        <text x="290" y="200" class="node-text">14</text>
+        <!-- Step 1: visit 8, path to 12 -->
+        <g class="nf-step" data-nf-step="1" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="160" y1="48" x2="240" y2="125" class="search-path"/>
+          <text x="208" y="38" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">9 &gt; 8 &rarr; RIGHT</text>
+        </g>
+        <!-- Step 2: visit 12, path to None -->
+        <g class="nf-step" data-nf-step="2" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="240" y1="125" x2="200" y2="210" stroke="var(--red)" stroke-width="3" stroke-dasharray="6,4"/>
+          <text x="165" y="145" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">9 &lt; 12 &rarr; LEFT</text>
+        </g>
+        <!-- Step 3: None indicator -->
+        <g class="nf-step" data-nf-step="3" style="opacity:0; transition: opacity 0.4s;">
+          <text x="200" y="225" style="font-family:'Fira Code',monospace; font-size:16px; fill:var(--red); font-weight:700; text-anchor:middle;">None</text>
+          <text x="200" y="248" style="font-family:'Inter'; font-size:13px; fill:var(--red); font-weight:600; text-anchor:middle;">return False</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>10 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 10: Pair Practice Search (KEEP) ==================== -->
+<div class="slide" id="slide-10">
+  <h2>Your Turn: Trace a Search</h2>
+  <div class="two-col">
+    <div>
+      <div class="activity-box">
+        <div class="label">Class Activity</div>
+        <strong style="font-size:1.2em;">Search for key 13</strong> on this tree.<br><br>
+        I'll call on someone to walk us through it:<br>
+        &bull; Which node do we visit first?<br>
+        &bull; Compare 13 to that node &mdash; which way do we go?<br>
+        &bull; What invariant fact justifies that move?
+      </div>
+      <div style="margin-top:16px;">
+        <h3 class="reveal-step">Solution</h3>
+        <table class="trace-table">
+          <tr><th>Step</th><th>At node</th><th>Compare</th><th>Go</th></tr>
+          <tr class="reveal-step" data-reveal-action="pp-step-1"><td>1</td><td>8</td><td>13 &gt; 8</td><td>Right</td></tr>
+          <tr class="reveal-step" data-reveal-action="pp-step-2"><td>2</td><td>12</td><td>13 &gt; 12</td><td>Right</td></tr>
+          <tr class="reveal-step" data-reveal-action="pp-step-3"><td>3</td><td>15</td><td>13 &lt; 15</td><td>Left</td></tr>
+          <tr class="reveal-step" data-reveal-action="pp-step-4"><td>4</td><td>13</td><td>13 == 13</td><td style="color:var(--green); font-weight:700;">Found!</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="tree-diagram">
+      <svg width="440" height="340" viewBox="0 0 440 340">
+        <!-- All edges -->
+        <line x1="160" y1="50" x2="80" y2="130" class="edge-line"/>
+        <line x1="160" y1="50" x2="240" y2="130" class="edge-line"/>
+        <line x1="80" y1="130" x2="40" y2="210" class="edge-line"/>
+        <line x1="80" y1="130" x2="120" y2="210" class="edge-line"/>
+        <line x1="240" y1="130" x2="200" y2="210" class="edge-line"/>
+        <line x1="240" y1="130" x2="280" y2="210" class="edge-line"/>
+        <line x1="280" y1="210" x2="255" y2="285" class="edge-line"/>
+        <line x1="280" y1="210" x2="305" y2="285" class="edge-line"/>
+        <!-- All nodes (start plain) -->
+        <circle cx="160" cy="50" r="26" class="node-circle" id="pp-n8"/>
+        <text x="160" y="50" class="node-text" style="font-size:20px;">8</text>
+        <circle cx="80" cy="130" r="24" class="node-circle"/>
+        <text x="80" y="130" class="node-text">3</text>
+        <circle cx="240" cy="130" r="24" class="node-circle" id="pp-n12"/>
+        <text x="240" y="130" class="node-text">12</text>
+        <circle cx="40" cy="210" r="24" class="node-circle"/>
+        <text x="40" y="210" class="node-text">1</text>
+        <circle cx="120" cy="210" r="24" class="node-circle"/>
+        <text x="120" y="210" class="node-text">6</text>
+        <circle cx="200" cy="210" r="24" class="node-circle"/>
+        <text x="200" y="210" class="node-text">10</text>
+        <circle cx="280" cy="210" r="24" class="node-circle" id="pp-n15"/>
+        <text x="280" y="210" class="node-text">15</text>
+        <circle cx="255" cy="285" r="24" class="node-circle" id="pp-n13"/>
+        <text x="255" y="285" class="node-text" id="pp-n13-text">13</text>
+        <circle cx="305" cy="285" r="24" class="node-circle"/>
+        <text x="305" y="285" class="node-text">20</text>
+        <!-- Step annotations -->
+        <g class="pp-step" data-pp-step="1" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="160" y1="50" x2="240" y2="130" class="search-path"/>
+          <text x="270" y="72" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">13 &gt; 8 &rarr; RIGHT</text>
+        </g>
+        <g class="pp-step" data-pp-step="2" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="240" y1="130" x2="280" y2="210" class="search-path"/>
+          <text x="310" y="168" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">13 &gt; 12 &rarr; RIGHT</text>
+        </g>
+        <g class="pp-step" data-pp-step="3" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="280" y1="210" x2="255" y2="285" class="search-path"/>
+          <text x="320" y="248" style="font-family:'Inter'; font-size:12px; fill:var(--accent); font-weight:600;">13 &lt; 15 &rarr; LEFT</text>
+        </g>
+        <g class="pp-step" data-pp-step="4" style="opacity:0; transition: opacity 0.4s;">
+          <text x="290" y="298" style="font-family:'Inter'; font-size:14px; fill:var(--green); font-weight:700;">Found!</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>11 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 11: Insertion Algorithm (KEEP) ==================== -->
+<div class="slide" id="slide-11">
+  <h2>Insertion Algorithm</h2>
+  <div class="two-col">
+    <div>
+      <p style="font-size:1.1em; margin-bottom:10px;">
+        <strong>Insertion = search until you fall off</strong>, then attach a new leaf there.
+      </p>
+      <div class="code-block"><span class="kw">def</span> <span class="fn">insert</span>(<span class="pr">node</span>, <span class="pr">key</span>):
+    <span class="kw">if</span> node <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span> <span class="fn">Node</span>(key)  <span class="cm"># new leaf!</span>
+
+    <span class="kw">if</span> key <span class="op">&lt;</span> node.key:
+        node.<span class="pr">left</span> = <span class="fn">insert</span>(node.<span class="pr">left</span>, key)
+    <span class="kw">else</span>:             <span class="cm"># key &ge; node.key</span>
+        node.<span class="pr">right</span> = <span class="fn">insert</span>(node.<span class="pr">right</span>, key)
+
+    <span class="kw">return</span> node</div>
+      <div class="reveal-step" style="background:#E8DAEF; border-radius:10px; padding:14px 18px; margin-top:10px; font-size:1em;">
+        <strong>Convention:</strong> duplicates go right (&ge;). The exact choice doesn't matter as long as you're <em>consistent</em>. This is a specification/design decision.
+      </div>
+    </div>
+    <div>
+      <h3>Example: insert 5</h3>
+      <svg width="380" height="310" viewBox="0 0 380 310">
+        <!-- All edges -->
+        <line x1="160" y1="40" x2="80" y2="120" class="edge-line"/>
+        <line x1="160" y1="40" x2="240" y2="120" class="edge-line"/>
+        <line x1="80" y1="120" x2="40" y2="200" class="edge-line"/>
+        <line x1="80" y1="120" x2="120" y2="200" class="edge-line"/>
+        <!-- Nodes (start plain) -->
+        <circle cx="160" cy="40" r="24" class="node-circle" id="ins-n8"/>
+        <text x="160" y="40" class="node-text">8</text>
+        <circle cx="80" cy="120" r="24" class="node-circle" id="ins-n3"/>
+        <text x="80" y="120" class="node-text">3</text>
+        <circle cx="240" cy="120" r="24" class="node-circle"/>
+        <text x="240" y="120" class="node-text">12</text>
+        <circle cx="40" cy="200" r="24" class="node-circle"/>
+        <text x="40" y="200" class="node-text">1</text>
+        <circle cx="120" cy="200" r="24" class="node-circle" id="ins-n6"/>
+        <text x="120" y="200" class="node-text">6</text>
+        <!-- New node 5 (hidden initially) -->
+        <circle cx="95" cy="272" r="24" class="node-circle" id="ins-n5" style="opacity:0; transition: opacity 0.4s;"/>
+        <text x="95" y="272" class="node-text" id="ins-n5-text" style="opacity:0; transition: opacity 0.4s;">5</text>
+        <!-- Step annotations -->
+        <g class="ins-step" data-ins-step="1" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="160" y1="40" x2="80" y2="120" class="search-path"/>
+          <text x="200" y="32" style="font-family:'Inter'; font-size:11px; fill:var(--accent); font-weight:600;">5 &lt; 8 &rarr; LEFT</text>
+        </g>
+        <g class="ins-step" data-ins-step="2" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="80" y1="120" x2="120" y2="200" class="search-path"/>
+          <text x="48" y="98" style="font-family:'Inter'; font-size:11px; fill:var(--accent); font-weight:600;">5 &gt; 3 &rarr; RIGHT</text>
+        </g>
+        <g class="ins-step" data-ins-step="3" style="opacity:0; transition: opacity 0.4s;">
+          <text x="142" y="192" style="font-family:'Inter'; font-size:11px; fill:var(--accent); font-weight:600;">5 &lt; 6 &rarr; LEFT</text>
+        </g>
+        <g class="ins-step" data-ins-step="4" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="120" y1="200" x2="95" y2="272" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="5,3"/>
+          <text x="130" y="268" style="font-family:'Inter'; font-size:12px; fill:var(--green); font-weight:700;">null &rarr; attach!</text>
+        </g>
+      </svg>
+      <table class="trace-table" style="font-size:0.88em;">
+        <tr><th>Step</th><th>At node</th><th>Compare</th><th>Go</th></tr>
+        <tr class="reveal-step" data-reveal-action="ins-step-1"><td>1</td><td>8</td><td>5 &lt; 8</td><td>Left</td></tr>
+        <tr class="reveal-step" data-reveal-action="ins-step-2"><td>2</td><td>3</td><td>5 &gt; 3</td><td>Right</td></tr>
+        <tr class="reveal-step" data-reveal-action="ins-step-3"><td>3</td><td>6</td><td>5 &lt; 6</td><td>Left</td></tr>
+        <tr class="reveal-step" data-reveal-action="ins-step-4"><td>4</td><td>null</td><td>&mdash;</td><td style="color:var(--green); font-weight:700;">Create node(5)</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>12 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 12: Pair Practice Insert Two (NEW) ==================== -->
+<div class="slide" id="slide-12">
+  <h2>Your Turn: Insert Two Keys</h2>
+  <div class="two-col">
+    <div>
+      <div class="activity-box">
+        <div class="label">Pair Activity &mdash; 3 minutes</div>
+        Starting with this tree, insert <strong style="font-size:1.2em;">9</strong> then <strong style="font-size:1.2em;">2</strong>.<br><br>
+        For each insertion:<br>
+        &bull; Write the comparison decisions<br>
+        &bull; Draw the result after each insert<br>
+        &bull; Where does each new node attach?
+      </div>
+      <div style="margin-top:14px;">
+        <h3 class="reveal-step">Solution</h3>
+        <table class="trace-table" style="font-size:0.85em;">
+          <tr class="reveal-step" data-reveal-action="ins2-step-1"><th colspan="4" style="background:var(--accent2);">Insert 9</th></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-2"><td>1</td><td>8</td><td>9 &gt; 8</td><td>Right</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-3"><td>2</td><td>12</td><td>9 &lt; 12</td><td>Left</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-4"><td>3</td><td>10</td><td>9 &lt; 10</td><td>Left</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-5"><td>4</td><td>None</td><td>&mdash;</td><td style="color:var(--green);">Attach left of 10</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-6"><th colspan="4" style="background:var(--accent2);">Insert 2</th></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-7"><td>1</td><td>8</td><td>2 &lt; 8</td><td>Left</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-8"><td>2</td><td>3</td><td>2 &lt; 3</td><td>Left</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-9"><td>3</td><td>1</td><td>2 &gt; 1</td><td>Right</td></tr>
+          <tr class="reveal-step" data-reveal-action="ins2-step-10"><td>4</td><td>None</td><td>&mdash;</td><td style="color:var(--green);">Attach right of 1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="tree-diagram">
+      <svg width="440" height="370" viewBox="0 0 440 370">
+        <!-- Original edges -->
+        <line x1="180" y1="50" x2="90" y2="130" class="edge-line"/>
+        <line x1="180" y1="50" x2="270" y2="130" class="edge-line"/>
+        <line x1="90" y1="130" x2="45" y2="210" class="edge-line"/>
+        <line x1="90" y1="130" x2="135" y2="210" class="edge-line"/>
+        <line x1="270" y1="130" x2="225" y2="210" class="edge-line"/>
+        <line x1="270" y1="130" x2="315" y2="210" class="edge-line"/>
+        <line x1="315" y1="210" x2="292" y2="285" class="edge-line"/>
+        <line x1="315" y1="210" x2="338" y2="285" class="edge-line"/>
+        <!-- Original nodes -->
+        <circle cx="180" cy="50" r="24" class="node-circle" id="ins2-n8"/>
+        <text x="180" y="50" class="node-text" style="font-size:18px;">8</text>
+        <circle cx="90" cy="130" r="24" class="node-circle" id="ins2-n3"/>
+        <text x="90" y="130" class="node-text">3</text>
+        <circle cx="270" cy="130" r="24" class="node-circle" id="ins2-n12"/>
+        <text x="270" y="130" class="node-text">12</text>
+        <circle cx="45" cy="210" r="24" class="node-circle" id="ins2-n1"/>
+        <text x="45" y="210" class="node-text">1</text>
+        <circle cx="135" cy="210" r="24" class="node-circle"/>
+        <text x="135" y="210" class="node-text">6</text>
+        <circle cx="225" cy="210" r="24" class="node-circle" id="ins2-n10"/>
+        <text x="225" y="210" class="node-text">10</text>
+        <circle cx="315" cy="210" r="24" class="node-circle"/>
+        <text x="315" y="210" class="node-text">15</text>
+        <circle cx="292" cy="285" r="24" class="node-circle"/>
+        <text x="292" y="285" class="node-text">13</text>
+        <circle cx="338" cy="285" r="24" class="node-circle"/>
+        <text x="338" y="285" class="node-text">20</text>
+        <!-- New node 9 (hidden) -->
+        <g id="ins2-new9" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="225" y1="210" x2="200" y2="285" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="5,3"/>
+          <circle cx="200" cy="285" r="22" class="new-node"/>
+          <text x="200" y="285" class="node-text" fill="var(--green)">9</text>
+        </g>
+        <!-- New node 2 (hidden) -->
+        <g id="ins2-new2" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="45" y1="210" x2="68" y2="285" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="5,3"/>
+          <circle cx="68" cy="285" r="22" class="new-node"/>
+          <text x="68" y="285" class="node-text" fill="var(--green)">2</text>
+        </g>
+        <!-- Step annotations for insert 9 -->
+        <g class="ins2-step" data-ins2-step="2" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="180" y1="50" x2="270" y2="130" class="search-path"/>
+          <text x="240" y="72" style="font-family:'Inter'; font-size:11px; fill:var(--accent); font-weight:600;">9 &gt; 8 &rarr; RIGHT</text>
+        </g>
+        <g class="ins2-step" data-ins2-step="3" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="270" y1="130" x2="225" y2="210" class="search-path"/>
+          <text x="265" y="168" style="font-family:'Inter'; font-size:11px; fill:var(--accent); font-weight:600;">9 &lt; 12 &rarr; LEFT</text>
+        </g>
+        <g class="ins2-step" data-ins2-step="4" style="opacity:0; transition: opacity 0.4s;">
+          <text x="250" y="228" style="font-family:'Inter'; font-size:11px; fill:var(--accent); font-weight:600;">9 &lt; 10 &rarr; LEFT</text>
+        </g>
+        <!-- Step annotations for insert 2 -->
+        <g class="ins2-step" data-ins2-step="7" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="180" y1="50" x2="90" y2="130" class="search-path"/>
+          <text x="115" y="72" style="font-family:'Inter'; font-size:11px; fill:var(--accent2); font-weight:600;">2 &lt; 8 &rarr; LEFT</text>
+        </g>
+        <g class="ins2-step" data-ins2-step="8" style="opacity:0; transition: opacity 0.4s;">
+          <line x1="90" y1="130" x2="45" y2="210" class="search-path"/>
+          <text x="40" y="168" style="font-family:'Inter'; font-size:11px; fill:var(--accent2); font-weight:600;">2 &lt; 3 &rarr; LEFT</text>
+        </g>
+        <g class="ins2-step" data-ins2-step="9" style="opacity:0; transition: opacity 0.4s;">
+          <text x="68" y="228" style="font-family:'Inter'; font-size:11px; fill:var(--accent2); font-weight:600;">2 &gt; 1 &rarr; RIGHT</text>
+        </g>
+        <text x="220" y="14" style="font-family:'Inter'; font-size:13px; fill:var(--gray); text-anchor:middle; font-style:italic;">Use this tree for both insertions</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>13 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 13: BST Node Class (NEW) ==================== -->
+<div class="slide" id="slide-13">
+  <h2>BST Node: From Pseudocode to Python</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:start; flex:1;">
+    <div>
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:center; margin-bottom:20px;">
+        <svg width="140" height="130" viewBox="0 0 140 130">
+          <rect x="10" y="10" width="120" height="110" rx="14" fill="white" stroke="var(--accent)" stroke-width="2.5"/>
+          <line x1="10" y1="42" x2="130" y2="42" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <line x1="10" y1="72" x2="130" y2="72" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="70" y="30" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--accent); text-anchor:middle; font-weight:700;">key | value</text>
+          <text x="42" y="60" style="font-family:'Fira Code',monospace; font-size:12px; fill:var(--fg); text-anchor:middle;">left</text>
+          <text x="98" y="60" style="font-family:'Fira Code',monospace; font-size:12px; fill:var(--fg); text-anchor:middle;">right</text>
+          <circle cx="42" cy="95" r="8" fill="none" stroke="#999" stroke-width="1.5"/>
+          <text x="42" y="98" style="font-size:8px; fill:#999; text-anchor:middle;">L</text>
+          <circle cx="98" cy="95" r="8" fill="none" stroke="#999" stroke-width="1.5"/>
+          <text x="98" y="98" style="font-size:8px; fill:#999; text-anchor:middle;">R</text>
+          <line x1="42" y1="72" x2="42" y2="87" stroke="#999" stroke-width="1.5"/>
+          <line x1="98" y1="72" x2="98" y2="87" stroke="#999" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <div style="font-size:1.05em; line-height:1.7;">
+            <strong style="color:var(--accent);">key</strong> &mdash; what we compare on<br>
+            <strong style="color:var(--accent2);">value</strong> &mdash; associated data<br>
+            <strong>left</strong> / <strong>right</strong> &mdash; child pointers
+          </div>
+        </div>
+      </div>
+      <div class="code-block" style="font-size:0.95em;"><span class="kw">class</span> <span class="fn">BSTNode</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="pr">self</span>, <span class="pr">key</span>, <span class="pr">value</span>=<span class="op">None</span>):
+        <span class="pr">self</span>.key   = key
+        <span class="pr">self</span>.value = value
+        <span class="pr">self</span>.left  = <span class="op">None</span>
+        <span class="pr">self</span>.right = <span class="op">None</span></div>
+    </div>
+    <div>
+      <div class="reveal-step">
+        <h3 style="margin-top:0;">Search in Real Python</h3>
+        <div class="code-block" style="font-size:0.95em;"><span class="kw">def</span> <span class="fn">search</span>(<span class="pr">node</span>, <span class="pr">key</span>):
+    <span class="kw">if</span> node <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span> <span class="op">None</span>
+    <span class="kw">if</span> key <span class="op">==</span> node.key:
+        <span class="kw">return</span> node.value
+    <span class="kw">elif</span> key <span class="op">&lt;</span> node.key:
+        <span class="kw">return</span> <span class="fn">search</span>(node.left, key)
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="fn">search</span>(node.right, key)</div>
+      </div>
+      <div class="reveal-step" style="background:linear-gradient(135deg,#E8DAEF,#D4E6F1); border-radius:14px; padding:18px 24px; margin-top:16px;">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:600; margin-bottom:8px;">Pseudocode &rarr; Real Code</div>
+        <div style="font-family:'Fira Code',monospace; font-size:0.95em; line-height:1.8;">
+          node.key &nbsp;&rarr; self.key<br>
+          node.left &rarr; self.left<br>
+          Node(key) &rarr; BSTNode(key, value)
+        </div>
+        <div style="margin-top:12px; font-size:0.95em; color:var(--accent); font-weight:600;">
+          This is what you'll implement in lab.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>14 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 14: Insertion Order + Shape ==================== -->
+<div class="slide" id="slide-14">
+  <h2>Insertion Order Determines Shape</h2>
+  <div class="two-col">
+    <div>
+      <p style="font-size:1.15em; margin-bottom:16px;">
+        The <strong>same keys</strong> inserted in a different order produce <strong>different trees</strong> with different heights.
+      </p>
+      <div class="activity-box" style="margin-bottom:16px; font-size:1.05em;">
+        <div class="label">Think about it</div>
+        Insert <strong>1, 2, 3, 4, 5</strong> starting from empty. What does the tree look like?
+      </div>
+      <div class="reveal-step" style="background:white; border-radius:12px; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,0.06); text-align:center; border-top:4px solid var(--red);">
+        <div style="font-weight:700; margin-bottom:8px; font-size:1.1em;">Insert 1, 2, 3, 4, 5</div>
+        <svg width="140" height="170" viewBox="0 0 140 170">
+          <line x1="30" y1="18" x2="50" y2="48" class="edge-line"/>
+          <line x1="50" y1="48" x2="70" y2="78" class="edge-line"/>
+          <line x1="70" y1="78" x2="90" y2="108" class="edge-line"/>
+          <line x1="90" y1="108" x2="110" y2="138" class="edge-line"/>
+          <circle cx="30" cy="18" r="14" class="node-circle"/><text x="30" y="18" class="node-text" style="font-size:12px;">1</text>
+          <circle cx="50" cy="48" r="14" class="node-circle"/><text x="50" y="48" class="node-text" style="font-size:12px;">2</text>
+          <circle cx="70" cy="78" r="14" class="node-circle"/><text x="70" y="78" class="node-text" style="font-size:12px;">3</text>
+          <circle cx="90" cy="108" r="14" class="node-circle"/><text x="90" y="108" class="node-text" style="font-size:12px;">4</text>
+          <circle cx="110" cy="138" r="14" class="node-circle"/><text x="110" y="138" class="node-text" style="font-size:12px;">5</text>
+        </svg>
+        <div style="color:var(--red); font-weight:700; font-size:1.1em;">Chain! h = 4 &mdash; basically a linked list</div>
+      </div>
+    </div>
+    <div>
+      <div class="reveal-step">
+        <div class="activity-box" style="margin-bottom:16px; font-size:1.05em;">
+          <div class="label">Now try</div>
+          Insert <strong>4, 2, 6, 1, 3, 5, 7</strong> starting from empty. What does the tree look like?
+        </div>
+      </div>
+      <div class="reveal-step">
+        <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,0.06); text-align:center; border-top:4px solid var(--green);">
+          <div style="font-weight:700; margin-bottom:8px; font-size:1.1em;">Insert 4, 2, 6, 1, 3, 5, 7</div>
+          <svg width="200" height="140" viewBox="0 0 200 140">
+            <line x1="100" y1="22" x2="52" y2="60" class="edge-line"/>
+            <line x1="100" y1="22" x2="148" y2="60" class="edge-line"/>
+            <line x1="52" y1="60" x2="28" y2="105" class="edge-line"/>
+            <line x1="52" y1="60" x2="76" y2="105" class="edge-line"/>
+            <line x1="148" y1="60" x2="124" y2="105" class="edge-line"/>
+            <line x1="148" y1="60" x2="172" y2="105" class="edge-line"/>
+            <circle cx="100" cy="22" r="16" class="node-circle"/><text x="100" y="22" class="node-text" style="font-size:13px;">4</text>
+            <circle cx="52" cy="60" r="16" class="node-circle"/><text x="52" y="60" class="node-text" style="font-size:13px;">2</text>
+            <circle cx="148" cy="60" r="16" class="node-circle"/><text x="148" y="60" class="node-text" style="font-size:13px;">6</text>
+            <circle cx="28" cy="105" r="16" class="node-circle"/><text x="28" y="105" class="node-text" style="font-size:13px;">1</text>
+            <circle cx="76" cy="105" r="16" class="node-circle"/><text x="76" y="105" class="node-text" style="font-size:13px;">3</text>
+            <circle cx="124" cy="105" r="16" class="node-circle"/><text x="124" y="105" class="node-text" style="font-size:13px;">5</text>
+            <circle cx="172" cy="105" r="16" class="node-circle"/><text x="172" y="105" class="node-text" style="font-size:13px;">7</text>
+          </svg>
+          <div style="color:var(--green); font-weight:700; font-size:1.1em;">Balanced! h = 2</div>
+        </div>
+      </div>
+      <div class="reveal-step" style="background:linear-gradient(135deg,#1a1a2e,#0f3460); color:white; border-radius:14px; padding:18px 24px; text-align:center; margin-top:20px; font-size:1.1em; line-height:1.6;">
+        <strong>Same keys, different order &rarr; different shape!</strong><br>
+        Insertion order determines the tree's height.
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>15 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 15: Finding Min and Max (NEW) ==================== -->
+<div class="slide" id="slide-15">
+  <h2>Finding Min and Max</h2>
+  <div class="two-col">
+    <div>
+      <div class="property-box" style="font-size:1.15em;">
+        <strong>Smallest key:</strong> always go <strong>left</strong> until you can't.<br>
+        <strong>Largest key:</strong> always go <strong>right</strong> until you can't.
+      </div>
+      <div class="code-block" style="font-size:0.95em;"><span class="kw">def</span> <span class="fn">find_min</span>(<span class="pr">node</span>):
+    <span class="kw">if</span> node.<span class="pr">left</span> <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span> node.key
+    <span class="kw">return</span> <span class="fn">find_min</span>(node.<span class="pr">left</span>)
+
+<span class="kw">def</span> <span class="fn">find_max</span>(<span class="pr">node</span>):
+    <span class="kw">if</span> node.<span class="pr">right</span> <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span> node.key
+    <span class="kw">return</span> <span class="fn">find_max</span>(node.<span class="pr">right</span>)</div>
+      <div class="reveal-step" style="background:#E8DAEF; border-radius:10px; padding:14px 18px; margin-top:10px; font-size:1em;">
+        <strong>Why does this work?</strong> The invariant guarantees everything smaller is to the left. So the leftmost node has no smaller keys anywhere in the tree.
+      </div>
+    </div>
+    <div class="tree-diagram">
+      <svg width="340" height="320" viewBox="0 0 340 320">
+        <!-- Edges -->
+        <line x1="170" y1="50" x2="85" y2="130" class="edge-line"/>
+        <line x1="170" y1="50" x2="255" y2="130" class="edge-line"/>
+        <line x1="85" y1="130" x2="42" y2="210" class="edge-line"/>
+        <line x1="85" y1="130" x2="128" y2="210" class="edge-line"/>
+        <line x1="255" y1="130" x2="298" y2="210" class="edge-line"/>
+        <line x1="128" y1="210" x2="106" y2="280" class="edge-line"/>
+        <!-- Min path -->
+        <line x1="170" y1="50" x2="85" y2="130" class="search-path"/>
+        <line x1="85" y1="130" x2="42" y2="210" class="search-path"/>
+        <!-- Min label -->
+        <text x="42" y="248" style="font-family:'Inter'; font-size:14px; fill:var(--green); font-weight:700; text-anchor:middle;">MIN = 1</text>
+        <!-- Max path (dashed blue) -->
+        <line x1="170" y1="50" x2="255" y2="130" stroke="var(--accent2)" stroke-width="3" stroke-dasharray="6,4"/>
+        <line x1="255" y1="130" x2="298" y2="210" stroke="var(--accent2)" stroke-width="3" stroke-dasharray="6,4"/>
+        <!-- Max label -->
+        <text x="298" y="248" style="font-family:'Inter'; font-size:14px; fill:var(--accent2); font-weight:700; text-anchor:middle;">MAX = 14</text>
+        <!-- Nodes -->
+        <circle cx="170" cy="50" r="24" class="node-circle"/>
+        <text x="170" y="50" class="node-text">8</text>
+        <circle cx="85" cy="130" r="24" class="highlight-node"/>
+        <text x="85" y="130" class="node-text">3</text>
+        <circle cx="255" cy="130" r="24" style="fill:#D4E6F1; stroke:var(--accent2); stroke-width:3;"/>
+        <text x="255" y="130" class="node-text">12</text>
+        <circle cx="42" cy="210" r="24" class="new-node"/>
+        <text x="42" y="210" class="node-text" fill="var(--green)">1</text>
+        <circle cx="128" cy="210" r="24" class="node-circle"/>
+        <text x="128" y="210" class="node-text">6</text>
+        <circle cx="298" cy="210" r="24" style="fill:#D4E6F1; stroke:var(--accent2); stroke-width:3;"/>
+        <text x="298" y="210" class="node-text">14</text>
+        <circle cx="106" cy="280" r="24" class="node-circle"/>
+        <text x="106" y="280" class="node-text">5</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>16 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 16: In-Order Traversal (NEW) ==================== -->
+<div class="slide" id="slide-16">
+  <h2>In-Order Traversal: Sorted Output!</h2>
+  <div class="two-col">
+    <div>
+      <div class="property-box" style="font-size:1.1em;">
+        Visit <strong>left subtree</strong>, then <strong>current node</strong>, then <strong>right subtree</strong>.<br>
+        Result: keys come out <strong>sorted</strong>!
+      </div>
+      <div class="code-block" style="font-size:0.95em;"><span class="kw">def</span> <span class="fn">in_order</span>(<span class="pr">node</span>):
+    <span class="kw">if</span> node <span class="kw">is</span> <span class="op">None</span>:
+        <span class="kw">return</span>
+    <span class="fn">in_order</span>(node.<span class="pr">left</span>)
+    <span class="fn">print</span>(node.key)
+    <span class="fn">in_order</span>(node.<span class="pr">right</span>)</div>
+      <h3>Trace on our tree <span style="font-size:0.7em; color:var(--gray);">(click through)</span></h3>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;">
+        <span class="reveal-step" data-reveal-action="iot-step-1" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">1</span>
+        <span class="reveal-step" data-reveal-action="iot-step-2" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">3</span>
+        <span class="reveal-step" data-reveal-action="iot-step-3" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">5</span>
+        <span class="reveal-step" data-reveal-action="iot-step-4" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">6</span>
+        <span class="reveal-step" data-reveal-action="iot-step-5" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">8</span>
+        <span class="reveal-step" data-reveal-action="iot-step-6" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">12</span>
+        <span class="reveal-step" data-reveal-action="iot-step-7" style="background:var(--accent-light); padding:6px 14px; border-radius:8px; font-weight:700; font-family:'Fira Code',monospace;">14</span>
+      </div>
+      <div class="reveal-step" style="font-size:1em; color:var(--green); font-weight:600;">Sorted! This is O(n) &mdash; we visit every node once.</div>
+      <div class="reveal-step" style="background:linear-gradient(135deg,#1a1a2e,#0f3460); color:white; border-radius:12px; padding:14px 18px; text-align:center; margin-top:10px; font-size:1em;">
+        This is WHY BSTs maintain order &mdash;<br>
+        <strong>hash tables CAN'T do this!</strong>
+      </div>
+    </div>
+    <div class="tree-diagram">
+      <svg width="340" height="320" viewBox="0 0 340 320">
+        <!-- Edges -->
+        <line x1="170" y1="50" x2="85" y2="130" class="edge-line"/>
+        <line x1="170" y1="50" x2="255" y2="130" class="edge-line"/>
+        <line x1="85" y1="130" x2="42" y2="210" class="edge-line"/>
+        <line x1="85" y1="130" x2="128" y2="210" class="edge-line"/>
+        <line x1="255" y1="130" x2="298" y2="210" class="edge-line"/>
+        <line x1="128" y1="210" x2="106" y2="280" class="edge-line"/>
+        <!-- Visit order labels (hidden, revealed per step) -->
+        <g class="iot-step" data-iot-step="1" style="opacity:0; transition: opacity 0.4s;">
+          <text x="18" y="240" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(1st)</text>
+        </g>
+        <g class="iot-step" data-iot-step="2" style="opacity:0; transition: opacity 0.4s;">
+          <text x="60" y="160" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(2nd)</text>
+        </g>
+        <g class="iot-step" data-iot-step="3" style="opacity:0; transition: opacity 0.4s;">
+          <text x="82" y="305" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(3rd)</text>
+        </g>
+        <g class="iot-step" data-iot-step="4" style="opacity:0; transition: opacity 0.4s;">
+          <text x="148" y="230" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(4th)</text>
+        </g>
+        <g class="iot-step" data-iot-step="5" style="opacity:0; transition: opacity 0.4s;">
+          <text x="190" y="58" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(5th)</text>
+        </g>
+        <g class="iot-step" data-iot-step="6" style="opacity:0; transition: opacity 0.4s;">
+          <text x="275" y="140" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(6th)</text>
+        </g>
+        <g class="iot-step" data-iot-step="7" style="opacity:0; transition: opacity 0.4s;">
+          <text x="310" y="240" style="font-family:'Fira Code',monospace; font-size:13px; fill:var(--green); font-weight:700;">(7th)</text>
+        </g>
+        <!-- Nodes (start plain) -->
+        <circle cx="42" cy="210" r="24" class="node-circle" id="iot-n1"/>
+        <text x="42" y="210" class="node-text">1</text>
+        <circle cx="85" cy="130" r="24" class="node-circle" id="iot-n3"/>
+        <text x="85" y="130" class="node-text">3</text>
+        <circle cx="106" cy="280" r="24" class="node-circle" id="iot-n5"/>
+        <text x="106" y="280" class="node-text">5</text>
+        <circle cx="128" cy="210" r="24" class="node-circle" id="iot-n6"/>
+        <text x="128" y="210" class="node-text">6</text>
+        <circle cx="170" cy="50" r="24" class="node-circle" id="iot-n8"/>
+        <text x="170" y="50" class="node-text">8</text>
+        <circle cx="255" cy="130" r="24" class="node-circle" id="iot-n12"/>
+        <text x="255" y="130" class="node-text">12</text>
+        <circle cx="298" cy="210" r="24" class="node-circle" id="iot-n14"/>
+        <text x="298" y="210" class="node-text">14</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>17 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 17: Deletion Three Cases (NEW) ==================== -->
+<div class="slide" id="slide-17">
+  <h2>Deletion: Three Cases</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; flex:1; align-items:start;">
+    <!-- Case 1: Leaf -->
+    <div class="reveal-step" style="background:white; border-radius:14px; padding:18px 20px; box-shadow:0 3px 16px rgba(0,0,0,0.07); border-top:4px solid var(--green);">
+      <h3 style="font-size:1.1em; margin:0 0 8px 0;">Case 1: Leaf</h3>
+      <p style="font-size:0.95em; color:#555; margin-bottom:10px;">No children &rarr; just remove it.</p>
+      <div style="text-align:center;">
+        <svg width="160" height="140" viewBox="0 0 160 140">
+          <!-- Before -->
+          <line x1="50" y1="25" x2="25" y2="70" class="edge-line"/>
+          <line x1="50" y1="25" x2="75" y2="70" class="edge-line" id="del1-edge" style="transition: opacity 0.4s;"/>
+          <circle cx="50" cy="25" r="16" class="node-circle"/><text x="50" y="25" class="node-text" style="font-size:13px;">8</text>
+          <circle cx="25" cy="70" r="16" class="node-circle"/><text x="25" y="70" class="node-text" style="font-size:13px;">4</text>
+          <circle cx="75" cy="70" r="16" class="node-circle" id="del1-node" style="transition: all 0.5s;"/><text x="75" y="70" class="node-text" style="font-size:13px; transition: all 0.5s;" id="del1-text">11</text>
+          <!-- X mark (hidden) -->
+          <g id="del1-x" style="opacity:0; transition: opacity 0.4s;">
+            <line x1="62" y1="83" x2="88" y2="57" stroke="var(--red)" stroke-width="3"/>
+            <line x1="88" y1="83" x2="62" y2="57" stroke="var(--red)" stroke-width="3"/>
+          </g>
+          <!-- Result label -->
+          <text x="80" y="125" id="del1-result" style="font-family:'Inter'; font-size:11px; fill:var(--green); text-anchor:middle; font-weight:600; opacity:0; transition: opacity 0.4s;">Done! Just removed.</text>
+        </svg>
+      </div>
+      <div style="text-align:center; font-size:0.95em; margin-top:4px;">
+        <span style="color:var(--red); font-weight:600;">Delete 11</span>
+        <button onclick="animateDelete1()" style="margin-left:8px; background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Animate</button>
+        <button onclick="resetDelete1()" style="margin-left:4px; background:var(--gray); color:white; border:none; padding:4px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Reset</button>
+      </div>
+    </div>
+    <!-- Case 2: One child -->
+    <div class="reveal-step" style="background:white; border-radius:14px; padding:18px 20px; box-shadow:0 3px 16px rgba(0,0,0,0.07); border-top:4px solid var(--orange);">
+      <h3 style="font-size:1.1em; margin:0 0 8px 0;">Case 2: One Child</h3>
+      <p style="font-size:0.95em; color:#555; margin-bottom:10px;">Replace node with its only child.</p>
+      <div style="text-align:center;">
+        <svg width="160" height="140" viewBox="0 0 160 140">
+          <line x1="80" y1="25" x2="45" y2="70" class="edge-line" id="del2-edge-old" style="transition: opacity 0.4s;"/>
+          <line x1="45" y1="70" x2="25" y2="110" class="edge-line" id="del2-edge-child" style="transition: opacity 0.4s;"/>
+          <line x1="80" y1="25" x2="115" y2="70" class="edge-line"/>
+          <!-- Bypass arrow (hidden) -->
+          <path d="M 65 30 Q 30 45 28 95" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="4,3" id="del2-bypass" style="opacity:0; transition: opacity 0.4s;" marker-end="url(#arrowhead-del2)"/>
+          <defs><marker id="arrowhead-del2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--green)"/></marker></defs>
+          <circle cx="80" cy="25" r="16" class="node-circle"/><text x="80" y="25" class="node-text" style="font-size:13px;">15</text>
+          <circle cx="45" cy="70" r="16" class="node-circle" id="del2-node" style="transition: all 0.5s;"/><text x="45" y="70" class="node-text" style="font-size:13px; transition: all 0.5s;" id="del2-text">4</text>
+          <circle cx="25" cy="110" r="16" class="node-circle" id="del2-child"/><text x="25" y="110" class="node-text" style="font-size:13px;">2</text>
+          <circle cx="115" cy="70" r="16" class="node-circle"/><text x="115" y="70" class="node-text" style="font-size:13px;">22</text>
+          <text x="80" y="135" id="del2-result" style="font-family:'Inter'; font-size:11px; fill:var(--green); text-anchor:middle; font-weight:600; opacity:0; transition: opacity 0.4s;">2 replaces 4</text>
+        </svg>
+      </div>
+      <div style="text-align:center; font-size:0.95em; margin-top:4px;">
+        <span style="color:var(--red); font-weight:600;">Delete 4</span>
+        <button onclick="animateDelete2()" style="margin-left:8px; background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Animate</button>
+        <button onclick="resetDelete2()" style="margin-left:4px; background:var(--gray); color:white; border:none; padding:4px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Reset</button>
+      </div>
+    </div>
+    <!-- Case 3: Two children -->
+    <div class="reveal-step" style="background:white; border-radius:14px; padding:18px 20px; box-shadow:0 3px 16px rgba(0,0,0,0.07); border-top:4px solid var(--accent);">
+      <h3 style="font-size:1.1em; margin:0 0 8px 0;">Case 3: Two Children</h3>
+      <p style="font-size:0.95em; color:#555; margin-bottom:10px;">Find <strong>in-order successor</strong>, copy key up, delete successor.</p>
+      <div style="text-align:center;">
+        <svg width="180" height="140" viewBox="0 0 180 140">
+          <line x1="80" y1="20" x2="40" y2="60" class="edge-line"/>
+          <line x1="80" y1="20" x2="130" y2="60" class="edge-line"/>
+          <line x1="130" y1="60" x2="105" y2="105" class="edge-line" id="del3-edge-succ" style="transition: opacity 0.4s;"/>
+          <line x1="130" y1="60" x2="160" y2="105" class="edge-line"/>
+          <circle cx="80" cy="20" r="16" class="node-circle" id="del3-target"/><text x="80" y="20" class="node-text" style="font-size:12px; transition: all 0.3s;" id="del3-target-text">8</text>
+          <circle cx="40" cy="60" r="16" class="node-circle"/><text x="40" y="60" class="node-text" style="font-size:13px;">4</text>
+          <circle cx="130" cy="60" r="16" class="node-circle"/><text x="130" y="60" class="node-text" style="font-size:13px;">11</text>
+          <circle cx="105" cy="105" r="16" class="node-circle" id="del3-succ" style="transition: all 0.5s;"/><text x="105" y="105" class="node-text" style="font-size:12px; transition: all 0.5s;" id="del3-succ-text">9</text>
+          <circle cx="160" cy="105" r="16" class="node-circle"/><text x="160" y="105" class="node-text" style="font-size:13px;">14</text>
+          <!-- Successor arrow (hidden) -->
+          <path d="M 100 90 Q 85 50 82 35" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="4,3" id="del3-arrow" style="opacity:0; transition: opacity 0.4s;" marker-end="url(#arrowhead-del3)"/>
+          <defs><marker id="arrowhead-del3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--green)"/></marker></defs>
+          <text x="72" y="135" id="del3-result" style="font-family:'Inter'; font-size:10px; fill:var(--green); font-weight:600; opacity:0; transition: opacity 0.4s;">Copy 9 up, remove old 9</text>
+        </svg>
+      </div>
+      <div style="text-align:center; font-size:0.95em; margin-top:4px;">
+        <span style="color:var(--red); font-weight:600;">Delete 8</span>
+        <button onclick="animateDelete3()" style="margin-left:8px; background:var(--accent); color:white; border:none; padding:4px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Animate</button>
+        <button onclick="resetDelete3()" style="margin-left:4px; background:var(--gray); color:white; border:none; padding:4px 12px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Reset</button>
+      </div>
+    </div>
+  </div>
+  <div class="reveal-step" style="background:linear-gradient(135deg,#E8DAEF,#D4E6F1); border-radius:12px; padding:14px 22px; margin-top:10px; font-size:1.05em; text-align:center;">
+    <strong>In-order successor</strong> = smallest key in the right subtree = <code>find_min(node.right)</code>.<br>
+    It always has <strong>at most one child</strong> (no left child!), so deleting it is Case 1 or 2.
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>18 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 18: Pair Practice Deletion (NEW) ==================== -->
+<div class="slide" id="slide-18">
+  <h2>Your Turn: Delete a Key</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; flex:1; align-items:start;">
+    <!-- Column 1: Activity + Tree + Solution -->
+    <div>
+      <div class="activity-box" style="font-size:0.95em;">
+        <div class="label">Class Activity</div>
+        <strong style="font-size:1.15em;">Delete key 8</strong> from this tree.<br><br>
+        &bull; Which case is this?<br>
+        &bull; What is the in-order successor?<br>
+        &bull; Draw the final tree.
+      </div>
+      <div style="text-align:center; margin-top:10px;">
+        <svg width="240" height="230" viewBox="0 0 240 230">
+          <line x1="120" y1="25" x2="60" y2="78" class="edge-line"/>
+          <line x1="120" y1="25" x2="180" y2="78" class="edge-line"/>
+          <line x1="60" y1="78" x2="30" y2="135" class="edge-line"/>
+          <line x1="60" y1="78" x2="90" y2="135" class="edge-line"/>
+          <line x1="180" y1="78" x2="150" y2="135" class="edge-line"/>
+          <line x1="180" y1="78" x2="210" y2="135" class="edge-line"/>
+          <line x1="90" y1="135" x2="72" y2="192" class="edge-line"/>
+          <circle cx="120" cy="25" r="17" class="node-circle"/><text x="120" y="25" class="node-text" style="font-size:13px;">15</text>
+          <circle cx="60" cy="78" r="17" style="fill:white; stroke:var(--orange); stroke-width:3;"/><text x="60" y="78" class="node-text" style="font-size:13px; fill:var(--orange);">8</text>
+          <circle cx="180" cy="78" r="17" class="node-circle"/><text x="180" y="78" class="node-text" style="font-size:13px;">22</text>
+          <circle cx="30" cy="135" r="17" class="node-circle"/><text x="30" y="135" class="node-text" style="font-size:13px;">4</text>
+          <circle cx="90" cy="135" r="17" class="node-circle"/><text x="90" y="135" class="node-text" style="font-size:13px;">11</text>
+          <circle cx="150" cy="135" r="17" class="node-circle"/><text x="150" y="135" class="node-text" style="font-size:13px;">18</text>
+          <circle cx="210" cy="135" r="17" class="node-circle"/><text x="210" y="135" class="node-text" style="font-size:13px;">25</text>
+          <circle cx="72" cy="192" r="17" class="node-circle"/><text x="72" y="192" class="node-text" style="font-size:13px;">9</text>
+        </svg>
+      </div>
+      <div class="reveal-step" style="margin-top:8px;">
+        <h3 style="font-size:1.05em;">Solution</h3>
+        <div style="background:white; border-radius:10px; padding:12px 14px; box-shadow:0 2px 10px rgba(0,0,0,0.06); font-size:0.88em; line-height:1.7;">
+          <strong>1.</strong> Two children &rarr; <strong>Case 3</strong><br>
+          <strong>2.</strong> Successor = 9<br>
+          <strong>3.</strong> Copy 9 up, delete old 9
+        </div>
+      </div>
+    </div>
+    <!-- Column 2: Find the successor (animated, same tree) -->
+    <div class="reveal-step">
+      <h3 style="margin-top:0; font-size:1.05em;">Step 1: Find the successor</h3>
+      <p style="font-size:0.85em; color:var(--gray); margin-bottom:6px;">Right subtree of 8, then keep going left.</p>
+      <div style="text-align:center;">
+        <svg width="260" height="260" viewBox="0 0 260 260">
+          <!-- Edges -->
+          <line x1="130" y1="28" x2="65" y2="85" class="edge-line"/>
+          <line x1="130" y1="28" x2="195" y2="85" class="edge-line"/>
+          <line x1="65" y1="85" x2="32" y2="145" class="edge-line"/>
+          <line x1="65" y1="85" x2="98" y2="145" class="edge-line"/>
+          <line x1="195" y1="85" x2="162" y2="145" class="edge-line"/>
+          <line x1="195" y1="85" x2="228" y2="145" class="edge-line"/>
+          <line x1="98" y1="145" x2="80" y2="205" class="edge-line"/>
+          <!-- Nodes -->
+          <circle cx="130" cy="28" r="18" class="node-circle"/>
+          <text x="130" y="28" class="node-text" style="font-size:13px;">15</text>
+          <circle cx="65" cy="85" r="18" class="node-circle" id="succ-n8"/>
+          <text x="65" y="85" class="node-text" style="font-size:13px;">8</text>
+          <circle cx="195" cy="85" r="18" class="node-circle"/>
+          <text x="195" y="85" class="node-text" style="font-size:13px;">22</text>
+          <circle cx="32" cy="145" r="18" class="node-circle"/>
+          <text x="32" y="145" class="node-text" style="font-size:13px;">4</text>
+          <circle cx="98" cy="145" r="18" class="node-circle" id="succ-n11"/>
+          <text x="98" y="145" class="node-text" style="font-size:13px;">11</text>
+          <circle cx="162" cy="145" r="18" class="node-circle"/>
+          <text x="162" y="145" class="node-text" style="font-size:13px;">18</text>
+          <circle cx="228" cy="145" r="18" class="node-circle"/>
+          <text x="228" y="145" class="node-text" style="font-size:13px;">25</text>
+          <circle cx="80" cy="205" r="18" class="node-circle" id="succ-n9x"/>
+          <text x="80" y="205" class="node-text" style="font-size:13px;">9</text>
+          <!-- Animated annotations -->
+          <g id="succ-path1" style="opacity:0; transition: opacity 0.4s;">
+            <text x="28" y="72" style="font-family:'Inter'; font-size:10px; fill:var(--red); font-weight:700;">DELETE</text>
+          </g>
+          <g id="succ-path2" style="opacity:0; transition: opacity 0.4s;">
+            <line x1="65" y1="85" x2="98" y2="145" class="search-path"/>
+            <text x="105" y="110" style="font-family:'Inter'; font-size:10px; fill:var(--accent); font-weight:600;">go right</text>
+          </g>
+          <g id="succ-path3" style="opacity:0; transition: opacity 0.4s;">
+            <line x1="98" y1="145" x2="80" y2="205" class="search-path"/>
+            <text x="108" y="175" style="font-family:'Inter'; font-size:10px; fill:var(--accent); font-weight:600;">go left</text>
+          </g>
+          <g id="succ-found" style="opacity:0; transition: opacity 0.4s;">
+            <text x="130" y="240" style="font-family:'Inter'; font-size:12px; fill:var(--green); text-anchor:middle; font-weight:700;">9 has no left child &rarr; Successor = 9</text>
+          </g>
+        </svg>
+      </div>
+      <div style="text-align:center; margin-top:4px;">
+        <button onclick="animateSuccessor()" style="background:var(--accent2); color:white; border:none; padding:5px 14px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Find Successor</button>
+        <button onclick="resetSuccessor()" style="margin-left:4px; background:var(--gray); color:white; border:none; padding:5px 14px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Reset</button>
+      </div>
+    </div>
+    <!-- Column 3: Full deletion tree (animated) -->
+    <div class="reveal-step">
+      <h3 style="margin-top:0; font-size:1.05em;">Step 2: Delete 8</h3>
+      <div style="text-align:center;">
+        <svg width="260" height="290" viewBox="0 0 260 290">
+          <!-- Edges -->
+          <line x1="130" y1="30" x2="65" y2="95" class="edge-line"/>
+          <line x1="130" y1="30" x2="195" y2="95" class="edge-line"/>
+          <line x1="65" y1="95" x2="32" y2="160" class="edge-line"/>
+          <line x1="65" y1="95" x2="98" y2="160" class="edge-line"/>
+          <line x1="195" y1="95" x2="160" y2="160" class="edge-line"/>
+          <line x1="195" y1="95" x2="230" y2="160" class="edge-line"/>
+          <line x1="98" y1="160" x2="80" y2="225" class="edge-line" id="del4-edge-succ"/>
+          <!-- Nodes -->
+          <circle cx="130" cy="30" r="20" class="node-circle"/>
+          <text x="130" y="30" class="node-text" style="font-size:14px;">15</text>
+          <circle cx="65" cy="95" r="20" class="node-circle" id="del4-target"/>
+          <text x="65" y="95" class="node-text" style="font-size:14px;" id="del4-target-text">8</text>
+          <circle cx="195" cy="95" r="20" class="node-circle"/>
+          <text x="195" y="95" class="node-text" style="font-size:14px;">22</text>
+          <circle cx="32" cy="160" r="20" class="node-circle"/>
+          <text x="32" y="160" class="node-text" style="font-size:14px;">4</text>
+          <circle cx="98" cy="160" r="20" class="node-circle"/>
+          <text x="98" y="160" class="node-text" style="font-size:14px;">11</text>
+          <circle cx="160" cy="160" r="20" class="node-circle"/>
+          <text x="160" y="160" class="node-text" style="font-size:14px;">18</text>
+          <circle cx="230" cy="160" r="20" class="node-circle"/>
+          <text x="230" y="160" class="node-text" style="font-size:14px;">25</text>
+          <circle cx="80" cy="225" r="20" class="node-circle" id="del4-succ"/>
+          <text x="80" y="225" class="node-text" style="font-size:14px;" id="del4-succ-text">9</text>
+          <!-- Annotations -->
+          <g id="del4-step1" style="opacity:0; transition: opacity 0.4s;">
+            <text x="25" y="82" style="font-family:'Inter'; font-size:11px; fill:var(--red); font-weight:700;">DELETE</text>
+          </g>
+          <g id="del4-step2" style="opacity:0; transition: opacity 0.4s;">
+            <text x="105" y="232" style="font-family:'Inter'; font-size:11px; fill:var(--green); font-weight:700;">successor</text>
+          </g>
+          <path d="M 78 208 Q 62 145 67 112" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-dasharray="4,3" id="del4-arrow" style="opacity:0; transition: opacity 0.4s;" marker-end="url(#arrowhead-del4)"/>
+          <defs><marker id="arrowhead-del4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--green)"/></marker></defs>
+          <text x="130" y="275" id="del4-result" style="font-family:'Inter'; font-size:12px; fill:var(--green); text-anchor:middle; font-weight:700; opacity:0; transition: opacity 0.4s;">Done! 9 replaced 8.</text>
+        </svg>
+      </div>
+      <div style="text-align:center; margin-top:4px;">
+        <button onclick="animateDelete4()" style="background:var(--accent); color:white; border:none; padding:5px 14px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Animate</button>
+        <button onclick="resetDelete4()" style="margin-left:4px; background:var(--gray); color:white; border:none; padding:5px 14px; border-radius:6px; font-size:0.85em; cursor:pointer; font-family:'Inter';">Reset</button>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>19 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 19: Runtime O(h) (UPDATE) ==================== -->
+<div class="slide" id="slide-19">
+  <h2>Runtime: O(h)</h2>
+  <p style="font-size:1.1em; margin-bottom:14px;">
+    Every operation follows <strong>one root-to-leaf path</strong>. Work is proportional to <strong>height <em>h</em></strong>.
+  </p>
+  <div class="runtime-grid" style="margin-bottom:14px;">
+    <div class="runtime-card good">
+      <h3 style="color:var(--green);">Balanced Tree</h3>
+      <svg width="260" height="130" viewBox="0 0 260 130">
+        <line x1="130" y1="25" x2="65" y2="60" class="edge-line"/>
+        <line x1="130" y1="25" x2="195" y2="60" class="edge-line"/>
+        <line x1="65" y1="60" x2="33" y2="100" class="edge-line"/>
+        <line x1="65" y1="60" x2="97" y2="100" class="edge-line"/>
+        <line x1="195" y1="60" x2="163" y2="100" class="edge-line"/>
+        <line x1="195" y1="60" x2="227" y2="100" class="edge-line"/>
+        <circle cx="130" cy="25" r="16" class="node-circle"/><text x="130" y="25" class="node-text" style="font-size:13px;">8</text>
+        <circle cx="65" cy="60" r="16" class="node-circle"/><text x="65" y="60" class="node-text" style="font-size:13px;">4</text>
+        <circle cx="195" cy="60" r="16" class="node-circle"/><text x="195" y="60" class="node-text" style="font-size:13px;">12</text>
+        <circle cx="33" cy="100" r="16" class="node-circle"/><text x="33" y="100" class="node-text" style="font-size:13px;">2</text>
+        <circle cx="97" cy="100" r="16" class="node-circle"/><text x="97" y="100" class="node-text" style="font-size:13px;">6</text>
+        <circle cx="163" cy="100" r="16" class="node-circle"/><text x="163" y="100" class="node-text" style="font-size:13px;">10</text>
+        <circle cx="227" cy="100" r="16" class="node-circle"/><text x="227" y="100" class="node-text" style="font-size:13px;">14</text>
+      </svg>
+      <div class="big-o">O(log n)</div>
+      <div class="detail">n = 1,000,000 &rarr; h &approx; 20</div>
+    </div>
+    <div class="runtime-card bad">
+      <h3 style="color:var(--red);">Degenerate Chain</h3>
+      <svg width="260" height="130" viewBox="0 0 260 130">
+        <line x1="60" y1="15" x2="90" y2="40" class="edge-line"/>
+        <line x1="90" y1="40" x2="120" y2="65" class="edge-line"/>
+        <line x1="120" y1="65" x2="150" y2="90" class="edge-line"/>
+        <line x1="150" y1="90" x2="180" y2="115" class="edge-line"/>
+        <circle cx="60" cy="15" r="14" class="node-circle"/><text x="60" y="15" class="node-text" style="font-size:12px;">1</text>
+        <circle cx="90" cy="40" r="14" class="node-circle"/><text x="90" y="40" class="node-text" style="font-size:12px;">2</text>
+        <circle cx="120" cy="65" r="14" class="node-circle"/><text x="120" y="65" class="node-text" style="font-size:12px;">3</text>
+        <circle cx="150" cy="90" r="14" class="node-circle"/><text x="150" y="90" class="node-text" style="font-size:12px;">4</text>
+        <circle cx="180" cy="115" r="14" class="node-circle"/><text x="180" y="115" class="node-text" style="font-size:12px;">5</text>
+        <text x="210" y="65" style="font-family:'Inter'; font-size:11px; fill:var(--red);">Inserting sorted</text>
+        <text x="210" y="80" style="font-family:'Inter'; font-size:11px; fill:var(--red);">data causes this!</text>
+      </svg>
+      <div class="big-o">O(n)</div>
+      <div class="detail">basically a linked list!</div>
+    </div>
+  </div>
+  <div class="reveal-step">
+    <h3 style="margin-top:0;">Operations Summary</h3>
+    <table class="compare-table" style="font-size:0.95em;">
+      <tr><th>Operation</th><th>Runtime</th><th>Why?</th></tr>
+      <tr><td>search(key)</td><td><strong>O(h)</strong></td><td>Follow one path down</td></tr>
+      <tr><td>insert(key)</td><td><strong>O(h)</strong></td><td>Search + attach leaf</td></tr>
+      <tr><td>delete(key)</td><td><strong>O(h)</strong></td><td>Find + restructure</td></tr>
+      <tr><td>findMin / findMax</td><td><strong>O(h)</strong></td><td>Walk one side</td></tr>
+      <tr><td>in-order traversal</td><td><strong>O(n)</strong></td><td>Visit every node</td></tr>
+    </table>
+  </div>
+  <div class="reveal-step" style="text-align:center; margin-top:8px; font-size:1.05em;">
+    <div style="background:linear-gradient(135deg,#E8DAEF,#D4E6F1); border-radius:12px; padding:14px 24px; display:inline-block;">
+      <strong>Coming up next:</strong> <em>Balanced BSTs</em> (AVL, red-black) guarantee h = O(log n)
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>20 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 20: Dictionary Implementations Compared (NEW) ==================== -->
+<div class="slide" id="slide-20">
+  <h2>Dictionary Implementations Compared</h2>
+  <p style="font-size:1.1em; margin-bottom:14px;">
+    How does a BST stack up against other ways to implement a dictionary?
+  </p>
+  <table class="compare-table" style="font-size:1.05em;">
+    <tr>
+      <th>Structure</th>
+      <th>Search</th>
+      <th>Insert</th>
+      <th>Delete</th>
+      <th>Sorted Output</th>
+    </tr>
+    <tr class="reveal-step">
+      <td>Unsorted Array / List</td>
+      <td style="color:var(--red); font-weight:700;">O(n)</td>
+      <td style="color:var(--green); font-weight:700;">O(1)</td>
+      <td style="color:var(--red); font-weight:700;">O(n)</td>
+      <td style="color:var(--red); font-weight:700;">O(n log n)</td>
+    </tr>
+    <tr class="reveal-step">
+      <td>Sorted Array</td>
+      <td style="color:var(--green); font-weight:700;">O(log n)</td>
+      <td style="color:var(--red); font-weight:700;">O(n)</td>
+      <td style="color:var(--red); font-weight:700;">O(n)</td>
+      <td style="color:var(--green); font-weight:700;">O(n)</td>
+    </tr>
+    <tr class="reveal-step">
+      <td>Hash Table</td>
+      <td style="color:var(--green); font-weight:700;">O(1) avg</td>
+      <td style="color:var(--green); font-weight:700;">O(1) avg</td>
+      <td style="color:var(--green); font-weight:700;">O(1) avg</td>
+      <td style="color:var(--red); font-weight:700;">O(n log n)</td>
+    </tr>
+    <tr class="reveal-step" style="background:#E8DAEF !important;">
+      <td style="font-weight:800; color:var(--accent);">BST (balanced)</td>
+      <td style="color:var(--green); font-weight:700;">O(log n)</td>
+      <td style="color:var(--green); font-weight:700;">O(log n)</td>
+      <td style="color:var(--green); font-weight:700;">O(log n)</td>
+      <td style="color:var(--green); font-weight:700;">O(n)</td>
+    </tr>
+  </table>
+  <div class="reveal-step" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:18px;">
+    <div style="background:white; border-radius:14px; padding:18px 22px; box-shadow:0 3px 16px rgba(0,0,0,0.07); border-left:5px solid var(--accent);">
+      <div style="font-weight:700; font-size:1.1em; color:var(--accent); margin-bottom:6px;">BST Advantage</div>
+      <div style="font-size:1.05em; line-height:1.6;">
+        &bull; <strong>Sorted traversal</strong> in O(n)<br>
+        &bull; Range queries (all keys between A and B)<br>
+        &bull; Finding predecessor / successor
+      </div>
+    </div>
+    <div style="background:white; border-radius:14px; padding:18px 22px; box-shadow:0 3px 16px rgba(0,0,0,0.07); border-left:5px solid var(--accent2);">
+      <div style="font-weight:700; font-size:1.1em; color:var(--accent2); margin-bottom:6px;">Hash Table Advantage</div>
+      <div style="font-size:1.05em; line-height:1.6;">
+        &bull; <strong>O(1) average</strong> for search/insert/delete<br>
+        &bull; Simpler to implement<br>
+        &bull; Better when order doesn't matter
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>21 / 22</span></div>
+</div>
+
+<!-- ==================== SLIDE 21: Exit Ticket + Wrap-up (UPDATE) ==================== -->
+<div class="slide" id="slide-21">
+  <h2>Exit Ticket <span style="font-size:0.45em; color:var(--gray);">(3 minutes, on your phone)</span></h2>
+  <div style="display:grid; grid-template-columns:1fr auto; gap:30px; flex:1; align-items:start;">
+    <div>
+      <div class="exit-ticket" style="padding:18px 22px;">
+        <div class="q" style="font-size:1.05em;">
+          <span class="q-num">1</span>
+          <span><strong>Search for 11</strong> &mdash; which nodes are visited?<br>
+            <span style="font-size:0.88em; color:var(--gray);">A. 8&rarr;3&rarr;6&rarr;11 &nbsp; B. 8&rarr;12&rarr;10&rarr;11 &nbsp; C. 8&rarr;12&rarr;15&rarr;11 &nbsp; D. 8&rarr;12&rarr;11</span>
+          </span>
+        </div>
+        <div class="q" style="font-size:1.05em;">
+          <span class="q-num">2</span>
+          <span><strong>Insert 9</strong> &mdash; where does it attach?<br>
+            <span style="font-size:0.88em; color:var(--gray);">A. Left of 10 &nbsp; B. Right of 10 &nbsp; C. Left of 11 &nbsp; D. Right of 6</span>
+          </span>
+        </div>
+        <div class="q" style="font-size:1.05em;">
+          <span class="q-num">3</span>
+          <span>Why is runtime <strong>O(h)</strong>?<br>
+            <span style="font-size:0.88em; color:var(--gray);">A. Visit every node &nbsp; B. One node per level on a single path &nbsp; C. Always log(n) &nbsp; D. Compare each with every other</span>
+          </span>
+        </div>
+        <div class="q" style="font-size:1.05em;">
+          <span class="q-num">4</span>
+          <span>Deleting a node with <strong>two children</strong> &mdash; what do we do?<br>
+            <span style="font-size:0.88em; color:var(--gray);">A. Remove &amp; reconnect &nbsp; B. Replace with left child &nbsp; C. Find successor, copy up, delete it &nbsp; D. Rebuild subtree</span>
+          </span>
+        </div>
+        <div class="q" style="font-size:1.05em;">
+          <span class="q-num">5</span>
+          <span>In one sentence: what is the BST invariant, and why does it make search efficient?</span>
+        </div>
+      </div>
+      <div class="reveal-step" style="margin-top:12px;">
+        <div class="summary-box" style="font-size:1.05em;">
+          <strong>One-sentence summary:</strong><br>
+          A BST is a binary tree with an ordering invariant that makes dictionary operations efficient when height is small.
+        </div>
+        <p style="font-size:1em; color:var(--gray); margin-top:10px; text-align:center;">
+          <strong>Next class:</strong> Balanced BSTs &mdash; structures that <em>enforce</em> O(log n) height.
+        </p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <div style="background:white; border-radius:16px; padding:20px; box-shadow:0 3px 16px rgba(0,0,0,0.08); margin-bottom:14px;">
+        <div style="font-size:0.85em; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:700; margin-bottom:10px;">Scan to answer</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fjinzhao3611.github.io%2Fcosi230b%2Factivities%2Fbst-exit-ticket-worksheet.html" alt="QR Code" width="200" height="200" style="border-radius:8px;"/>
+        <div style="font-size:0.8em; color:var(--gray); margin-top:8px; max-width:200px; word-break:break-all;">jinzhao3611.github.io/cosi230b/activities/bst-exit-ticket-worksheet.html</div>
+      </div>
+      <div style="text-align:center; margin-bottom:14px;">
+        <svg width="240" height="220" viewBox="0 0 240 220">
+          <line x1="120" y1="30" x2="60" y2="80" stroke="#555" stroke-width="2"/>
+          <line x1="120" y1="30" x2="180" y2="80" stroke="#555" stroke-width="2"/>
+          <line x1="60" y1="80" x2="30" y2="130" stroke="#555" stroke-width="2"/>
+          <line x1="60" y1="80" x2="90" y2="130" stroke="#555" stroke-width="2"/>
+          <line x1="180" y1="80" x2="150" y2="130" stroke="#555" stroke-width="2"/>
+          <line x1="180" y1="80" x2="210" y2="130" stroke="#555" stroke-width="2"/>
+          <line x1="150" y1="130" x2="135" y2="180" stroke="#555" stroke-width="2"/>
+          <circle cx="120" cy="30" r="18" class="node-circle"/><text x="120" y="30" class="node-text" style="font-size:14px;">8</text>
+          <circle cx="60" cy="80" r="18" class="node-circle"/><text x="60" y="80" class="node-text" style="font-size:14px;">3</text>
+          <circle cx="180" cy="80" r="18" class="node-circle"/><text x="180" y="80" class="node-text" style="font-size:14px;">12</text>
+          <circle cx="30" cy="130" r="18" class="node-circle"/><text x="30" y="130" class="node-text" style="font-size:14px;">1</text>
+          <circle cx="90" cy="130" r="18" class="node-circle"/><text x="90" y="130" class="node-text" style="font-size:14px;">6</text>
+          <circle cx="150" cy="130" r="18" class="node-circle"/><text x="150" y="130" class="node-text" style="font-size:14px;">10</text>
+          <circle cx="210" cy="130" r="18" class="node-circle"/><text x="210" y="130" class="node-text" style="font-size:14px;">15</text>
+          <circle cx="135" cy="180" r="18" class="node-circle"/><text x="135" y="180" class="node-text" style="font-size:14px;">11</text>
+          <text x="120" y="210" style="font-family:'Inter'; font-size:11px; fill:var(--gray); text-anchor:middle; font-style:italic;">Use this tree for Q1 &amp; Q2</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Introduction to Binary Search Trees</span><span>22 / 22</span></div>
+</div>
+
+  </div><!-- end slide-area -->
+
+  <!-- ==================== NOTES PANEL ==================== -->
+  <div class="notes-panel hidden" id="notesPanel">
+    <!-- Notes are swapped by JS per slide -->
+    <div id="notesContent"></div>
+  </div>
+</div><!-- end app -->
+
+<script>
+// ==================== NOTES DATA ====================
+const notesData = [
+  // Slide 0: Title
+  `<span class="timing">0:00 &ndash; 0:30</span>
+  <h3>Set context</h3>
+  <div class="say">"Alright, let's start with binary search trees."</div>
+
+  <h3>Definition first &mdash; anchor understanding</h3>
+  <div class="say">"A binary search tree, or BST, is just two things combined: a binary tree&mdash;so each node has at most two children&mdash;plus an <strong>ordering invariant</strong>."</div>
+  <div class="do-item">Pause briefly.</div>
+  <div class="say">"That invariant is the key idea."</div>
+
+  <h3>Explain the invariant clearly</h3>
+  <div class="say">"It means that for every node: everything in the <strong>left subtree is smaller</strong>, and everything in the <strong>right subtree is larger</strong>."</div>
+  <div class="do-item">Optional hand gesture: left vs right.</div>
+
+  <h3>Connect invariant &rarr; search</h3>
+  <div class="say">"Once you have that rule, you can use it to search."</div>
+  <div class="say">"If I'm looking for a value, I start at the root, compare, and then decide: go left or go right. So every step, I throw away half the possibilities."</div>
+
+  <h3>Connect search &rarr; insert</h3>
+  <div class="say">"And when we insert a new value, we follow the exact same logic. We walk down the tree using comparisons, and place the new value where the rule is still satisfied."</div>
+
+  <h3>Tie the pipeline together</h3>
+  <div class="say">"So that's the flow here: the <strong>invariant</strong> gives us structure, we <strong>use</strong> it for search, and we <strong>preserve</strong> it during insertion."</div>
+
+  <h3>The dictionary line</h3>
+  <div class="say">"This gives us a way to implement a <strong>dictionary</strong>&mdash;a key-value store&mdash;where we can search and insert efficiently."</div>
+
+  <h3>The critical caveat: shallow</h3>
+  <div class="say">"But there's an important condition: this is only efficient <strong>when the tree stays shallow</strong>."</div>
+  <div class="say">"If the tree is shallow, we only take a few steps. If it becomes very deep, we lose that efficiency."</div>
+  <div class="do-item">Slight emphasis on "shallow." This plants the seed for the O(h) discussion later.</div>
+
+  <h3>Wrap with intuition</h3>
+  <div class="say">"So you can think of a BST as: <strong>binary search&mdash;but on a structure that grows dynamically.</strong>"</div>
+
+  <div class="transition">&darr; Next: the Dictionary ADT &darr;</div>`,
+
+  // Slide 1: Remember the Guessing Game?
+  `<span class="timing">0:30 &ndash; 2:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Remember when we learned binary search? We played the number guessing game&mdash;pick a number 1 to 100, I find it in 7 guesses by always halving the range. That works beautifully because the data is sorted."</div>
+  <div class="do-item">Point to the purple "What we already know" box on the right. Let them nod&mdash;this is familiar ground. Don't dwell.</div>
+  <h3>The problem (click to reveal)</h3>
+  <div class="say">"But here's the thing. In the real world, data keeps arriving. Imagine we have this sorted array and a new value 42 shows up. Where does 42 go?"</div>
+  <div class="do-item">Click to reveal the orange "But what if data keeps arriving?" box. Let someone answer: "Between 38 and 51."</div>
+  <div class="say">"Right, between 38 and 51. But to make room in a sorted array, we have to <strong>shift</strong> everything after it&mdash;51, 67, 84, 93 all slide one position. That's O(n) work. Every insertion could move half the array."</div>
+  <div class="do-item">Click to reveal the "Sorted Array: The Tradeoff" card showing O(log n) search vs O(n) insert.</div>
+  <div class="say">"So sorted arrays give us the fast search we love from binary search, but <em>insertion is expensive</em>."</div>
+  <h3>The bridge to BSTs</h3>
+  <div class="do-item">Click to reveal the dark punchline box on the left, then click to reveal the green "Today's answer: BST" card.</div>
+  <div class="say">"What if the data structure itself was shaped so that both search AND insert are O(log n)? Same halving idea as binary search, but organized as a tree instead of an array. That's exactly what a binary search tree does."</div>
+  <div class="warn-item">
+    <strong>The key connection to make explicit:</strong><br>
+    &bull; Binary search (what they know) = the <em>strategy</em> of halving<br>
+    &bull; Sorted array = one <em>implementation</em> that supports that strategy, but has slow insert<br>
+    &bull; BST = a <em>different</em> implementation (a tree) that supports the same halving strategy AND makes insert fast
+  </div>
+  <div class="check-item">Don't replay the actual guessing game. This is a CALLBACK&mdash;reference it, connect it, move on. Keep this slide to ~90 seconds.</div>
+  <div class="transition">&darr; Next: concrete example with words &darr;</div>`,
+
+  // Slide 2: The Dictionary ADT
+  `<span class="timing">3:30 &ndash; 5:30</span>
+  <h3>What to say</h3>
+  <div class="say">"Now let's be precise about what problem we're solving. We want to implement a <strong>dictionary</strong>&mdash;also called a map. It stores key-value pairs and supports three operations: insert, search, and remove."</div>
+  <div class="do-item">Point to the three operations in the code block.</div>
+  <div class="say">"You've already used dictionaries in Python&mdash;the built-in dict type. But today we're asking: how do we BUILD one from scratch?"</div>
+  <div class="do-item">Click to reveal the concrete example.</div>
+  <div class="say">"Here's a concrete example: a student records system. The key is the student ID, the value is the student's name. We want to look up a name by ID, add new students, and remove graduates."</div>
+  <div class="do-item">Click to reveal the 'where you've seen dictionaries' box.</div>
+  <div class="say">"Dictionaries show up everywhere: phone contacts map name to number, DNS maps domain names to IP addresses, compilers map variable names to memory addresses."</div>
+  <div class="do-item">Click to reveal the 'today we learn one implementation' box.</div>
+  <div class="say">"There are many ways to implement a dictionary&mdash;arrays, hash tables, and today: the binary search tree. By the end of class, you'll understand the tradeoffs."</div>
+  <div class="warn-item">
+    <strong>ADT vs Data Structure:</strong> A dictionary is an ADT&mdash;it defines WHAT operations are available. A BST is a data structure&mdash;it's HOW we implement those operations. This distinction is important in CS35.
+  </div>
+  <div class="transition">&darr; Next: learning objectives &darr;</div>`,
+
+  // Slide 3: Objectives (UPDATE)
+  `<span class="timing">6:00 &ndash; 7:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Here are our seven learning objectives for today. By the end of class, you'll be able to do all of these."</div>
+  <div class="do-item">Click to reveal each objective one at a time. Briefly describe each. Objectives 4&ndash;5 are new compared to what they might expect from shorter lessons.</div>
+  <div class="say">"The first three&mdash;invariant, search, insert&mdash;are the core. Then we'll build on those with findMin, traversal, deletion, and a comparison to other dictionary implementations."</div>
+  <div class="warn-item">
+    <strong>What is O(h)?</strong> Big-O notation describes how the running time grows as input grows. O(h) means the time is proportional to the height of the tree. The key insight of this lesson is that h can be log(n) (good) or n (bad) depending on the tree's shape.
+  </div>
+  <div class="check-item">This slide signals organized teaching. Faculty evaluators notice clear objectives.</div>
+  <div class="transition">&darr; Next: quick vocabulary recap &darr;</div>`,
+
+  // Slide 4: Vocabulary (KEEP)
+  `<span class="timing">7:00 &ndash; 9:00</span>
+  <h3>What to say</h3>
+  <div class="say">Quick recap. In a binary tree, each node can have up to two children. What do we call them?</div>
+  <div class="do-item">Point to the diagram. Cold-call 1&ndash;2 people: "What do we call the two children?" (left child, right child). "What about this whole group of nodes under 3?" (left subtree of 8). Click to reveal terms one by one.</div>
+  <div class="warn-item">
+    <strong>Subtree is the crucial term!</strong> A subtree is NOT just the immediate child&mdash;it's the child AND all of ITS descendants. When we say "everything in the left subtree," we mean every single node reachable by going left from the current node and then following any path down. This distinction is what makes BST validity tricky.
+  </div>
+  <div class="say">"The most important term here is <strong>subtree</strong>. It means a node AND all of its descendants, not just the immediate child. This will matter a lot when we define the BST property."</div>
+  <div class="warn-item"><strong>Height:</strong> The height is the number of edges on the longest root-to-leaf path. A single node has height 0. This tree has height 2 (root &rarr; 3 &rarr; 1 is 2 edges).</div>
+  <h3>Participation norm</h3>
+  <div class="say">"Participation norm: I'll ask you to think for about 10 seconds, then pair with a neighbor for 30 seconds, then we'll share. If I call on you, I care more about your <em>reasoning</em> than just the answer."</div>
+  <div class="do-item">Establish wait time. Say "pair" norm. Reassure: "it's fine to be wrong, we're building understanding."</div>
+  <div class="transition">&darr; Next: define the BST property &darr;</div>`,
+
+  // Slide 5: BST Property (KEEP)
+  `<span class="timing">9:00 &ndash; 11:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Now: a plain binary tree isn't automatically searchable. We need an <strong>ordering rule</strong>. Here's the BST property."</div>
+  <div class="do-item">Write the property on the board as you say it. Click to reveal each bullet. Emphasize "subtree" not just "child."</div>
+  <div class="say">"For a node with key K: everything in the LEFT subtree is less than K. Everything in the RIGHT subtree is greater than or equal to K. And this must hold for EVERY node."</div>
+  <div class="warn-item">
+    <strong>Why does this help?</strong> Because at any node, if you're looking for a key, you can immediately rule out HALF the remaining nodes. This is similar to binary search on a sorted array, but the tree structure lets us also insert efficiently.
+  </div>
+  <div class="say">"That rule is called an <strong>invariant</strong>&mdash;a condition that must remain true before and after every operation we do on the tree."</div>
+  <div class="check-item">Ask: "What part of this definition is easiest to forget?" Expected answer: that it applies to the ENTIRE subtree, not just the immediate child.</div>
+  <div class="warn-item">
+    <strong>The &ge; convention:</strong> We put duplicates on the RIGHT side. Some textbooks use strict &gt; on the right instead. It doesn't matter as long as you're consistent. In this class, duplicates go right.
+  </div>
+  <div class="say">"Let's verify this tree together. Node 8: left subtree has 3, 1, 6&mdash;all less than 8. Right subtree has 12, 14&mdash;all &ge; 8. Check! Now node 3: left has 1 (&lt; 3), right has 6 (&ge; 3). Check!"</div>
+  <div class="transition">&darr; Next: interactive BST validity check &darr;</div>`,
+
+  // Slide 6: Is This a BST? (KEEP)
+  `<span class="timing">11:00 &ndash; 14:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Thumbs up or thumbs down: is Tree A a valid BST? Is Tree B?"</div>
+  <div class="do-item">Show both trees. Give 10 seconds to think. Then 30 seconds to pair-discuss. Then cold-call.</div>
+  <div class="answer">
+    <strong>Tree A:</strong> Valid! 15 &rarr; left subtree {10, 7, 12} all &lt; 15 &#10003;. Right subtree {20} &ge; 15 &#10003;. Node 10: left=7 (&lt;10) &#10003;, right=12 (&ge;10) &#10003;.<br><br>
+    <strong>Tree B:</strong> INVALID! Node 17 is the right child of 10&mdash;and 17 &gt; 10, so locally it looks perfectly fine. BUT 17 is in the <strong>left subtree of 15</strong>, and the rule says everything there must be &lt; 15. 17 &gt; 15, so it violates the BST property.
+  </div>
+  <div class="say">"Tree B is the tricky one. 17 is the right child of 10&mdash;and 17 is greater than 10, so if you only check the parent-child relationship, it looks fine. But remember: the BST property applies to the entire SUBTREE. 17 is in the left subtree of 15, so it must be less than 15. It's not."</div>
+  <div class="do-item">Click to reveal the verdict and explanation. Use this as a teaching moment about subtree vs child.</div>
+  <div class="warn-item">
+    <strong>Common misconception to correct:</strong> Students often check only the immediate parent-child relationship. The BST property requires checking against ALL ancestors. This is why we emphasized "subtree" earlier.
+  </div>
+  <div class="transition">&darr; Next: search algorithm &darr;</div>`,
+
+  // Slide 7: One More Check + Range Checking
+  `<span class="timing">17:00 &ndash; 20:00</span>
+  <h3>The tricky tree (left side)</h3>
+  <div class="say">"One more check. Look at this tree on the left. Is it a valid BST? Think for 10 seconds, then discuss with your partner."</div>
+  <div class="do-item">Give 10 seconds think time, 30 seconds pair discussion. Many students will say invalid because 22 is hard to check. Cold-call for answers.</div>
+  <div class="warn-item">
+    <strong>This tree IS valid!</strong> Here's why:<br>
+    &bull; 22 is left child of 25 (22 &lt; 25 &#10003;)<br>
+    &bull; 22 is in the right subtree of 20 (22 &gt; 20 &#10003;)<br>
+    &bull; 22 is in the left subtree of 30 (22 &lt; 30 &#10003;)<br>
+    All ancestor constraints hold. But it's hard to verify by hand!
+  </div>
+  <div class="do-item">Click to reveal "Valid!" answer. Then click to reveal "How do we check systematically?"</div>
+  <div class="say">"A lot of you weren't sure. That's the point&mdash;checking by hand is error-prone. We need a systematic method."</div>
+
+  <h3>The mental model (right side)</h3>
+  <div class="do-item">Click to reveal the mental model box.</div>
+  <div class="say">"Here's the key idea: each node lives in a <strong>legal interval</strong>. The root can be anything&mdash;its range is negative infinity to positive infinity. When you go left, the current node becomes the new upper bound. When you go right, it becomes the new lower bound."</div>
+  <div class="do-item">Click to reveal the algorithm.</div>
+  <div class="say">"The algorithm is elegant: at each node, check if the value is inside its legal range. If not, return false. Then recurse left with a tighter upper bound, and right with a tighter lower bound."</div>
+  <div class="warn-item">
+    <strong>Line by line:</strong><br>
+    &bull; <code>if node is None</code>: empty tree is valid (base case)<br>
+    &bull; <code>if node.value &lt;= min or &gt;= max</code>: outside legal range &rarr; invalid<br>
+    &bull; Recurse left: pass <code>min, node.value</code> (upper bound shrinks)<br>
+    &bull; Recurse right: pass <code>node.value, max</code> (lower bound rises)
+  </div>
+  <div class="do-item">Click to reveal the insight box.</div>
+  <div class="say">"So for node 22: we went right from 20 (min becomes 20), then left from 25... actually left from 30, then left from 25. Its range is (20, 25). Is 22 in that range? Yes! And that's exactly how we confirm it's valid."</div>
+  <div class="say">"And remember 17 from Tree B on the last slide? Its range would be (10, 15). 17 is outside that range&mdash;that's why it was invalid."</div>
+  <div class="check-item">The tricky valid tree creates the <em>need</em> for the algorithm. Students feel the pain of manual checking, then the algorithm gives them a reliable tool. Much better than just showing the algorithm cold.</div>
+  <div class="transition">&darr; Next: search algorithm &darr;</div>`,
+
+  // Slide 8: Search Algorithm (KEEP)
+  `<span class="timing">14:00 &ndash; 17:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Now let's see how the invariant enables efficient search. The key idea is simple: at each node, the invariant tells us which direction to go. We never have to check both sides."</div>
+  <div class="do-item">Walk through the pseudocode line by line. Then trace search(root, 7) on the tree.</div>
+  <div class="say">"Let me trace search for 7. Start at root 8: 7 &lt; 8, so we go LEFT. At node 3: 7 &gt; 3, go RIGHT. At node 6: 7 &gt; 6, go RIGHT. At node 7: found it!"</div>
+  <div class="warn-item">
+    <strong>The base case matters:</strong> If node is None, we've "fallen off the tree"&mdash;the key isn't here. This is how we handle unsuccessful searches. Emphasize this because the next slide shows it in detail.
+  </div>
+  <div class="say">"Notice: we visited 4 nodes out of... how many total? Just 4 comparisons to find our key. That's the power of the invariant."</div>
+  <div class="check-item">Ask: "At each step, what's happening to the search space?" Students should say it's being halved (like binary search).</div>
+  <div class="transition">&darr; Next: what happens when the key isn't found? &darr;</div>`,
+
+  // Slide 9: Search Not Found (NEW)
+  `<span class="timing">17:00 &ndash; 20:00</span>
+  <h3>What to say</h3>
+  <div class="say">"We just saw a successful search. But what if the key isn't in the tree? Let's trace search for 9."</div>
+  <div class="say">"Start at 8: 9 &gt; 8, go RIGHT. At 12: 9 &lt; 12, go LEFT. But 12 has no left child! We've reached None."</div>
+  <div class="do-item">Click to reveal the trace table.</div>
+  <div class="say">"When we reach None, that means we've 'fallen off the tree.' The key simply doesn't exist. We return False."</div>
+  <div class="do-item">Click to reveal the explanation box.</div>
+  <div class="say">"This is the same base case in our pseudocode: <code>if node is None: return False</code>. It's not an error&mdash;it's the algorithm correctly determining the key isn't present."</div>
+  <div class="warn-item">
+    <strong>Key insight:</strong> The "not found" case is important because it's ALSO where insertion will happen. When we insert a key, we follow the same path, and when we "fall off," that's exactly where the new node goes. This connection between search-not-found and insertion is crucial.
+  </div>
+  <div class="check-item">Ask: "If we wanted to insert 9, where would it go?" Answer: as the left child of 12&mdash;exactly where we "fell off."</div>
+  <div class="transition">&darr; Next: pair practice &darr;</div>`,
+
+  // Slide 10: Pair Practice Search (KEEP)
+  `<span class="timing">20:00 &ndash; 23:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Your turn. With a partner, trace the search for key 13 on this tree. Write out the comparison at each step."</div>
+  <div class="do-item">Give exactly 2 minutes. Circulate and listen. Then cold-call for the path.</div>
+  <div class="answer">
+    search(root, 13):<br>
+    13 &gt; 8 &rarr; right to 12<br>
+    13 &gt; 12 &rarr; right to 15<br>
+    13 &lt; 15 &rarr; left to 13<br>
+    13 == 13 &rarr; Found!
+  </div>
+  <div class="do-item">Click to reveal solution. Quick check: "Who got the same path? Thumbs up."</div>
+  <div class="check-item">Listen for students writing comparison decisions, not just naming the final node. The reasoning matters more than the answer.</div>
+  <div class="transition">&darr; Next: insertion algorithm &darr;</div>`,
+
+  // Slide 11: Insertion Algorithm (KEEP)
+  `<span class="timing">23:00 &ndash; 27:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Now let's see how insertion works. The key insight is: insertion IS search, plus attaching a leaf."</div>
+  <div class="do-item">Show pseudocode. Walk through line by line, then trace insert(root, 5).</div>
+  <div class="warn-item">
+    <strong>How to explain the code:</strong><br>
+    1. <code>if node is None</code>: We've found the right spot! Create a new node with this key and return it. The parent will attach it.<br>
+    2. <code>if key < node.key</code>: Go left (same as search). But we set <code>node.left = insert(node.left, key)</code> so the new node gets connected.<br>
+    3. <code>else</code>: Go right. Note <code>else</code> means key &ge; node.key, so duplicates go right.<br>
+    4. <code>return node</code>: return the (possibly updated) node back up.
+  </div>
+  <div class="say">"Let me trace insert(root, 5). Start at 8: 5 &lt; 8 &rarr; go left. At 3: 5 &gt; 3 &rarr; go right. At 6: 5 &lt; 6 &rarr; go left. Node 6 has no left child, so we hit None. Create a new node with key 5, attach it as 6's left child. Done!"</div>
+  <div class="say">"Notice: the new node is ALWAYS a leaf. We never rearrange existing nodes. The search path determines the location, and that location automatically satisfies the invariant."</div>
+  <div class="do-item">Click to reveal trace table.</div>
+  <div class="transition">&darr; Next: pair practice with two insertions &darr;</div>`,
+
+  // Slide 12: Pair Practice Insert Two (NEW)
+  `<span class="timing">27:00 &ndash; 31:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Your turn again. This time, insert 9 and then 2 into this tree. Don't just draw the result&mdash;write the comparison decisions for each insertion."</div>
+  <div class="do-item">Give 3 minutes. Circulate. Help students who get stuck on which tree to use for the second insertion (use the tree AFTER inserting 9).</div>
+  <div class="answer">
+    <strong>Insert 9:</strong><br>
+    9 &gt; 8 &rarr; right to 12<br>
+    9 &lt; 12 &rarr; left to 10<br>
+    9 &lt; 10 &rarr; left... None &rarr; attach 9 as left child of 10<br><br>
+    <strong>Insert 2:</strong><br>
+    2 &lt; 8 &rarr; left to 3<br>
+    2 &lt; 3 &rarr; left to 1<br>
+    2 &gt; 1 &rarr; right... None &rarr; attach 2 as right child of 1
+  </div>
+  <div class="do-item">Click to reveal solution. Debrief: "Where did 9 land? Where did 2 land?" Cold-call.</div>
+  <div class="check-item">Check that students write comparison decisions, not just the final picture. If someone asks about insertion order mattering: YES! Different insertion orders create different tree shapes. We'll see this soon.</div>
+  <div class="transition">&darr; Next: the BSTNode class &darr;</div>`,
+
+  // Slide 13: BST Node Class (NEW)
+  `<span class="timing">31:00 &ndash; 34:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Let's connect our pseudocode to real Python code. Here's the BSTNode class you'll implement in lab."</div>
+  <div class="do-item">Walk through the class definition. Point out how each field maps to what we've been drawing.</div>
+  <div class="say">"Each node stores four things: a key (what we compare on), an optional value (the associated data&mdash;remember the dictionary ADT!), and two pointers: left and right, initialized to None."</div>
+  <div class="do-item">Click to reveal the search implementation in real Python.</div>
+  <div class="say">"Notice how the real code looks almost identical to our pseudocode. The only difference is that we return the value instead of True, and None instead of False. The logic is exactly the same."</div>
+  <div class="do-item">Click to reveal the mapping box.</div>
+  <div class="say">"In your lab, you'll implement this class plus insert, search, and some of the other operations we'll discuss today."</div>
+  <div class="warn-item">
+    <strong>Don't over-explain:</strong> Students will work with this code in lab. The goal here is just to show that the pseudocode maps directly to real code&mdash;no magic involved.
+  </div>
+  <div class="transition">&darr; Announce a 2-minute stretch break! &darr;</div>`,
+
+  // Slide 14: More BST Checks + Shape (NEW)
+  `<span class="timing">36:00 &ndash; 41:00</span>
+  <h3>What to say (after break)</h3>
+  <div class="say">"Welcome back. Let's do one more BST validity check, then talk about something important: tree shape."</div>
+  <div class="do-item">Point to the 7-node tree on the left. Give 15 seconds.</div>
+  <div class="say">"Is this tree a valid BST? Think carefully about the subtree constraints."</div>
+  <div class="do-item">Click to reveal the first answer. This one IS valid&mdash;it's a trick to keep students sharp.</div>
+  <div class="say">"This one's actually valid! Node 22 is in the right subtree of 20 (22 &gt; 20), and in the left subtree of 25... wait, there's no node 25. It's the left child of 25? Let me check: 22 is the left child of 25 (22 &lt; 25), yes. And 22 is in the right subtree of 20 (22 &gt; 20). All good!"</div>
+  <h3>Shape matters</h3>
+  <div class="say">"Now here's a crucial question. If I insert the keys 1, 2, 3, 4, 5 starting from an empty tree, what does the tree look like?"</div>
+  <div class="do-item">Let students think. Then click to reveal both tree shapes.</div>
+  <div class="say">"It's a chain! Every key is larger than the previous one, so it always goes right. Height = 4. But if I insert 4, 2, 6, 1, 3, 5, 7? I get a perfectly balanced tree with height 2."</div>
+  <div class="do-item">Click to reveal the bottom takeaway box.</div>
+  <div class="say">"Same keys, different insertion order, completely different shape. This is why insertion order matters&mdash;and why balanced BSTs exist."</div>
+  <div class="check-item">Ask: "What insertion order would give you the worst possible tree for keys 1-7?" Answer: sorted (1,2,3,4,5,6,7) or reverse-sorted (7,6,5,4,3,2,1).</div>
+  <div class="transition">&darr; Next: findMin and findMax &darr;</div>`,
+
+  // Slide 15: Finding Min and Max (NEW)
+  `<span class="timing">41:00 &ndash; 44:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Here's a nice consequence of the BST invariant. How do you find the smallest key? Just keep going left until you can't anymore."</div>
+  <div class="do-item">Point to the tree diagram. Trace the purple path for min (8 &rarr; 3 &rarr; 1) and the blue path for max (8 &rarr; 12 &rarr; 14).</div>
+  <div class="say">"Similarly, the largest key is always the rightmost node. Just keep going right."</div>
+  <div class="say">"The code is beautifully simple&mdash;3 lines each."</div>
+  <div class="do-item">Click to reveal the 'why does this work?' box.</div>
+  <div class="say">"Why does this work? Because the invariant guarantees that everything smaller than the current node is to its left. So if a node has no left child, nothing in the entire tree is smaller. It must be the minimum."</div>
+  <div class="check-item">Ask: "What's the runtime of findMin?" Answer: O(h)&mdash;we follow one path from root to the leftmost leaf.</div>
+  <div class="warn-item">
+    <strong>Connection to deletion:</strong> findMin is used in deletion! When deleting a node with two children, we need the in-order successor, which is findMin of the right subtree. Plant this seed now.
+  </div>
+  <div class="transition">&darr; Next: in-order traversal &darr;</div>`,
+
+  // Slide 16: In-Order Traversal (NEW)
+  `<span class="timing">44:00 &ndash; 50:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Now here's something beautiful about BSTs. If you visit nodes in a specific order&mdash;left subtree, then current node, then right subtree&mdash;the keys come out sorted. This is called in-order traversal."</div>
+  <div class="do-item">Walk through the pseudocode. Then trace on the tree.</div>
+  <div class="say">"Let me trace this. Start at root 8. First, recurse on the left subtree (3). That recursion goes left to 1. Node 1 has no left child, so we print 1. Then back to 3: print 3. Then right of 3: go to 6, left of 6 is 5 (print 5), then print 6. Back to root: print 8. Then right subtree: 12, then 14."</div>
+  <div class="do-item">Click to reveal the sorted output.</div>
+  <div class="say">"Look at that: 1, 3, 5, 6, 8, 12, 14. Perfectly sorted! And we visited every node exactly once, so this is O(n)."</div>
+  <div class="do-item">Click to reveal the hash table comparison.</div>
+  <div class="say">"This is a major advantage of BSTs over hash tables. Hash tables can search in O(1) average, but they CAN'T give you sorted output efficiently. If you need to iterate through keys in order&mdash;like for range queries, or printing a sorted list&mdash;BSTs are the way to go."</div>
+  <div class="warn-item">
+    <strong>Recursion intuition:</strong> If students struggle with the recursive trace, use this mental model: "In-order means: handle everything smaller than me, then me, then everything larger than me." That's just the BST property in action!
+  </div>
+  <div class="check-item">Quick pair activity if time: "Trace in-order on this tree and write the output sequence." Verify they get sorted output.</div>
+  <div class="transition">&darr; Next: deletion &darr;</div>`,
+
+  // Slide 17: Deletion Three Cases (NEW)
+  `<span class="timing">50:00 &ndash; 56:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Deletion is the trickiest BST operation. There are three cases, depending on how many children the node has."</div>
+  <div class="do-item">Click to reveal Case 1.</div>
+  <div class="say">"Case 1: the node is a leaf&mdash;no children. Easy: just remove it. Nothing else to fix."</div>
+  <div class="do-item">Click to reveal Case 2.</div>
+  <div class="say">"Case 2: the node has one child. Replace the node with its only child. The child 'moves up' to take its parent's position. The BST property is preserved because the child was already on the correct side."</div>
+  <div class="do-item">Click to reveal Case 3.</div>
+  <div class="say">"Case 3: two children. This is the hard one. We can't just remove the node&mdash;we'd disconnect the tree. Instead, we find the <strong>in-order successor</strong>: the smallest key in the right subtree. We copy that key into our node, then delete the successor from its original position."</div>
+  <div class="do-item">Click to reveal the bottom explanation.</div>
+  <div class="say">"Why the in-order successor? Because it's the smallest value that's still larger than everything in the left subtree. So copying it up preserves the BST property. And here's the beautiful part: the in-order successor has no left child (if it did, that child would be smaller, contradicting it being the minimum). So deleting it is always Case 1 or Case 2!"</div>
+  <div class="warn-item">
+    <strong>Alternative to successor:</strong> You could also use the in-order predecessor (max of left subtree). Either works. We use successor by convention.
+  </div>
+  <div class="check-item">Ask: "Why can't the in-order successor have two children?" This tests understanding of findMin.</div>
+  <div class="transition">&darr; Next: pair practice on deletion &darr;</div>`,
+
+  // Slide 18: Pair Practice Deletion (NEW)
+  `<span class="timing">56:00 &ndash; 61:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Let's practice deletion. Delete key 8 from this tree."</div>
+  <div class="do-item">Give 4 minutes. Circulate and help. Key questions to ask students: "How many children does 8 have?" "What's the in-order successor?"</div>
+  <div class="answer">
+    <strong>Delete 8:</strong><br>
+    1. Node 8 has two children (4 and 22) &rarr; Case 3<br>
+    2. In-order successor = findMin(right subtree of 8) = go to 22, then left to 18, then left to 11, then left to 9. Node 9 has no left child &rarr; successor = 9<br>
+    3. Copy 9 into node 8's position (node now holds key 9)<br>
+    4. Delete old node 9 from its original position (it's a leaf &rarr; Case 1)<br>
+    5. Result: the tree has 9 where 8 used to be, and the old 9 leaf is gone.
+  </div>
+  <div class="do-item">Click to reveal solution. Walk through the steps. Draw on board if helpful.</div>
+  <div class="say">"The successor was 9&mdash;the leftmost node in the right subtree. We copy 9 up to replace 8, then delete the original 9 node, which was a leaf. Clean!"</div>
+  <div class="check-item">Make sure students understand WHY 9 is the successor (smallest in right subtree), not just that it is.</div>
+  <div class="transition">&darr; Next: runtime analysis &darr;</div>`,
+
+  // Slide 19: Runtime O(h) (UPDATE)
+  `<span class="timing">61:00 &ndash; 67:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Let's talk runtime. In every operation we've seen&mdash;search, insert, delete, findMin&mdash;we followed one path from root toward a leaf. That means work is proportional to the HEIGHT, h."</div>
+  <div class="do-item">Point to both tree shapes. Write on board: <strong>"time = O(h)"</strong>.</div>
+  <div class="say">"If the tree is <strong>balanced</strong>&mdash;roughly the same number of nodes on each side&mdash;then h is about log n. With a million items, that's only about 20 comparisons!"</div>
+  <div class="say">"But if the tree <strong>degenerates into a chain</strong>&mdash;every node only has one child&mdash;then h = n-1. Everything becomes O(n). Basically a linked list. Terrible."</div>
+  <div class="do-item">Click to reveal the operations summary table.</div>
+  <div class="say">"Here's the full picture. Search, insert, delete, findMin/Max are all O(h). In-order traversal is O(n) because it visits every node. The key variable is h: is it log n or n?"</div>
+  <div class="do-item">Click to reveal the balanced BST preview.</div>
+  <div class="say">"That's why balanced BSTs exist&mdash;AVL trees, red-black trees. They automatically rebalance after each operation to guarantee h stays O(log n). That's the next topic."</div>
+  <div class="check-item">Ask: "What insertion order creates a chain?" Answer: sorted data like 1, 2, 3, 4, 5.</div>
+  <div class="transition">&darr; Next: comparing dictionary implementations &darr;</div>`,
+
+  // Slide 20: Dictionary Implementations Compared (NEW)
+  `<span class="timing">67:00 &ndash; 72:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Let's zoom out and compare BSTs to the other dictionary implementations we know."</div>
+  <div class="do-item">Click to reveal each row of the table one at a time.</div>
+  <div class="say">"Unsorted array: fast insert (just append), but slow everything else. Sorted array: fast search via binary search, but slow insert because of shifting. Hash table: O(1) average for everything&mdash;but no sorted output!"</div>
+  <div class="say">"And here's our BST. O(log n) for search, insert, delete when balanced. And the killer feature: sorted output in O(n) via in-order traversal."</div>
+  <div class="do-item">Click to reveal the comparison boxes at the bottom.</div>
+  <div class="say">"So when do you choose a BST over a hash table? When you need <strong>sorted order</strong>. Range queries, finding the nearest key, iterating in order. Hash tables can't do that. When do you choose a hash table? When you just need fast lookup and don't care about order."</div>
+  <div class="warn-item">
+    <strong>If asked "why not always use hash tables?":</strong><br>
+    &bull; Hash tables don't support range queries (find all keys between 5 and 15)<br>
+    &bull; Hash tables don't support finding predecessor/successor<br>
+    &bull; Hash tables have O(n) worst case (hash collisions), BSTs' worst case is more predictable<br>
+    &bull; Balanced BSTs guarantee O(log n) worst case, not just average case
+  </div>
+  <div class="transition">&darr; Next: exit ticket &darr;</div>`,
+
+  // Slide 21: Exit Ticket (UPDATE)
+  `<span class="timing">72:00 &ndash; 90:00</span>
+  <h3>What to say</h3>
+  <div class="say">"Exit ticket time. 3 minutes, solo. Answer these four questions on the tree shown."</div>
+  <div class="do-item">Display exit ticket. Give exactly 3 minutes. Then do a whole-class review.</div>
+  <div class="answer">
+    <strong>A. Search for 11:</strong> Nodes visited: 8 &rarr; 12 &rarr; 10 &rarr; 11.<br>
+    &bull; 11 &gt; 8 &rarr; right to 12<br>
+    &bull; 11 &lt; 12 &rarr; left to 10<br>
+    &bull; 11 &gt; 10 &rarr; right to 11 &rarr; Found!<br><br>
+    <strong>B. Insert 9:</strong><br>
+    &bull; 9 &gt; 8 &rarr; right to 12<br>
+    &bull; 9 &lt; 12 &rarr; left to 10<br>
+    &bull; 9 &lt; 10 &rarr; left... 10's left child is None &rarr; attach 9 as left child of 10<br><br>
+    <strong>C. Why O(h)?</strong> "We visit one node per level along a single path, so time is proportional to height. Worst case: h = n (a chain from sorted insertions)."<br><br>
+    <strong>D. Delete node 10:</strong> Node 10 has one child (11). This is Case 2. Replace 10 with its child 11. Node 11 becomes the left child of 12.
+  </div>
+  <h3>Review (75:00&ndash;80:00)</h3>
+  <div class="say">"Let's check. Question A: what's the search path for 11? [cold-call] Where does 9 attach? [cold-call] Why is everything O(h)? [cold-call] What case of deletion is question D? [cold-call]"</div>
+  <div class="do-item">Rapid whole-class review. Ask for parts, not full answers. Correct misconceptions immediately.</div>
+  <h3>Wrap-up (80:00&ndash;82:00)</h3>
+  <div class="say">"One-sentence summary: a BST is a binary tree with an ordering invariant that makes dictionary operations efficient when height is small."</div>
+  <div class="do-item">Click to reveal "Next class" preview. Pause for questions.</div>
+  <h3>Questions (82:00&ndash;90:00)</h3>
+  <div class="say">"We have about 8 minutes for questions. What would you like to clarify?"</div>
+  <div class="warn-item">
+    <strong>If asked about balancing:</strong> "That's exactly what we'll cover next! AVL trees and red-black trees are BSTs that automatically rebalance to guarantee O(log n) height."<br><br>
+    <strong>If asked "why not always use a hash table?":</strong> "Hash tables give O(1) average for search/insert, but BSTs maintain sorted order. You can do in-order traversal to get all keys sorted, and you can do range queries. Hash tables can't do that efficiently."<br><br>
+    <strong>If asked about duplicate keys:</strong> "Our convention puts duplicates to the right (&ge;). Some implementations don't allow duplicates at all, or store a count. It's a design decision."
+  </div>
+  <h3>CUTS IF BEHIND SCHEDULE</h3>
+  <div class="warn-item">
+    &bull; If &lt;72:00 and not done with dictionary comparison: SKIP slide 21, go straight to exit ticket.<br>
+    &bull; If &lt;80:00 and exit ticket not started: do exit ticket only (no review), then give a 30-second summary.<br>
+    &bull; Deletion pair practice (slide 19) can be shortened to a quick demo if behind.
+  </div>`
+];
+
+// ==================== SLIDE ENGINE ====================
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+
+function getRevealSteps(slideEl) {
+  return slideEl.querySelectorAll('.reveal-step');
+}
+
+function revealedCount(slideEl) {
+  return slideEl.querySelectorAll('.reveal-step.revealed').length;
+}
+
+function showSlide(n, revealAll) {
+  if (n < 0 || n >= slides.length) return;
+  slides[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+
+  // Handle reveals
+  const steps = getRevealSteps(slides[current]);
+  if (revealAll) {
+    steps.forEach(s => {
+      s.classList.add('revealed');
+      handleRevealAction(s, true);
+    });
+  } else {
+    // Reset vocab highlights when entering fresh
+    slides[current].querySelectorAll('.vocab-hl').forEach(g => {
+      g.style.opacity = g.getAttribute('data-vocab') === 'edge' ? '0.2' : '0';
+    });
+    // Reset search step animations when entering fresh
+    slides[current].querySelectorAll('.search-step').forEach(g => {
+      g.style.opacity = '0';
+    });
+    ['search-n8','search-n3','search-n6','search-n7'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) { el.setAttribute('class', 'node-circle'); el.removeAttribute('style'); }
+    });
+    var n7t = document.getElementById('search-n7-text');
+    if (n7t) n7t.removeAttribute('fill');
+    // Reset not-found search animations
+    slides[current].querySelectorAll('.nf-step').forEach(g => {
+      g.style.opacity = '0';
+    });
+    ['nf-n8','nf-n12'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) el.setAttribute('class', 'node-circle');
+    });
+    // Reset deletion animations (slide 18)
+    // Case 1
+    var d1n = document.getElementById('del1-node');
+    var d1t = document.getElementById('del1-text');
+    var d1e = document.getElementById('del1-edge');
+    var d1x = document.getElementById('del1-x');
+    var d1r = document.getElementById('del1-result');
+    if (d1n) { d1n.setAttribute('class','node-circle'); d1n.style.opacity='1'; }
+    if (d1t) { d1t.removeAttribute('fill'); d1t.style.opacity='1'; }
+    if (d1e) d1e.style.opacity='1';
+    if (d1x) d1x.style.opacity='0';
+    if (d1r) d1r.style.opacity='0';
+    // Case 2
+    var d2n = document.getElementById('del2-node');
+    var d2t = document.getElementById('del2-text');
+    var d2eo = document.getElementById('del2-edge-old');
+    var d2ec = document.getElementById('del2-edge-child');
+    var d2b = document.getElementById('del2-bypass');
+    var d2c = document.getElementById('del2-child');
+    var d2r = document.getElementById('del2-result');
+    if (d2n) { d2n.setAttribute('class','node-circle'); d2n.style.opacity='1'; }
+    if (d2t) { d2t.removeAttribute('fill'); d2t.style.opacity='1'; }
+    if (d2eo) d2eo.style.opacity='1';
+    if (d2ec) d2ec.style.opacity='1';
+    if (d2b) d2b.style.opacity='0';
+    if (d2c) d2c.setAttribute('class','node-circle');
+    if (d2r) d2r.style.opacity='0';
+    // Case 3
+    var d3t = document.getElementById('del3-target');
+    var d3tt = document.getElementById('del3-target-text');
+    var d3s = document.getElementById('del3-succ');
+    var d3st = document.getElementById('del3-succ-text');
+    var d3a = document.getElementById('del3-arrow');
+    var d3e = document.getElementById('del3-edge-succ');
+    var d3r = document.getElementById('del3-result');
+    if (d3t) d3t.setAttribute('class','node-circle');
+    if (d3tt) { d3tt.textContent='8'; d3tt.removeAttribute('fill'); }
+    if (d3s) { d3s.setAttribute('class','node-circle'); d3s.style.opacity='1'; }
+    if (d3st) { d3st.removeAttribute('fill'); d3st.style.opacity='1'; }
+    if (d3a) d3a.style.opacity='0';
+    if (d3e) d3e.style.opacity='1';
+    if (d3r) d3r.style.opacity='0';
+    // Reset slide 19 successor + deletion animations
+    if (document.getElementById('succ-n11')) resetSuccessor();
+    if (document.getElementById('del4-target')) resetDelete4();
+    // Reset in-order traversal animations (slide 17)
+    slides[current].querySelectorAll('.iot-step').forEach(g => {
+      g.style.opacity = '0';
+    });
+    ['iot-n1','iot-n3','iot-n5','iot-n6','iot-n8','iot-n12','iot-n14'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) { el.setAttribute('class', 'node-circle'); el.removeAttribute('style'); }
+    });
+    // Reset insertion algorithm animations (slide 12)
+    slides[current].querySelectorAll('.ins-step').forEach(g => {
+      g.style.opacity = '0';
+    });
+    ['ins-n8','ins-n3','ins-n6'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) el.setAttribute('class', 'node-circle');
+    });
+    var n5 = document.getElementById('ins-n5');
+    var n5t = document.getElementById('ins-n5-text');
+    if (n5) { n5.style.opacity = '0'; n5.setAttribute('class', 'node-circle'); }
+    if (n5t) { n5t.style.opacity = '0'; n5t.removeAttribute('fill'); }
+    // Reset pair practice insert animations (slide 13)
+    slides[current].querySelectorAll('.ins2-step').forEach(g => {
+      g.style.opacity = '0';
+    });
+    ['ins2-n8','ins2-n3','ins2-n12','ins2-n10','ins2-n1'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) el.setAttribute('class', 'node-circle');
+    });
+    var g9 = document.getElementById('ins2-new9');
+    var g2 = document.getElementById('ins2-new2');
+    if (g9) g9.style.opacity = '0';
+    if (g2) g2.style.opacity = '0';
+    // Reset pair practice search animations
+    slides[current].querySelectorAll('.pp-step').forEach(g => {
+      g.style.opacity = '0';
+    });
+    ['pp-n8','pp-n12','pp-n15','pp-n13'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) { el.setAttribute('class', 'node-circle'); el.removeAttribute('style'); }
+    });
+    var pp13t = document.getElementById('pp-n13-text');
+    if (pp13t) pp13t.removeAttribute('fill');
+  }
+
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById('progress').style.width =
+    ((current / (slides.length - 1)) * 100) + '%';
+  document.getElementById('slideCounter').textContent =
+    (current + 1) + ' / ' + slides.length;
+  document.getElementById('notesContent').innerHTML = notesData[current] || '';
+  goToSlideSkip = true;
+  document.getElementById('goToSlide').value = current;
+  goToSlideSkip = false;
+  // Scroll notes to top
+  document.getElementById('notesPanel').scrollTop = 0;
+}
+
+var goToSlideSkip = false;
+function goToSlide(n) {
+  if (goToSlideSkip) return;
+  showSlide(parseInt(n), true);
+}
+
+function handleRevealAction(el, show) {
+  const action = el.getAttribute('data-reveal-action');
+  if (action === 'highlight-node11') {
+    const normal = document.getElementById('node11-normal');
+    const textNormal = document.getElementById('node11-text-normal');
+    const bad = document.getElementById('node11-bad');
+    const textBad = document.getElementById('node11-text-bad');
+    if (show) {
+      normal.style.display = 'none';
+      textNormal.style.display = 'none';
+      bad.style.display = '';
+      textBad.style.display = '';
+    } else {
+      normal.style.display = '';
+      textNormal.style.display = '';
+      bad.style.display = 'none';
+      textBad.style.display = 'none';
+    }
+  }
+  // Vocab diagram highlighting
+  const vocab = el.getAttribute('data-vocab-trigger');
+  if (vocab) {
+    document.querySelectorAll('.vocab-hl[data-vocab="' + vocab + '"]').forEach(g => {
+      g.style.opacity = show ? '1' : (vocab === 'edge' ? '0.2' : '0');
+    });
+  }
+  // Search step animation
+  if (action && action.startsWith('search-step-')) {
+    const step = action.split('-')[2];
+    const nodeMap = { '1': 'search-n8', '2': 'search-n3', '3': 'search-n6', '4': 'search-n7' };
+    const svgGroup = document.querySelector('.search-step[data-search-step="' + step + '"]');
+    const nodeEl = document.getElementById(nodeMap[step]);
+    if (svgGroup) svgGroup.style.opacity = show ? '1' : '0';
+    if (nodeEl) {
+      if (show) {
+        if (step === '4') {
+          nodeEl.setAttribute('style', 'fill:#D5F5E3; stroke:var(--green); stroke-width:3;');
+          var txt = document.getElementById('search-n7-text');
+          if (txt) txt.setAttribute('fill', 'var(--green)');
+        } else {
+          nodeEl.setAttribute('class', 'highlight-node');
+        }
+      } else {
+        nodeEl.setAttribute('class', 'node-circle');
+        nodeEl.removeAttribute('style');
+        if (step === '4') {
+          var txt = document.getElementById('search-n7-text');
+          if (txt) txt.removeAttribute('fill');
+        }
+      }
+    }
+  }
+  // In-order traversal step animation (slide 17)
+  if (action && action.startsWith('iot-step-')) {
+    const step = action.split('-')[2];
+    const nodeMap = { '1': 'iot-n1', '2': 'iot-n3', '3': 'iot-n5', '4': 'iot-n6', '5': 'iot-n8', '6': 'iot-n12', '7': 'iot-n14' };
+    const svgGroup = document.querySelector('.iot-step[data-iot-step="' + step + '"]');
+    const nodeEl = nodeMap[step] ? document.getElementById(nodeMap[step]) : null;
+    if (svgGroup) svgGroup.style.opacity = show ? '1' : '0';
+    if (nodeEl) {
+      if (show) {
+        nodeEl.setAttribute('style', 'fill:#D5F5E3; stroke:var(--green); stroke-width:3;');
+      } else {
+        nodeEl.setAttribute('class', 'node-circle');
+        nodeEl.removeAttribute('style');
+      }
+    }
+  }
+  // Insertion algorithm step animation (slide 12)
+  if (action && action.startsWith('ins-step-')) {
+    const step = action.split('-')[2];
+    const nodeMap = { '1': 'ins-n8', '2': 'ins-n3', '3': 'ins-n6' };
+    const svgGroup = document.querySelector('.ins-step[data-ins-step="' + step + '"]');
+    const nodeEl = nodeMap[step] ? document.getElementById(nodeMap[step]) : null;
+    if (svgGroup) svgGroup.style.opacity = show ? '1' : '0';
+    if (nodeEl) {
+      nodeEl.setAttribute('class', show ? 'highlight-node' : 'node-circle');
+    }
+    if (step === '4') {
+      var n5 = document.getElementById('ins-n5');
+      var n5t = document.getElementById('ins-n5-text');
+      if (n5) { n5.style.opacity = show ? '1' : '0'; n5.setAttribute('class', show ? 'new-node' : 'node-circle'); }
+      if (n5t) { n5t.style.opacity = show ? '1' : '0'; if (show) n5t.setAttribute('fill','var(--green)'); else n5t.removeAttribute('fill'); }
+    }
+  }
+  // Pair practice insert step animation (slide 13)
+  if (action && action.startsWith('ins2-step-')) {
+    const step = action.split('-')[2];
+    // Node highlights: steps 2-4 for insert 9, steps 7-9 for insert 2
+    const nodeMap = { '2': 'ins2-n8', '3': 'ins2-n12', '4': 'ins2-n10', '7': 'ins2-n8', '8': 'ins2-n3', '9': 'ins2-n1' };
+    const svgGroup = document.querySelector('.ins2-step[data-ins2-step="' + step + '"]');
+    const nodeEl = nodeMap[step] ? document.getElementById(nodeMap[step]) : null;
+    if (svgGroup) svgGroup.style.opacity = show ? '1' : '0';
+    if (nodeEl) {
+      nodeEl.setAttribute('class', show ? 'highlight-node' : 'node-circle');
+    }
+    // Show new node 9
+    if (step === '5') {
+      var g = document.getElementById('ins2-new9');
+      if (g) g.style.opacity = show ? '1' : '0';
+    }
+    // Show new node 2
+    if (step === '10') {
+      var g = document.getElementById('ins2-new2');
+      if (g) g.style.opacity = show ? '1' : '0';
+    }
+    // Reset insert-9 path highlights when starting insert-2 (step 6 = header)
+    if (step === '6' && show) {
+      ['ins2-n8','ins2-n12','ins2-n10'].forEach(id => {
+        var el = document.getElementById(id);
+        if (el) el.setAttribute('class', 'node-circle');
+      });
+    }
+  }
+  // Pair practice search step animation
+  if (action && action.startsWith('pp-step-')) {
+    const step = action.split('-')[2];
+    const nodeMap = { '1': 'pp-n8', '2': 'pp-n12', '3': 'pp-n15', '4': 'pp-n13' };
+    const svgGroup = document.querySelector('.pp-step[data-pp-step="' + step + '"]');
+    const nodeEl = nodeMap[step] ? document.getElementById(nodeMap[step]) : null;
+    if (svgGroup) svgGroup.style.opacity = show ? '1' : '0';
+    if (nodeEl) {
+      if (show) {
+        if (step === '4') {
+          nodeEl.setAttribute('style', 'fill:#D5F5E3; stroke:var(--green); stroke-width:3;');
+          var txt = document.getElementById('pp-n13-text');
+          if (txt) txt.setAttribute('fill', 'var(--green)');
+        } else {
+          nodeEl.setAttribute('class', 'highlight-node');
+        }
+      } else {
+        nodeEl.setAttribute('class', 'node-circle');
+        nodeEl.removeAttribute('style');
+        if (step === '4') {
+          var txt = document.getElementById('pp-n13-text');
+          if (txt) txt.removeAttribute('fill');
+        }
+      }
+    }
+  }
+  // Not-found search step animation
+  if (action && action.startsWith('nf-step-')) {
+    const step = action.split('-')[2];
+    const nodeMap = { '1': 'nf-n8', '2': 'nf-n12' };
+    const svgGroup = document.querySelector('.nf-step[data-nf-step="' + step + '"]');
+    const nodeEl = nodeMap[step] ? document.getElementById(nodeMap[step]) : null;
+    if (svgGroup) svgGroup.style.opacity = show ? '1' : '0';
+    if (nodeEl) {
+      if (show) {
+        nodeEl.setAttribute('class', 'highlight-node');
+      } else {
+        nodeEl.setAttribute('class', 'node-circle');
+      }
+    }
+  }
+}
+
+function nextAction() {
+  const steps = getRevealSteps(slides[current]);
+  const unrevealed = Array.from(steps).filter(s => !s.classList.contains('revealed'));
+  if (unrevealed.length > 0) {
+    unrevealed[0].classList.add('revealed');
+    handleRevealAction(unrevealed[0], true);
+  } else if (current < slides.length - 1) {
+    // Reset next slide reveals
+    const nextSlide = slides[current + 1];
+    getRevealSteps(nextSlide).forEach(s => {
+      s.classList.remove('revealed');
+      handleRevealAction(s, false);
+    });
+    showSlide(current + 1, false);
+  }
+}
+
+function prevAction() {
+  const steps = getRevealSteps(slides[current]);
+  const revealed = Array.from(steps).filter(s => s.classList.contains('revealed'));
+  if (revealed.length > 0) {
+    const last = revealed[revealed.length - 1];
+    last.classList.remove('revealed');
+    handleRevealAction(last, false);
+  } else if (current > 0) {
+    showSlide(current - 1, true);
+  }
+}
+
+// ==================== TIMER ====================
+let timerRunning = false;
+let timerStart = 0;
+let timerInterval = null;
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerBtn').textContent = 'Resume';
+  } else {
+    if (!timerStart) timerStart = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+    timerRunning = true;
+    document.getElementById('timerBtn').textContent = 'Pause';
+  }
+}
+
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  const display = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = display;
+  // Color warnings
+  if (elapsed >= 5100) { el.style.background = 'var(--red)'; } // 85 min
+  else if (elapsed >= 4800) { el.style.background = 'var(--orange)'; } // 80 min
+  else { el.style.background = 'var(--accent)'; }
+}
+
+// ==================== NOTES TOGGLE ====================
+function toggleNotes() {
+  document.getElementById('notesPanel').classList.toggle('hidden');
+}
+
+// ==================== KEYBOARD ====================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'n' || e.key === 'N') { e.preventDefault(); toggleNotes(); return; }
+  if (e.key === 't' || e.key === 'T') { e.preventDefault(); toggleTimer(); return; }
+  if (e.key === 'f' || e.key === 'F') {
+    e.preventDefault();
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+    return;
+  }
+  if (e.key === 'g' || e.key === 'G') {
+    e.preventDefault(); document.getElementById('goToSlide').focus(); return;
+  }
+  // Number keys: 1-9 jump to slides 1-9, 0 jumps to slide 10
+  if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+    const num = parseInt(e.key);
+    if (!isNaN(num)) {
+      e.preventDefault();
+      const target = num === 0 ? 9 : num - 1; // 1->slide0, 0->slide9
+      if (target < slides.length) goToSlide(target);
+      return;
+    }
+  }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+    e.preventDefault(); nextAction();
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault(); prevAction();
+  }
+  if (e.key === 'Home') { e.preventDefault(); showSlide(0, false); }
+  if (e.key === 'End') { e.preventDefault(); showSlide(slides.length - 1, true); }
+});
+
+// Click navigation on slide area only
+document.getElementById('slideArea').addEventListener('click', (e) => {
+  if (e.target.closest('button') || e.target.closest('select')) return;
+  if (e.clientX > document.getElementById('slideArea').offsetWidth / 2) nextAction();
+  else prevAction();
+});
+
+// Touch
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', (e) => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) nextAction(); else prevAction();
+  }
+});
+
+// ==================== DELETION ANIMATIONS ====================
+function animateDelete1() {
+  // Case 1: Leaf — highlight node, X it, fade out
+  var node = document.getElementById('del1-node');
+  var text = document.getElementById('del1-text');
+  var edge = document.getElementById('del1-edge');
+  var x = document.getElementById('del1-x');
+  var result = document.getElementById('del1-result');
+  // Step 1: highlight red
+  node.setAttribute('class', 'bad-node');
+  text.setAttribute('fill', 'var(--red)');
+  setTimeout(function() {
+    // Step 2: show X
+    x.style.opacity = '1';
+  }, 600);
+  setTimeout(function() {
+    // Step 3: fade out node + edge
+    node.style.opacity = '0';
+    text.style.opacity = '0';
+    edge.style.opacity = '0';
+    x.style.opacity = '0';
+  }, 1200);
+  setTimeout(function() {
+    // Step 4: show result
+    result.style.opacity = '1';
+  }, 1700);
+}
+
+function animateDelete2() {
+  // Case 2: One child — highlight, show bypass, fade out, move child up
+  var node = document.getElementById('del2-node');
+  var text = document.getElementById('del2-text');
+  var edgeOld = document.getElementById('del2-edge-old');
+  var edgeChild = document.getElementById('del2-edge-child');
+  var bypass = document.getElementById('del2-bypass');
+  var child = document.getElementById('del2-child');
+  var result = document.getElementById('del2-result');
+  // Step 1: highlight target red
+  node.setAttribute('class', 'bad-node');
+  text.setAttribute('fill', 'var(--red)');
+  setTimeout(function() {
+    // Step 2: show bypass arrow
+    bypass.style.opacity = '1';
+  }, 600);
+  setTimeout(function() {
+    // Step 3: fade out the deleted node
+    node.style.opacity = '0';
+    text.style.opacity = '0';
+    edgeOld.style.opacity = '0';
+    edgeChild.style.opacity = '0';
+  }, 1200);
+  setTimeout(function() {
+    // Step 4: highlight child green
+    child.setAttribute('class', 'new-node');
+    result.style.opacity = '1';
+  }, 1700);
+}
+
+function animateDelete3() {
+  // Case 3: Two children — find successor, copy up, remove old
+  var target = document.getElementById('del3-target');
+  var targetText = document.getElementById('del3-target-text');
+  var succ = document.getElementById('del3-succ');
+  var succText = document.getElementById('del3-succ-text');
+  var arrow = document.getElementById('del3-arrow');
+  var edgeSucc = document.getElementById('del3-edge-succ');
+  var result = document.getElementById('del3-result');
+  // Step 1: highlight target red
+  target.setAttribute('class', 'bad-node');
+  targetText.setAttribute('fill', 'var(--red)');
+  setTimeout(function() {
+    // Step 2: highlight successor green
+    succ.setAttribute('class', 'new-node');
+    succText.setAttribute('fill', 'var(--green)');
+    arrow.style.opacity = '1';
+  }, 700);
+  setTimeout(function() {
+    // Step 3: copy successor value up
+    target.setAttribute('class', 'new-node');
+    targetText.textContent = '9';
+    targetText.setAttribute('fill', 'var(--green)');
+  }, 1400);
+  setTimeout(function() {
+    // Step 4: remove old successor
+    succ.style.opacity = '0';
+    succText.style.opacity = '0';
+    edgeSucc.style.opacity = '0';
+    arrow.style.opacity = '0';
+    result.style.opacity = '1';
+  }, 2100);
+}
+
+function resetDelete1() {
+  var n = document.getElementById('del1-node');
+  var t = document.getElementById('del1-text');
+  var e = document.getElementById('del1-edge');
+  var x = document.getElementById('del1-x');
+  var r = document.getElementById('del1-result');
+  if (n) { n.setAttribute('class','node-circle'); n.style.opacity='1'; }
+  if (t) { t.removeAttribute('fill'); t.style.opacity='1'; }
+  if (e) e.style.opacity='1';
+  if (x) x.style.opacity='0';
+  if (r) r.style.opacity='0';
+}
+
+function resetDelete2() {
+  var n = document.getElementById('del2-node');
+  var t = document.getElementById('del2-text');
+  var eo = document.getElementById('del2-edge-old');
+  var ec = document.getElementById('del2-edge-child');
+  var b = document.getElementById('del2-bypass');
+  var c = document.getElementById('del2-child');
+  var r = document.getElementById('del2-result');
+  if (n) { n.setAttribute('class','node-circle'); n.style.opacity='1'; }
+  if (t) { t.removeAttribute('fill'); t.style.opacity='1'; }
+  if (eo) eo.style.opacity='1';
+  if (ec) ec.style.opacity='1';
+  if (b) b.style.opacity='0';
+  if (c) c.setAttribute('class','node-circle');
+  if (r) r.style.opacity='0';
+}
+
+function animateSuccessor() {
+  // Animate finding the in-order successor on the FULL tree
+  var n8 = document.getElementById('succ-n8');
+  var n11 = document.getElementById('succ-n11');
+  var n9 = document.getElementById('succ-n9x');
+  var p1 = document.getElementById('succ-path1');
+  var p2 = document.getElementById('succ-path2');
+  var p3 = document.getElementById('succ-path3');
+  var found = document.getElementById('succ-found');
+  // Step 1: highlight 8 red (the node to delete)
+  if (n8) { n8.setAttribute('class', 'bad-node'); }
+  if (p1) p1.style.opacity = '1';
+  setTimeout(function() {
+    // Step 2: go right to 11
+    if (n11) n11.setAttribute('class', 'highlight-node');
+    if (p2) p2.style.opacity = '1';
+  }, 700);
+  setTimeout(function() {
+    // Step 3: go left to 9
+    if (n9) n9.setAttribute('class', 'highlight-node');
+    if (p3) p3.style.opacity = '1';
+  }, 1400);
+  setTimeout(function() {
+    // Step 4: 9 has no left child — found!
+    if (n9) n9.setAttribute('style', 'fill:#D5F5E3; stroke:var(--green); stroke-width:3;');
+    if (found) found.style.opacity = '1';
+  }, 2100);
+}
+
+function resetSuccessor() {
+  var n8 = document.getElementById('succ-n8');
+  var n11 = document.getElementById('succ-n11');
+  var n9 = document.getElementById('succ-n9x');
+  var p1 = document.getElementById('succ-path1');
+  var p2 = document.getElementById('succ-path2');
+  var p3 = document.getElementById('succ-path3');
+  var found = document.getElementById('succ-found');
+  if (n8) n8.setAttribute('class', 'node-circle');
+  if (n11) n11.setAttribute('class', 'node-circle');
+  if (n9) { n9.setAttribute('class', 'node-circle'); n9.removeAttribute('style'); }
+  if (p1) p1.style.opacity = '0';
+  if (p2) p2.style.opacity = '0';
+  if (p3) p3.style.opacity = '0';
+  if (found) found.style.opacity = '0';
+}
+
+function animateDelete4() {
+  // Slide 19: Delete 8 (two children) — full animated walkthrough
+  var target = document.getElementById('del4-target');
+  var targetText = document.getElementById('del4-target-text');
+  var succ = document.getElementById('del4-succ');
+  var succText = document.getElementById('del4-succ-text');
+  var arrow = document.getElementById('del4-arrow');
+  var edgeSucc = document.getElementById('del4-edge-succ');
+  var step1 = document.getElementById('del4-step1');
+  var step2 = document.getElementById('del4-step2');
+  var result = document.getElementById('del4-result');
+  // Step 1: highlight target red, show DELETE label
+  target.setAttribute('class', 'bad-node');
+  targetText.setAttribute('fill', 'var(--red)');
+  step1.style.opacity = '1';
+  setTimeout(function() {
+    // Step 2: find successor — highlight green, show label
+    succ.setAttribute('class', 'new-node');
+    succText.setAttribute('fill', 'var(--green)');
+    step2.style.opacity = '1';
+  }, 800);
+  setTimeout(function() {
+    // Step 3: show arrow from successor to target
+    arrow.style.opacity = '1';
+  }, 1500);
+  setTimeout(function() {
+    // Step 4: copy successor value up to target
+    target.setAttribute('class', 'new-node');
+    targetText.textContent = '9';
+    targetText.setAttribute('fill', 'var(--green)');
+    step1.style.opacity = '0';
+  }, 2200);
+  setTimeout(function() {
+    // Step 5: remove old successor
+    succ.style.opacity = '0';
+    succText.style.opacity = '0';
+    edgeSucc.style.opacity = '0';
+    arrow.style.opacity = '0';
+    step2.style.opacity = '0';
+  }, 2900);
+  setTimeout(function() {
+    // Step 6: show result
+    result.style.opacity = '1';
+  }, 3400);
+}
+
+function resetDelete4() {
+  var target = document.getElementById('del4-target');
+  var targetText = document.getElementById('del4-target-text');
+  var succ = document.getElementById('del4-succ');
+  var succText = document.getElementById('del4-succ-text');
+  var arrow = document.getElementById('del4-arrow');
+  var edgeSucc = document.getElementById('del4-edge-succ');
+  var step1 = document.getElementById('del4-step1');
+  var step2 = document.getElementById('del4-step2');
+  var result = document.getElementById('del4-result');
+  if (target) target.setAttribute('class', 'node-circle');
+  if (targetText) { targetText.textContent = '8'; targetText.removeAttribute('fill'); }
+  if (succ) { succ.setAttribute('class', 'node-circle'); succ.style.opacity = '1'; }
+  if (succText) { succText.removeAttribute('fill'); succText.style.opacity = '1'; }
+  if (arrow) arrow.style.opacity = '0';
+  if (edgeSucc) edgeSucc.style.opacity = '1';
+  if (step1) step1.style.opacity = '0';
+  if (step2) step2.style.opacity = '0';
+  if (result) result.style.opacity = '0';
+}
+
+function resetDelete3() {
+  var t = document.getElementById('del3-target');
+  var tt = document.getElementById('del3-target-text');
+  var s = document.getElementById('del3-succ');
+  var st = document.getElementById('del3-succ-text');
+  var a = document.getElementById('del3-arrow');
+  var e = document.getElementById('del3-edge-succ');
+  var r = document.getElementById('del3-result');
+  if (t) t.setAttribute('class','node-circle');
+  if (tt) { tt.textContent='8'; tt.removeAttribute('fill'); }
+  if (s) { s.setAttribute('class','node-circle'); s.style.opacity='1'; }
+  if (st) { st.removeAttribute('fill'); st.style.opacity='1'; }
+  if (a) a.style.opacity='0';
+  if (e) e.style.opacity='1';
+  if (r) r.style.opacity='0';
+}
+
+// Initialize
+updateUI();
+</script>
+
+</body>
+</html>
