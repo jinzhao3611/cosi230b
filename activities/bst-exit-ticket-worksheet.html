@@ -140,5 +140,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script src="classroom-submit.js"></script>
+    <script>
+      // Default session code for this exit ticket
+      setTimeout(function() {
+        var input = document.getElementById('sessionCodeInput');
+        if (input && !input.value) input.value = 'K9EEJ6';
+      }, 500);
+    </script>
 </body>
 </html>
