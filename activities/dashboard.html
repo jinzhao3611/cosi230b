@@ -624,7 +624,8 @@
             'relation-extraction': { name: 'Relation Extraction', file: 'relation-extraction-worksheet.html' },
             'argumentation': { name: 'Argumentation Mining', file: 'argumentation-worksheet.html' },
             'text-simplification': { name: 'Text Simplification', file: 'text-simplification-worksheet.html' },
-            'bias-detection': { name: 'Bias Detection', file: 'bias-detection-worksheet.html' }
+            'bias-detection': { name: 'Bias Detection', file: 'bias-detection-worksheet.html' },
+            'bst-exit-ticket': { name: 'BST Exit Ticket (CS35)', file: 'bst-exit-ticket-worksheet.html' }
         };
 
         const chartColors = [
@@ -1277,6 +1278,32 @@
                         all: 'All of the above'
                     }
                 }
+                };
+            }
+
+            if (worksheetId === 'bst-exit-ticket') {
+                return {
+                    order: ['q1', 'q2', 'q3', 'q4', 'q5'],
+                    titles: {
+                        q1: 'Q1: Search Trace',
+                        q2: 'Q2: Insertion',
+                        q3: 'Q3: Runtime',
+                        q4: 'Q4: Deletion',
+                        q5: 'Q5: Reflection'
+                    },
+                    subtitles: {
+                        q1: 'Which nodes are visited when searching for 11?',
+                        q2: 'Where does key 9 attach?',
+                        q3: 'Why is runtime O(h)?',
+                        q4: 'Deleting a node with two children',
+                        q5: 'What is the BST invariant?'
+                    },
+                    optionLabels: {
+                        q1: { A: '8→3→6→11', B: '8→12→10→11', C: '8→12→15→11', D: '8→12→11' },
+                        q2: { A: 'Left of 10', B: 'Right of 10', C: 'Left of 11', D: 'Right of 6' },
+                        q3: { A: 'Visit every node', B: 'One node per level on a single path', C: 'Always log(n) nodes', D: 'Compare each with every other' },
+                        q4: { A: 'Remove and reconnect children', B: 'Replace with left child', C: 'Find successor, copy up, delete successor', D: 'Delete subtree and rebuild' }
+                    }
                 };
             }
 
